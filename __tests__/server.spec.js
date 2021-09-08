@@ -1,16 +1,18 @@
-jest.useFakeTimers();
-
 const supertest = require('supertest');
-// const User = require('../models/user');
 const mongoose = require('mongoose');
-// const faker = require('faker');
 const createServer = require('../server');
+// jest.useFakeTimers();
+
+// const User = require('../models/user');
+// const faker = require('faker');
+const app = createServer();
 
 const DATABASE_NAME = 'scrimsTestDatabase';
 
 beforeAll(async () => {
   let MONGODB_URI = 'mongodb://127.0.0.1:27017/scrimsTestDatabase';
 
+  //  Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
   await mongoose.connect(MONGODB_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
@@ -30,18 +32,12 @@ beforeAll(async () => {
   // console.log('Created users!', createdUsers);
 });
 
-const app = createServer();
-
 describe('GET /', () => {
   it('is the home page and returns the name and instructions on how to use the api', async (done) => {
-    await supertest(app)
-      .get('/')
-      .expect(200)
-      .then((response) => {
-        expect(response.text).toBe(
-          '<h1>LOL BOOTCAMP SCRIMS FINDER</h1> <h2>How to use: go to /api/scrims to find all scrims.</h2>'
-        );
-      });
+    const res = await supertest(app).get('/');
+    expect(res.text).toBe(
+      '<h1>LOL BOOTCAMP SCRIMS FINDER</h1> <h2>How to use: go to /api/scrims to find all scrims.</h2>'
+    );
 
     done();
   });
@@ -49,6 +45,7 @@ describe('GET /', () => {
 
 // fix: Jest has detected the following 1 open handle potentially keeping Jest from exiting mongoose connection
 afterAll(async () => {
-  await mongoose.connection.db.dropDatabase();
+  await mongoose.connection.db.dropDatabase(); // TypeError: Cannot read property 'dropDatabase' of undefined
   await mongoose.connection.close();
+  return;
 });
