@@ -1,35 +1,34 @@
-const createServer = require('../server');
-const supertest = require('supertest');
-const User = require('../models/user');
-const mongoose = require('mongoose');
-const faker = require('faker');
+jest.useFakeTimers();
 
-const app = createServer();
+const supertest = require('supertest');
+// const User = require('../models/user');
+const mongoose = require('mongoose');
+// const faker = require('faker');
+const app = require('../app');
+
+const DATABASE_NAME = 'scrimsTestDatabase';
 
 beforeAll(async () => {
-  let MONGODB_URI =
-    process.env.PROD_MONGODB || 'mongodb://127.0.0.1:27017/scrimsdatabase';
+  let MONGODB_URI = 'mongodb://127.0.0.1:27017/scrimsTestDatabase';
 
   await mongoose.connect(MONGODB_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
 
-  const users = [...Array(25)].map((user, idx) => ({
-    name: faker.name.firstName(),
-    discord: faker.name.firstName() + `#123${idx}`,
-    email: faker.internet.email(),
-    uid: `13918310120${idx}`,
-    adminKey: '',
-    region: 'NA',
-    rank: 'Silver 2',
-  }));
+  // const users = [...Array(25)].map((user, idx) => ({
+  //   name: faker.name.firstName(),
+  //   discord: faker.name.firstName() + `#123${idx}`,
+  //   email: faker.internet.email(),
+  //   uid: `13918310120${idx}`,
+  //   adminKey: '',
+  //   region: 'NA',
+  //   rank: 'Silver 2',
+  // }));
 
-  const createdUsers = await User.insertMany(users);
-  console.log('Created users!', createdUsers);
+  // const createdUsers = await User.insertMany(users);
+  // console.log('Created users!', createdUsers);
 });
-
-let user;
 
 describe('GET /', () => {
   it('is the home page and returns the name and instructions on how to use the api', async (done) => {
@@ -44,4 +43,10 @@ describe('GET /', () => {
 
     done();
   });
+});
+
+// fix: Jest has detected the following 1 open handle potentially keeping Jest from exiting mongoose connection
+afterAll(async () => {
+  await mongoose.connection.db.dropDatabase();
+  await mongoose.connection.close();
 });
