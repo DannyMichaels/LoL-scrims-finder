@@ -2,7 +2,13 @@ import Enzyme from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-import firebase from 'firebase';
+import * as firebase from 'firebase/app';
+import 'firebase/auth'; // for authentication
+import 'firebase/storage'; // for storage
+import 'firebase/database'; // for realtime database
+import 'firebase/firestore'; // for cloud firestore
+import 'firebase/messaging'; // for cloud messaging
+import 'firebase/functions'; // for cloud functions
 
 import Intro from './../screens/Intro';
 import IntroForms from './../components/IntroForms';
@@ -12,7 +18,7 @@ Enzyme.configure({ adapter: new Adapter() });
 //  having an issue mocking firebase
 jest.mock('firebase', () => {
   const auth = jest.fn();
-  const mAuth = { signInWithRedirect: jest.fn() };
+  const mAuth = { signInWithPopup: jest.fn() };
   // @ts-ignore
   auth.GoogleAuthProvider = jest.fn();
   // @ts-ignore
