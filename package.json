@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --detectOpenHandles",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -27,6 +27,7 @@
     "yarn": "^1.22.11"
   },
   "devDependencies": {
+    "jest": "^27.0.6",
     "nodemon": "^2.0.12",
     "supertest": "^6.1.6"
   }
