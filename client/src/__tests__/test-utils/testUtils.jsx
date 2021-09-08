@@ -10,11 +10,13 @@ const history = createMemoryHistory();
 function render(ui, { preloadedState, ...renderOptions } = {}) {
   function Wrapper({ children }) {
     return (
-      <ScrimsProvider>
-        <Router history={history}>
-          <Route>{children}</Route>
-        </Router>
-      </ScrimsProvider>
+      <CurrentUserProvider>
+        <ScrimsProvider>
+          <Router history={history}>
+            <Route>{children}</Route>
+          </Router>
+        </ScrimsProvider>
+      </CurrentUserProvider>
     );
   }
   return rtlRender(ui, { wrapper: Wrapper, ...renderOptions });
