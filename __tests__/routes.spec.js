@@ -18,7 +18,11 @@ beforeAll(async () => {
     email: faker.internet.email(),
     rank: 'Silver 2',
     region: 'NA',
+    uid: '1414141041' + idx,
   }));
+
+  const createdUsers = await User.insertMany(users);
+  console.log('Created users!', createdUsers.length);
 });
 
 const app = createServer();
