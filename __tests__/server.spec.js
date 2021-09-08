@@ -4,7 +4,7 @@ const supertest = require('supertest');
 // const User = require('../models/user');
 const mongoose = require('mongoose');
 // const faker = require('faker');
-const app = require('../app');
+const createServer = require('../server');
 
 const DATABASE_NAME = 'scrimsTestDatabase';
 
@@ -29,6 +29,8 @@ beforeAll(async () => {
   // const createdUsers = await User.insertMany(users);
   // console.log('Created users!', createdUsers);
 });
+
+const app = createServer();
 
 describe('GET /', () => {
   it('is the home page and returns the name and instructions on how to use the api', async (done) => {
