@@ -1,18 +1,15 @@
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const createServer = require('../server');
-// jest.useFakeTimers();
-
+const DATABASE_NAME = 'scrimsTestDatabase';
+jest.useFakeTimers();
 // const User = require('../models/user');
 // const faker = require('faker');
+
 const app = createServer();
 
-const DATABASE_NAME = 'scrimsTestDatabase';
-
 beforeAll(async () => {
-  let MONGODB_URI = 'mongodb://127.0.0.1:27017/scrimsTestDatabase';
-
-  //  Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+  const MONGODB_URI = `mongodb://127.0.0.1/${DATABASE_NAME}`;
   await mongoose.connect(MONGODB_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,

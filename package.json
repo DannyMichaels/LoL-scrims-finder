@@ -4,9 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles",
+    "test": "jest __tests__ --detectOpenHandles --forceExit --testTimeout=10000 ",
     "start": "node index.js",
     "dev": "nodemon index.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DannyMichaels/LoL-scrims-finder"
   },
   "keywords": [],
   "author": "",
@@ -27,11 +34,8 @@
     "yarn": "^1.22.11"
   },
   "devDependencies": {
-    "jest": "^27.0.6",
+    "jest": "^25.1.0",
     "nodemon": "^2.0.12",
-    "supertest": "^6.1.6"
-  },
-  "jest": {
-    "testEnvironment": "node"
+    "supertest": "^4.0.2"
   }
 }
