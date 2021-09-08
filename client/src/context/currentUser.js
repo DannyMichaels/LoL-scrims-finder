@@ -106,7 +106,6 @@ function CurrentUserProvider({ children }) {
 
   return (
     <CurrentUserContext.Provider value={value}>
-      {/* don't render children if loading */}
       {children}
     </CurrentUserContext.Provider>
   );
