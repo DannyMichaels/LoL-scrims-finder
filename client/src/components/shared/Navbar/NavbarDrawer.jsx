@@ -75,11 +75,11 @@ export default function NavbarDrawer({
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
-  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+  const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
 
   const drawerAnchor = useMemo(
-    () => (matchesMd ? 'top' : 'right'),
-    [matchesMd]
+    () => (matchesLg ? 'top' : 'right'),
+    [matchesLg]
   );
 
   console.dir({ theme });

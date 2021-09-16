@@ -1,5 +1,6 @@
 import { useAuth } from './../context/currentUser';
 import { useState, useEffect, Fragment, useMemo } from 'react';
+import { useScrims } from './../context/scrimsContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 
@@ -21,7 +22,7 @@ import { compareDateWithCurrentTime } from './../utils/compareDateWithCurrentTim
 
 // icons
 import HelpIcon from '@mui/icons-material/Help';
-import { useScrims } from './../context/scrimsContext';
+import MenuIcon from '@mui/icons-material/Menu';
 
 // compare scrim start time with now.
 const compareDates = (scrim) => {
@@ -69,7 +70,7 @@ export default function Scrims() {
   const [hideUpcomingScrims, setHideUpcomingScrims] = useState(false);
 
   const theme = useTheme();
-  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+  const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
 
   const dateFilteredScrims = useMemo(
     () =>
@@ -265,9 +266,19 @@ export default function Scrims() {
               <Box marginRight={2} />
               <Box style={{ cursor: 'help' }}>
                 <Tooltip
-                  title={`use the Region dropdown in the ${
-                    matchesMd ? '"More Options" menu' : 'Navbar/Header'
-                  } to change the region`}
+                  title={
+                    <>
+                      use the Region dropdown in the
+                      {matchesLg ? (
+                        <Grid item container alignItems="center">
+                          "More Options" ( <MenuIcon fontSize="small" /> ) menu
+                        </Grid>
+                      ) : (
+                        ' Navbar/Header'
+                      )}{' '}
+                      to change the region
+                    </>
+                  }
                   placement="top">
                   <HelpIcon fontSize="large" />
                 </Tooltip>
