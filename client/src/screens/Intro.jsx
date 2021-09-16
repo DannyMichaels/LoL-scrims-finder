@@ -2,18 +2,20 @@ import { useState, useEffect, useCallback, Fragment } from 'react';
 
 // components
 import { Redirect } from 'react-router-dom';
-import Alert from '@material-ui/lab/Alert';
-import { Button, Grid, Typography } from '@material-ui/core';
-import IntroForms from '../components/IntroForms';
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepLabel from '@material-ui/core/StepLabel';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
 import Navbar from '../components/shared/Navbar/Navbar';
 import {
   InnerColumn,
   PageSection,
   PageContent,
 } from '../components/shared/PageComponents';
+import IntroForms from '../components/IntroForms';
 
 // utils
 import { auth, provider } from '../firebase';
