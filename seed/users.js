@@ -1,6 +1,9 @@
 const faker = require('faker');
 const sample = require('../utils/sample');
 const User = require('../models/user');
+const mongoose = require('mongoose');
+const connect = require('../db/connection');
+const { MONGODB_URI } = require('../utils/constants');
 
 // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
 const makeUuid = () => {
@@ -45,8 +48,15 @@ const main = async () => {
 };
 
 const run = async () => {
+  connect(MONGODB_URI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
+
   await main();
-  db.close();
+  await mongoose.connection.close();
 };
 
 run();
+
+module.exports = run;

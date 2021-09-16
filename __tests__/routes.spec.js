@@ -22,7 +22,7 @@ const makeUuid = () => {
 
 beforeAll(async () => {
   const MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
-  conn = connect(MONGODB_URI, {
+  connect(MONGODB_URI, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
   });
@@ -55,10 +55,12 @@ beforeAll(async () => {
 
   let createdUsers = await User.insertMany(users);
 
-  console.log(`Created ${createdUsers.length} new users!`);
+  console.log(
+    `Created ${createdUsers.length} new users (testing environment)!`
+  );
 });
 
-let user;
+let user, scrim;
 
 const app = createServer();
 
@@ -90,8 +92,43 @@ describe('/api/users', () => {
   });
 });
 
+describe('/api/scrims', () => {
+  it('should show all scrims', async (done) => {
+    const response = await request(app)
+      .get('/api/scrims')
+      .set(headers)
+      .expect(200);
+
+    scrim = response.body[0];
+    expect(response.body[0]).toHaveProperty('_id');
+    expect(response.body[0]).toHaveProperty('teamOne');
+    expect(response.body[0]).toHaveProperty('teamTwo');
+    expect(response.body[0]).toHaveProperty('gameStartTime');
+
+    expect(response.body[0]).not.toHaveProperty('randomProperty');
+
+    done();
+  });
+});
+
+describe('/api/users', () => {
+  it('should show all users', async (done) => {
+    const response = await request(app)
+      .get('/api/users')
+      .set(headers)
+      .expect(200);
+
+    user = response.body[0];
+    expect(response.body[0]).toHaveProperty('_id');
+    expect(response.body[0]).not.toHaveProperty('randomProperty');
+
+    done();
+  });
+});
+
 afterAll(async () => {
   // clear database and close after tests are over
+  console.log('dropping test database');
   await mongoose.connection.db.dropDatabase();
   await mongoose.connection.close();
 });

@@ -1,11 +1,9 @@
 const createServer = require('./server');
 const connect = require('./db/connection');
 const mongoose = require('mongoose');
+const { MONGODB_URI } = require('./utils/constants');
 
 const PORT = process.env.PORT || 3000;
-
-let MONGODB_URI =
-  process.env.PROD_MONGODB || 'mongodb://127.0.0.1:27017/scrimsdatabase';
 
 const app = createServer();
 
