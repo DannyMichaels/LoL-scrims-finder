@@ -275,8 +275,8 @@ export default function Scrims() {
                         </Grid>
                       ) : (
                         ' Navbar/Header'
-                      )}{' '}
-                      to change the region
+                      )}
+                      &nbsp;to change the region
                     </>
                   }
                   placement="top">
