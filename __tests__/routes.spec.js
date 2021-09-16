@@ -1,12 +1,10 @@
 // utils
 const createServer = require('../server.js');
-const mongoose = require('mongoose');
 const faker = require('faker');
 const sample = require('../utils/sample');
 const mongooseConnect = require('../db/connection');
 const generatePassword = require('../utils/generatePassword');
 const KEYS = require('../config/keys');
-
 const databaseName = 'scrimsTestDatabase';
 
 // models
