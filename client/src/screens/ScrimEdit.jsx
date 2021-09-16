@@ -6,14 +6,12 @@ import { useAlerts } from '../context/alertsContext';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';
-import {
-  Button,
-  FormHelperText,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-} from '@material-ui/core';
+import Button from '@mui/material/Button';
+import FormHelperText from '@mui/material/FormHelperText';
+import Grid from '@mui/material/Grid';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 import {
   PageContent,
   PageSection,
@@ -34,7 +32,7 @@ import { updateScrim, getScrimById } from '../services/scrims';
  */
 const sample = (array) => array[Math.floor(Math.random() * array.length)];
 
-const RANDOM_HOST_CODE = '_$random';
+const RANDOM_HOST_CODE = '_$random'; // because input doesn't want value to be null, if lobbyhost is equal to this, send it as null in the back end
 
 export default function ScrimEdit() {
   const { currentUser, isCurrentUserAdmin } = useAuth();

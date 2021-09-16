@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useScrims } from './../context/scrimsContext';
 import { useAlerts } from './../context/alertsContext';
+import { useAuth } from './../context/currentUser';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';
@@ -11,9 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import Button from '@mui/material/Button';
 import Select from '@mui/material/Select';
-
 import { Redirect } from 'react-router';
-import { useAuth } from './../context/currentUser';
 import {
   InnerColumn,
   PageContent,
