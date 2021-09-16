@@ -60,7 +60,7 @@ const app = createServer();
 
 describe('GET /', () => {
   it('should show welcome with instructions on how to use api', async (done) => {
-    let response = await supertest(app).get('/').expect(200);
+    const response = await supertest(app).get('/').expect(200);
 
     expect(response.text).toBe(
       '<h1>LOL BOOTCAMP SCRIMS FINDER</h1> <h2>How to use: go to /api/scrims to find all scrims.</h2>'
@@ -70,18 +70,14 @@ describe('GET /', () => {
   });
 });
 
-// describe('/api/users', () => {
-//   it('should show all users', async (done) => {
-//     const app = await createServer();
+describe('/api/users', () => {
+  it('should show all users', async (done) => {
+    const response = await supertest(app).get('/api/users').expect(200);
+    console.log({ response });
 
-//     const res = await request(app).get('/api/users');
-//     console.log('res', res);
-//     expect(res.statusCode).toEqual(200);
-//     user = res.body[0];
-//     expect(res.body[0]).toHaveProperty('_id');
-//     done();
-//   });
-// });
+    done();
+  });
+});
 
 afterAll(async () => {
   // clear database and close after tests are over

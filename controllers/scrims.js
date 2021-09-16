@@ -13,11 +13,12 @@ const {
 } = require('../utils/scrimUtils');
 const capitalizeWord = require('../utils/capitalizeWord');
 const AWS = require('aws-sdk');
+const KEYS = require('../config/keys');
 
 let s3bucket = new AWS.S3({
   Bucket: 'lol-scrimsfinder-bucket',
-  accessKeyId: process.env.REACT_APP_S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.REACT_APP_S3_SECRET_ACCESS_KEY,
+  accessKeyId: KEYS.S3_ACCESS_KEY_ID,
+  secretAccessKey: KEYS.S3_SECRET_ACCESS_KEY,
 });
 
 /**
