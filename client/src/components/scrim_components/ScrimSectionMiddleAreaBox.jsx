@@ -8,13 +8,13 @@ import UploadPostGameImage from './UploadPostGameImage';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import makeStyles from '@mui/material/makeStyles';
 import Tooltip from '../shared/Tooltip';
 
 //icons
-import InfoIcon from '@mui/icons-material';
+import InfoIcon from '@mui/icons-material/Info';
 
 // utils
+import makeStyles from '@mui/styles/makeStyles';
 import pluralize from 'pluralize';
 import { updateScrim } from '../../services/scrims';
 

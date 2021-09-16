@@ -4,7 +4,10 @@ import { useAlerts } from '../../context/alertsContext';
 
 // components
 import Moment from 'react-moment';
-import { Button, Grid, Typography, Tooltip } from '@material-ui/core';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 
 // utils
 import 'moment-timezone';
@@ -12,8 +15,8 @@ import { copyTextToClipboard } from './../../utils/copyToClipboard';
 import AdminArea from './../shared/AdminArea';
 
 // icons
-import ShareIcon from '@material-ui/icons/Share';
-import SettingsIcon from '@material-ui/icons/Settings';
+import ShareIcon from '@mui/icons-material/Share';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 const MAX_CASTER_AMOUNT = 2;
 
