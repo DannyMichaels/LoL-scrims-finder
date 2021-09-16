@@ -1,6 +1,8 @@
-import { useContext, Fragment, useMemo } from 'react';
-import { useScrimSectionStyles } from '../styles/scrimSection.styles';
-import { CurrentUserContext } from '../context/currentUser';
+import { Fragment, useMemo } from 'react';
+import { useScrims } from './../../context/scrimsContext';
+import { useAuth } from './../../context/currentUser';
+import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
+import { useAlerts } from '../../context/alertsContext';
 
 // components
 import List from '@material-ui/core/List';
@@ -9,35 +11,35 @@ import Divider from '@material-ui/core/Divider';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
-import { Grid, IconButton, Typography } from '@material-ui/core';
-import Tooltip from '../components/shared/Tooltip';
-import AdminArea from './shared/AdminArea';
+import {
+  Grid,
+  IconButton,
+  Typography,
+  useMediaQuery,
+  Box,
+} from '@material-ui/core';
+import Tooltip from '../shared/Tooltip';
+import AdminArea from '../shared/AdminArea';
 import ListSubheader from '@material-ui/core/ListSubheader';
 
 // utils
-import { RANK_IMAGES, ROLE_IMAGES } from '../utils/imageMaps';
-import { truncate } from './../utils/truncate';
+import { RANK_IMAGES, ROLE_IMAGES } from '../../utils/imageMaps';
+import { truncate } from '../../utils/truncate';
+import { copyTextToClipboard } from '../../utils/copyToClipboard';
 
 // services
-import { insertPlayerInScrim, removePlayerFromScrim } from '../services/scrims';
+import {
+  insertPlayerInScrim,
+  removePlayerFromScrim,
+  movePlayerInScrim,
+} from '../../services/scrims';
 
 // icons
 import SwapIcon from '@material-ui/icons/SwapHoriz';
 import JoinIcon from '@material-ui/icons/MeetingRoom';
 import ExitIcon from '@material-ui/icons/NoMeetingRoom';
 import KickIcon from '@material-ui/icons/HighlightOff';
-import { copyTextToClipboard } from './../utils/copyToClipboard';
-
-const compareArrays = (arr1, arr2) => {
-  if (arr1.length !== arr2.length) return false;
-
-  for (let i = 0; i < arr1.length; i++) {
-    if (arr1[i]._id !== arr2[i]._id) return false;
-  }
-
-  // If all elements were same.
-  return true;
-};
+import InfoIcon from '@material-ui/icons/Help';
 
 const getRankImage = (user) => {
   // replace number with empty string: Diamond 1 => Diamond
@@ -48,139 +50,118 @@ const getRankImage = (user) => {
 export default function ScrimTeamList({
   playerEntered,
   scrim,
-  getNewScrimsData,
-  teamOne,
-  teamTwo,
   teamData,
   casterEntered,
   gameStarted,
 }) {
-  const { currentUser } = useContext(CurrentUserContext);
+  const { fetchScrims } = useScrims();
+  const { currentUser } = useAuth();
+  const { setCurrentAlert } = useAlerts();
+
   const classes = useScrimSectionStyles({ scrim });
+  const isSmScreen = useMediaQuery('@media (max-width: 630px)');
 
   const gameEnded = useMemo(() => scrim.teamWon, [scrim.teamWon]);
 
   const { teamRoles, teamName, teamTitleName, teamArray } = teamData;
 
   const joinGame = async (teamJoiningName, role) => {
-    getNewScrimsData();
+    fetchScrims();
 
     if (casterEntered) {
-      alert("You're already a caster for this game!");
+      setCurrentAlert({
+        type: 'Error',
+        message: (
+          <span>
+            cannot join team:&nbsp;
+            <strong>You're already a caster for this game!</strong>
+          </span>
+        ),
+      });
       return;
     }
 
-    const dataSending = {
+    const updatedScrim = await insertPlayerInScrim({
+      scrimId: scrim._id,
+      userId: currentUser._id,
+
+      // sending the role joining and the team name in the req.body.
       playerData: {
-        ...currentUser,
         role,
         team: { name: teamJoiningName },
       },
-    };
-
-    const updatedScrim = await insertPlayerInScrim(scrim._id, dataSending);
+      setAlert: setCurrentAlert,
+    });
 
     if (updatedScrim) {
       console.log(
         `%c added ${currentUser?.name} to scrim: ${scrim._id} in team: ${teamJoiningName}`,
         'color: #99ff99'
       );
-      getNewScrimsData();
+      fetchScrims();
     }
   };
 
-  const handleMovePlayer = async (teamStr, role) => {
-    getNewScrimsData();
+  const handleMovePlayer = async (teamName, role) => {
+    fetchScrims();
 
-    let currentTeamName = playerEntered.team.name;
-    const currentTeamArr = currentTeamName === 'teamOne' ? teamOne : teamTwo;
-
-    let teamArr = teamStr === 'teamOne' ? teamOne : teamTwo;
-
-    let dataSending = {};
-
-    // if is the array that the user is moving to is different, that means he is changing teams.
-    if (compareArrays(currentTeamArr, teamArr) === false) {
-      console.log(`swapping teams for summoner ${currentUser?.name}`);
-
-      dataSending = {
-        playerData: {
-          ...currentUser,
-          role,
-          team: { name: teamStr },
-        },
-
-        swapData: {
-          isChangingTeams: true,
-          isMoving: true,
-          currentTeamName: playerEntered.team.name,
-          teamChangingToName: teamStr,
-        },
-      };
-    } else {
-      dataSending = {
-        playerData: {
-          ...currentUser,
-          role,
-          team: { name: teamStr },
-        },
-        swapData: {
-          isMoving: true,
-        },
-      };
-    }
-
-    const updatedScrim = await insertPlayerInScrim(scrim._id, dataSending);
+    const updatedScrim = await movePlayerInScrim({
+      scrimId: scrim._id,
+      userId: currentUser._id,
+      playerData: {
+        role,
+        team: { name: teamName },
+      },
+      setAlert: setCurrentAlert,
+    });
 
     if (updatedScrim) {
       console.log(
-        `%cswapped ${currentUser?.name} in scrim: ${scrim._id} to: ${teamStr} as ${role}`,
+        `%cswapped ${currentUser?.name} in scrim: ${scrim._id} to: ${teamName} as ${role}`,
         'color: #99ff99'
       );
-      getNewScrimsData();
+      fetchScrims();
     }
   };
 
-  const leaveGame = async (teamLeavingName) => {
-    const dataSending = {
+  const leaveGame = async () => {
+    const updatedScrim = await removePlayerFromScrim({
+      scrimId: scrim._id,
+      userId: playerEntered?._user?._id,
       playerData: {
-        ...currentUser,
-        role: playerEntered.role,
-        teamLeavingName,
+        role: playerEntered?.role,
       },
-    };
-
-    const updatedScrim = await removePlayerFromScrim(scrim._id, dataSending);
+      setAlert: setCurrentAlert,
+    });
 
     if (updatedScrim) {
       console.log(
         `%cremoved ${currentUser?.name} from scrim: ${scrim._id}`,
         'color: #99ff99'
       );
-      getNewScrimsData();
+      fetchScrims();
     }
   };
 
-  const kickPlayerFromGame = async (playerToKick, teamLeavingName) => {
+  const kickPlayerFromGame = async (playerToKick) => {
+    // if person kicking isn't an admin, return.
     if (currentUser?.adminKey !== process.env.REACT_APP_ADMIN_KEY) return;
-    const dataSending = {
-      playerData: {
-        ...playerToKick,
-        role: playerToKick.role,
-        teamLeavingName,
-        _id: playerToKick._user?._id,
-        name: playerToKick._user?.name,
-      },
-    };
 
-    const updatedScrim = await removePlayerFromScrim(scrim._id, dataSending);
+    const updatedScrim = await removePlayerFromScrim({
+      scrimId: scrim._id,
+      userId: playerToKick?._user?._id,
+      playerData: {
+        role: playerEntered.role,
+      },
+      setAlert: setCurrentAlert,
+    });
 
     if (updatedScrim) {
       console.log(
-        `%ckicked ${dataSending?.playerData?.name} from scrim: ${scrim._id}`,
+        `%ckicked ${playerToKick?._user?.name} from scrim: ${scrim._id}`,
         'color: #99ff99'
       );
-      getNewScrimsData();
+      fetchScrims();
     }
   };
 
@@ -219,15 +200,13 @@ export default function ScrimTeamList({
                   style={{
                     // fallback for non-supporting browsers
                     background:
-                      isLobbyHost && !gameEnded && gameStarted
-                        ? '#63d471'
-                        : '#424242',
+                      isLobbyHost && gameStarted ? '#63d471' : '#424242',
 
                     // if game has started, but the game didn't end, and the player is the lobby host, make his background green.
                     // we don't care if the guy is the lobby host if game ended.
                     // eslint-disable-next-line
                     background:
-                      isLobbyHost && !gameEnded && gameStarted
+                      isLobbyHost && gameStarted
                         ? 'linear-gradient(315deg, #63d471 0%, #233329 74%)'
                         : '#424242',
                   }}>
@@ -247,20 +226,22 @@ export default function ScrimTeamList({
                             href={`https://${userInfo?.region}.op.gg/summoner/userName=${userInfo?.name}`}
                             target="_blank"
                             rel="noreferrer">
-                            {truncate(userInfo?.name, 16)}
+                            {isSmScreen
+                              ? userInfo?.name
+                              : truncate(userInfo?.name, 16)}
                           </a>
                         </Tooltip>
-                        {userInfo?.rank !== 'Unranked' && (
-                          <>
-                            &nbsp;
-                            <img
-                              width="25px"
-                              style={{ objectFit: 'cover' }}
-                              alt={playerAssigned?.role}
-                              src={getRankImage(userInfo)}
-                            />
-                          </>
-                        )}
+
+                        <>
+                          {/* rank image */}
+                          &nbsp;
+                          <img
+                            width="25px"
+                            style={{ objectFit: 'cover' }}
+                            alt={playerAssigned?.role}
+                            src={getRankImage(userInfo)}
+                          />
+                        </>
                       </Grid>
                     }
                     secondary={
@@ -275,10 +256,16 @@ export default function ScrimTeamList({
                                 className="link"
                                 color="textPrimary"
                                 style={{ cursor: 'pointer' }}
-                                onClick={() =>
-                                  copyTextToClipboard(userInfo?.discord)
-                                }>
-                                {truncate(userInfo?.discord, 10)}
+                                onClick={() => {
+                                  copyTextToClipboard(userInfo?.discord);
+                                  setCurrentAlert({
+                                    type: 'Success',
+                                    message: `copied player discord (${userInfo?.discord}) to clipboard`,
+                                  });
+                                }}>
+                                {isSmScreen
+                                  ? userInfo?.discord
+                                  : truncate(userInfo?.discord, 9)}
                               </Typography>
                             </Tooltip>
                             <br />
@@ -305,6 +292,18 @@ export default function ScrimTeamList({
                     }
                   />
 
+                  {isLobbyHost && (
+                    <Tooltip
+                      title={`This player is the lobby captain. \n 
+                      It's expected of the lobby captain to create the custom lobby and select who won after the game,\n
+                      AND to upload the post-game image to verify the winner`}>
+                      <Box
+                        style={{ cursor: 'help' }}
+                        className={classes.infoIcon}>
+                        <InfoIcon />
+                      </Box>
+                    </Tooltip>
+                  )}
                   {isCurrentUser
                     ? // don't let user leave if game has already ended
                       !gameEnded && (

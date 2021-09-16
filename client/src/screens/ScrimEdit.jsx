@@ -1,9 +1,11 @@
-import { useContext, useState, useEffect, useMemo } from 'react';
-import { CurrentUserContext } from '../context/currentUser';
+import { useState, useEffect, useMemo } from 'react';
+import { useScrims } from './../context/scrimsContext';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
-import { updateScrim, getScrimById } from '../services/scrims';
-import { ScrimsContext } from '../context/scrimsContext';
-import Navbar from './../components/shared/Navbar';
+import { useAuth } from './../context/currentUser';
+import { useAlerts } from '../context/alertsContext';
+
+// components
+import Navbar from '../components/shared/Navbar/Navbar';
 import {
   Button,
   FormHelperText,
@@ -12,15 +14,18 @@ import {
   Select,
   TextField,
 } from '@material-ui/core';
-import moment from 'moment';
-import 'moment-timezone';
-import { getDateAndTimeSeparated } from '../utils/getDateAndTimeSeparated';
-import devLog from '../utils/devLog';
 import {
   PageContent,
   PageSection,
   InnerColumn,
 } from '../components/shared/PageComponents';
+
+// utils // services
+import moment from 'moment';
+import 'moment-timezone';
+import { getDateAndTimeSeparated } from '../utils/getDateAndTimeSeparated';
+import devLog from '../utils/devLog';
+import { updateScrim, getScrimById } from '../services/scrims';
 
 /**
  * @method sample
@@ -32,8 +37,9 @@ const sample = (array) => array[Math.floor(Math.random() * array.length)];
 const RANDOM_HOST_CODE = '_$random';
 
 export default function ScrimEdit() {
-  const { currentUser } = useContext(CurrentUserContext);
-  const { toggleFetch } = useContext(ScrimsContext);
+  const { currentUser } = useAuth();
+  const { fetchScrims } = useScrims();
+  const { setCurrentAlert } = useAlerts();
 
   const [scrimData, setScrimData] = useState({
     teamWon: '',
@@ -198,7 +204,7 @@ export default function ScrimEdit() {
       // if the lobby is full get a random player from the lobby to be the host.
       if ([...teamOne, ...teamTwo].length === 10) {
         devLog('getting random user to host');
-        return sample([...teamOne, ...teamTwo]);
+        return sample([...teamOne, ...teamTwo])._user;
       } else {
         devLog("team size isn't 10, returning null");
         // if lobby isn't full return null so it will generate a host on the backend.
@@ -211,22 +217,37 @@ export default function ScrimEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let yes = window.confirm('are you sure you want to update this scrim?');
-    if (!yes) return;
 
-    const dataSending = {
-      ...scrimData,
-      lobbyHost: await getLobbyHost(),
-      // if user selected N//A send null for teamWon, else send the actual value and result to null if undefined
-      teamWon: scrimData?.teamWon === 'N/A' ? null : scrimData?.teamWon ?? null,
-    };
+    try {
+      let yes = window.confirm('are you sure you want to update this scrim?');
+      if (!yes) return;
 
-    const updatedScrim = await updateScrim(id, dataSending);
+      const dataSending = {
+        ...scrimData,
+        lobbyHost: await getLobbyHost(),
+        // if user selected N//A send null for teamWon, else send the actual value and result to null if undefined
+        teamWon:
+          scrimData?.teamWon === 'N/A' ? null : scrimData?.teamWon ?? null,
+      };
 
-    if (updatedScrim) {
-      toggleFetch((prev) => !prev);
-      console.log(`%c updated scrim: ${id}`, 'color: lightgreen');
-      setUpdated(true);
+      const updatedScrim = await updateScrim(id, dataSending);
+
+      if (updatedScrim) {
+        fetchScrims();
+        console.log(`%c updated scrim: ${id}`, 'color: lightgreen');
+        setCurrentAlert({
+          type: 'Success',
+          message: 'Scrim updated successfully!',
+        });
+        setUpdated(true);
+        return;
+      }
+    } catch (error) {
+      setCurrentAlert({
+        type: 'Error',
+        message: 'Error updating Scrim',
+      });
+      return;
     }
   };
 
@@ -242,6 +263,13 @@ export default function ScrimEdit() {
       ...prevState,
       gameStartTime: gameStartTime.toISOString(),
     }));
+
+    return () => {
+      setScrimData((prevState) => ({
+        ...prevState,
+        gameStartTime: gameStartTime.toISOString(),
+      }));
+    };
   }, [dateData]);
 
   //  if user doesn't have admin key, push to '/'

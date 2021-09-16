@@ -1,5 +1,9 @@
-import { useState, useEffect, useContext } from 'react';
-import Navbar from './../components/shared/Navbar';
+import { useState, useEffect } from 'react';
+import { useScrims } from './../context/scrimsContext';
+import { useAlerts } from './../context/alertsContext';
+
+// components
+import Navbar from '../components/shared/Navbar/Navbar';
 import {
   Grid,
   TextField,
@@ -9,9 +13,8 @@ import {
   Button,
 } from '@material-ui/core';
 import { Redirect } from 'react-router';
-import { CurrentUserContext } from '../context/currentUser';
+import { useAuth } from './../context/currentUser';
 import { Select } from '@material-ui/core';
-import { ScrimsContext } from '../context/scrimsContext';
 import {
   InnerColumn,
   PageContent,
@@ -23,10 +26,13 @@ import { createScrim } from './../services/scrims';
 import { getMinutes } from './../utils/getMinutes';
 import moment from 'moment';
 import 'moment-timezone';
+import devLog from './../utils/devLog';
 
 export default function ScrimCreate() {
-  const { toggleFetch } = useContext(ScrimsContext);
-  const { currentUser } = useContext(CurrentUserContext);
+  const { fetchScrims } = useScrims();
+  const { currentUser } = useAuth();
+  const { setCurrentAlert } = useAlerts();
+
   const [scrimData, setScrimData] = useState({
     gameStartTime: new Date().toISOString(),
     lobbyHost: currentUser,
@@ -92,17 +98,27 @@ export default function ScrimCreate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const scrimToCreate = {
+        ...scrimData,
+        lobbyHost: scrimData.lobbyHost === 'random' ? null : currentUser,
+      };
 
-    const scrimToCreate = {
-      ...scrimData,
-      lobbyHost: scrimData.lobbyHost === 'random' ? null : currentUser,
-    };
+      const createdScrim = await createScrim(scrimToCreate);
 
-    const createdScrim = await createScrim(scrimToCreate);
+      fetchScrims();
 
-    toggleFetch((prevState) => !prevState);
+      devLog('created new scrim!', createdScrim);
+      setCreated({ createdScrim });
 
-    setCreated({ createdScrim });
+      setCurrentAlert({
+        type: 'Success',
+        message: 'scrim created successfully!',
+      });
+    } catch (error) {
+      setCurrentAlert({ type: 'Error', message: 'error creating scrim' });
+      console.error(error);
+    }
   };
 
   if (process.env.REACT_APP_ADMIN_KEY !== currentUser?.adminKey) {

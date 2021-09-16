@@ -9,8 +9,9 @@ import {
   FormControl,
   makeStyles,
   FormHelperText,
+  Typography,
 } from '@material-ui/core';
-import Navbar from '../components/shared/Navbar';
+import Navbar from '../components/shared/Navbar/Navbar';
 import {
   InnerColumn,
   PageContent,
@@ -20,6 +21,7 @@ import {
 import { useAuth } from '../context/currentUser';
 import { updateUser, getAllUsers } from './../services/users';
 import { setAuthToken } from './../services/auth';
+import { useAlerts } from '../context/alertsContext';
 
 // remove spaces from # in discord name
 const removeSpaces = (str) => {
@@ -51,6 +53,8 @@ export default function Settings() {
     region: currentUser?.region ?? 'NA',
     ...currentUser,
   });
+
+  const { setCurrentAlert } = useAlerts();
 
   const [rankData, setRankData] = useState({
     rankDivision: currentUser?.rank?.replace(/[0-9]/g, '').trim(), // match letters, trim spaces.
@@ -108,13 +112,18 @@ export default function Settings() {
     e.preventDefault();
 
     if (foundUserSummonerName) {
-      alert(
-        `Summoner name ${userData.name} in ${userData.region} is already taken!`
-      );
+      setCurrentAlert({
+        type: 'Error',
+        message: `Summoner name ${userData.name} in ${userData.region} is already taken!`,
+      });
       return;
     }
+
     if (foundUserDiscord) {
-      alert(`Discord name ${userData.discord} is already taken!`);
+      setCurrentAlert({
+        type: 'Error',
+        message: `Discord name ${userData.discord} is already taken!`,
+      });
       return;
     }
 
@@ -127,6 +136,7 @@ export default function Settings() {
 
     if (!yes) return;
     try {
+      // updating the user
       const data = await updateUser(currentUser?._id, userData);
 
       if (data?.token) {
@@ -136,11 +146,18 @@ export default function Settings() {
         let updatedUser = data?.user;
         setCurrentUser(updatedUser);
         setUserData({ ...updatedUser });
-        alert('Account details updated!');
+        setCurrentAlert({
+          type: 'Success',
+          message: 'Account details updated!',
+        });
       }
     } catch (error) {
       console.error('ERROR:', error);
-      alert(error);
+      let errMsg = error.messasge;
+      setCurrentAlert({
+        type: 'Error',
+        message: errMsg ?? error,
+      });
     }
   };
 
@@ -207,7 +224,7 @@ export default function Settings() {
                 width: 'auto',
               }}>
               <Grid item>
-                <h1>Settings</h1>
+                <Typography variant="h1">Settings</Typography>
               </Grid>
 
               <Grid

@@ -1,10 +1,10 @@
 // hooks
 import { useEffect, useMemo } from 'react';
-import { useAuth } from './../../context/currentUser';
+import { useAuth } from '../../../context/currentUser';
 import { useHistory } from 'react-router-dom';
 import { useMediaQuery, useTheme } from '@material-ui/core';
 // components
-import { InnerColumn } from './PageComponents';
+import { InnerColumn } from '../PageComponents';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -25,7 +25,7 @@ import {
   Hidden,
   makeStyles,
 } from '@material-ui/core';
-import AdminArea from './AdminArea';
+import AdminArea from '../AdminArea';
 
 // icons
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -34,9 +34,13 @@ import CreateIcon from '@material-ui/icons/BorderColor';
 // utils
 import moment from 'moment';
 import clsx from 'clsx';
-import { KEYCODES } from '../../utils/keycodes';
+import { KEYCODES } from '../../../utils/keycodes';
+import { useScrims } from '../../../context/scrimsContext';
 
 const useStyles = makeStyles({
+  drawerRoot: {
+    backgroundColor: 'rgba(18,25,35)',
+  },
   drawerList: {
     width: 250,
   },
@@ -60,12 +64,13 @@ export default function NavbarDrawer({
   setScrimsRegion,
   scrimsDate, // the date the scrims are going to be filtered by
   setScrimsDate,
-  fetchScrims,
 }) {
-  const classes = useStyles();
   const { currentUser, logOutUser } = useAuth();
+  const { fetchScrims } = useScrims();
+
+  const classes = useStyles();
   const history = useHistory();
-  let allRegions = ['NA', 'EUW', 'EUNE', 'LAN'];
+
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
@@ -75,11 +80,6 @@ export default function NavbarDrawer({
     () => (matchesMd ? 'top' : 'right'),
     [matchesMd]
   );
-
-  let selectRegions = [
-    currentUser?.region,
-    ...allRegions.filter((r) => r !== currentUser?.region),
-  ];
 
   // this is terrible but I'm doing it this way because it will cause an error that it can't find props of undefined
   let hidePreviousScrims = hideProps?.hidePreviousScrims,
@@ -96,6 +96,13 @@ export default function NavbarDrawer({
     await sleep(80);
     history.push(path);
   };
+
+  let allRegions = ['NA', 'EUW', 'EUNE', 'LAN'];
+
+  let selectRegions = [
+    currentUser?.region,
+    ...allRegions.filter((r) => r !== currentUser?.region),
+  ];
 
   const onSelectRegion = (e) => {
     const region = e.target.value;
@@ -130,6 +137,7 @@ export default function NavbarDrawer({
     <Drawer
       anchor={drawerAnchor}
       open={isDrawerOpen}
+      classes={{ paper: classes.drawerRoot }}
       onClose={() => setIsDrawerOpen(false)}>
       <InnerColumn>
         <div

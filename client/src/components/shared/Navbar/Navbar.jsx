@@ -1,7 +1,11 @@
 // hooks
 import { useState } from 'react';
-import { useAuth } from '../../context/currentUser';
+import { useAuth } from '../../../context/currentUser';
+import { useScrims } from '../../../context/scrimsContext';
 import { useLocation, useHistory } from 'react-router-dom';
+import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
+import { useTheme } from '@material-ui/core';
+import { useMediaQuery } from '@material-ui/core';
 
 // components
 import {
@@ -25,12 +29,12 @@ import {
 } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import NavbarDrawer from './NavbarDrawer';
-// import { BOOTCAMP_LOL_SRC } from '../../utils/bootcampImg'; // need license
 import moment from 'moment';
 import 'moment-timezone';
-import HideOnScroll from './HideOnScroll';
-import { InnerColumn } from './PageComponents';
-import Tooltip from './Tooltip';
+import HideOnScroll from '../HideOnScroll';
+import { InnerColumn } from '../PageComponents';
+import Tooltip from '../Tooltip';
+
 // icons
 import KeyIcon from '@material-ui/icons/VpnKey';
 import MenuIcon from '@material-ui/icons/Menu'; // burger icon
@@ -41,8 +45,10 @@ const useStyles = makeStyles((theme) => ({
   siteHeader: {
     top: '0',
     zIndex: '5',
-    backgroundColor: 'black',
     borderBottom: '1px solid white',
+    background: '#101820', // fallback
+    backgroundColor: 'rgba(18,25,35,.85)',
+    backdropFilter: 'blur(8px)',
   },
   toolbar: {
     paddingTop: '30px',
@@ -51,7 +57,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Navbar({
-  toggleFetch,
   setScrimsRegion,
   scrimsRegion,
   scrimsDate,
@@ -66,6 +71,9 @@ export default function Navbar({
   const classes = useStyles();
   const { pathname } = useLocation();
   const history = useHistory();
+  const { fetchScrims } = useScrims();
+  const theme = useTheme();
+  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   const noBackButtonPaths = [
     /^\/user-setup/,
@@ -92,7 +100,7 @@ export default function Navbar({
 
   const onSelectRegion = (e) => {
     const region = e.target.value;
-    toggleFetch((prev) => !prev); // not necessary, trying to ping the server.
+    fetchScrims(); // not necessary, trying to ping the server.
     setScrimsRegion(region); // set the navbar select value to selected region
   };
 
@@ -117,19 +125,29 @@ export default function Navbar({
                   direction="row"
                   alignItems="center"
                   justifyContent="space-between">
-                  <Grid item container alignItems="center" xs={6} sm={6}>
-                    {/* need license to use img */}
-                    {/* <img
-                  src={BOOTCAMP_LOL_SRC}
-                  alt="logo"
-                  style={{ marginRight: '10px' }}
-                /> */}
-                    &nbsp;
-                    <Link to="/" className="link">
-                      <Typography component="h1" variant="h1">
-                        LoL Scrims Finder
-                      </Typography>
-                    </Link>
+                  <Grid
+                    item
+                    container
+                    direction="row"
+                    alignItems="center"
+                    xs={6}
+                    sm={6}>
+                    <Grid item container alignItems="center">
+                      <Link
+                        to="/"
+                        className="link-2"
+                        style={{ display: 'flex', alignItems: 'center' }}>
+                        <img src={Logo} width="80px" alt="Logo" />
+                        <Box marginLeft={2}>
+                          <Typography
+                            component="h1"
+                            variant={matchesSm ? 'h3' : 'h1'}
+                            className="text-white">
+                            Bootcamp LoL Scrim Gym
+                          </Typography>
+                        </Box>
+                      </Link>
+                    </Grid>
                   </Grid>
 
                   <Grid
@@ -194,7 +212,7 @@ export default function Navbar({
                       {showCheckboxes && (
                         <Hidden mdDown>
                           {/* Show scrims (current, previous, upcoming) buttons */}
-                          <Grid item xs={6} alignItems="center" container>
+                          <Grid item xs={7} alignItems="center" container>
                             <FormGroup
                               row
                               className="text-white"
@@ -332,7 +350,6 @@ export default function Navbar({
         setScrimsRegion={setScrimsRegion}
         scrimsDate={scrimsDate}
         setScrimsDate={setScrimsDate}
-        fetchScrims={() => toggleFetch((prev) => !prev)}
       />
 
       <div className={classes.offset} />

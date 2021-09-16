@@ -1,57 +1,61 @@
 import './App.css';
-import AppRouter from './navigation/AppRouter';
-import { createTheme, ThemeProvider } from '@material-ui/core';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Footer from './components/shared/Footer';
+// hooks
 import { useAuth } from './context/currentUser';
+import { useAlerts } from './context/alertsContext';
+
+// styles
+import { appTheme } from './appTheme';
+import { useAppStyles } from './styles/App.styles';
+
+// components
+import AppRouter from './navigation/AppRouter';
+import { ThemeProvider } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import Loading from './components/shared/Loading';
-
-const theme = createTheme({
-  palette: {
-    type: 'dark',
-    primary: {
-      main: '#FBC02D',
-      contrastText: '#000',
-    },
-
-    // secondary: {},
-  },
-  typography: {
-    // Use the system font instead of the default Roboto font.
-    h1: {
-      color: '#fff',
-      fontFamily: ['Montserrat', 'sans-serif'].join(','),
-      fontSize: '2em',
-      fontWeight: 'bold',
-    },
-
-    h2: {
-      fontSize: '1.5em',
-      fontFamily: ['Montserrat', 'sans-serif'].join(','),
-      fontWeight: 'bold',
-    },
-
-    p: {
-      fontFamily: ['Montserrat', 'sans-serif'].join(','),
-      color: 'green',
-      fontWeight: 600,
-    },
-  },
-});
+import Footer from './components/shared/Footer';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 
 function App() {
   const { loading: verifyingUser } = useAuth();
+  const { currentAlert, closeAlert } = useAlerts();
+  const classes = useAppStyles();
 
   if (verifyingUser) {
-    return <Loading text="Verifying user..." />;
+    return (
+      <div className={classes.root}>
+        <Loading text="Verifying user..." />;
+      </div>
+    );
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppRouter />
-      <Footer />
-    </ThemeProvider>
+    <div className={classes.root}>
+      <ThemeProvider theme={appTheme}>
+        <CssBaseline />
+
+        {currentAlert && (
+          // if there is an alert in the context, show it
+          <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            autoHideDuration={6000} // autohide will set the current alert to null in the state.
+            open={currentAlert.message ? true : false}
+            onClose={closeAlert}
+            message={currentAlert.message}>
+            <Alert
+              variant="filled"
+              onClose={closeAlert}
+              severity={currentAlert.type.toLowerCase()}>
+              {/* example: success - scrim created successfully! */}
+              <strong>{currentAlert.type}</strong> - {currentAlert.message}
+            </Alert>
+          </Snackbar>
+        )}
+
+        <AppRouter />
+        <Footer />
+      </ThemeProvider>
+    </div>
   );
 }
 
