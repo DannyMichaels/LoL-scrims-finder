@@ -37,7 +37,7 @@ export default function ScrimSectionMiddleAreaBox({
   playerEntered,
   casterEntered,
 }) {
-  const { currentUser } = useAuth();
+  const { currentUser, isCurrentUserAdmin } = useAuth();
   const classes = useStyles({ gameStarted, imageUploaded });
   const { fetchScrims } = useScrims();
 
@@ -106,7 +106,7 @@ export default function ScrimSectionMiddleAreaBox({
               {/* show buttons if is admin or is lobby captain */}
               {/* don't show if game has ended */}
               {(scrim.lobbyHost?._id === currentUser?._id ||
-                currentUser?.adminKey === process.env.REACT_APP_ADMIN_KEY) &&
+                isCurrentUserAdmin) &&
                 !gameEnded && (
                   // WHO WON BUTTONS
                   <Grid
@@ -163,7 +163,7 @@ export default function ScrimSectionMiddleAreaBox({
                   */}
               {/* POST GAME IMAGE SECTION */}
               {(scrim.lobbyHost?._id === currentUser?._id ||
-                currentUser?.adminKey === process.env.REACT_APP_ADMIN_KEY) && (
+                isCurrentUserAdmin) && (
                 <>
                   <Box marginTop={2} />
 
