@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken');
 const KEYS = require('../config/keys');
 const mongoose = require('mongoose');
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
 const getAllUsers = async (req, res) => {
   const region = req.query?.region;
   // /api/users?region=NA

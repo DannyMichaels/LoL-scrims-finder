@@ -5,6 +5,15 @@ const User = require('../models/user');
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+// https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
+const makeUuid = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 const main = async () => {
   const ranks = [
     'Diamond 2',
@@ -18,18 +27,6 @@ const main = async () => {
     'Gold 2',
     'Master',
   ];
-
-  // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
-  const makeUuid = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-      /[xy]/g,
-      function (c) {
-        var r = (Math.random() * 16) | 0,
-          v = c == 'x' ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      }
-    );
-  };
 
   let users = new Array(10).fill().map((_user, idx) => {
     let name = faker.name.firstName();

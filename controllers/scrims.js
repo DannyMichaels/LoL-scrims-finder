@@ -14,8 +14,6 @@ const {
 const capitalizeWord = require('../utils/capitalizeWord');
 const AWS = require('aws-sdk');
 
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
 let s3bucket = new AWS.S3({
   Bucket: 'lol-scrimsfinder-bucket',
   accessKeyId: process.env.REACT_APP_S3_ACCESS_KEY_ID,

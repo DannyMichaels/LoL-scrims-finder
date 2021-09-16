@@ -5,23 +5,60 @@ const databaseName = 'scrimsTestDatabase';
 const User = require('../models/user');
 const faker = require('faker');
 
+// https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
+const makeUuid = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
+let conn;
 beforeAll(async () => {
   const MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
-  await mongoose.connect(MONGODB_URI, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
+  conn = await mongoose
+    .createConnection(MONGODB_URI, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+    })
+    .then((data) => {
+      console.log('Successfully connected to MongoDB on  ' + MONGODB_URI);
+
+      return data;
+    })
+    .catch((e) => {
+      console.error('Connection error', e.message);
+    });
+
+  const ranks = [
+    'Diamond 2',
+    'Platinum 1',
+    'Platinum 4',
+    'Grandmaster',
+    'Challenger',
+    'Gold 3',
+    'Silver 3',
+    'Bronze 1',
+    'Gold 2',
+    'Master',
+  ];
+
+  let users = new Array(10).fill().map((_user, idx) => {
+    let name = faker.name.firstName();
+
+    return {
+      name: name,
+      rank: sample(ranks),
+      discord: `${name}#1${idx}3`,
+      email: faker.internet.email(name),
+      region: 'NA',
+      uid: makeUuid(),
+    };
   });
 
-  const users = [...Array(25)].map((user, idx) => ({
-    name: faker.name.firstName(),
-    discord: faker.name.lastName() + `#13${idx}`,
-    email: faker.internet.email(),
-    rank: 'Silver 2',
-    region: 'NA',
-    uid: '1414141041' + idx,
-  }));
+  await User.insertMany(users);
 
-  const createdUsers = await User.insertMany(users);
   console.log('Created users!', createdUsers.length);
 });
 
@@ -40,6 +77,6 @@ describe('/api/users', () => {
 });
 
 afterAll(async () => {
-  await mongoose.connection.db.dropDatabase();
-  await mongoose.connection.close();
+  await conn.dropDatabase();
+  await conn.close();
 });
