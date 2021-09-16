@@ -64,7 +64,8 @@ const app = createServer();
 
 describe('GET /', () => {
   it('should show welcome with instructions on how to use api', async (done) => {
-    const response = await request(app).get('/').set(headers).expect(200);
+    // headers aren't required on this path
+    const response = await request(app).get('/').expect(200);
 
     expect(response.text).toBe(
       '<h1>LOL BOOTCAMP SCRIMS FINDER</h1> <h2>How to use: go to /api/scrims to find all scrims.</h2>'
@@ -80,7 +81,10 @@ describe('/api/users', () => {
       .get('/api/users')
       .set(headers)
       .expect(200);
-    console.log({ response });
+
+    user = response.body[0];
+    expect(response.body[0]).toHaveProperty('_id');
+    expect(response.body[0]).not.toHaveProperty('randomProperty');
 
     done();
   });
