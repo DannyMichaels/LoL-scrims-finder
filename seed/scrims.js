@@ -54,17 +54,17 @@ const main = async () => {
     },
 
     {
-      createdBy: users[0],
+      createdBy: users[2],
       teamOne: teamTwo,
       teamTwo: teamOne,
-      lobbyHost: users[2],
+      lobbyHost: users[4],
       lobbyPassword: await generatePassword(),
       gameStartTime: toIsoString(
         new Date(today.setHours(today.getHours() + 1))
       ), // 1 hour from seed time
-      title: `${users[0].name}'s scrim`,
+      title: `${users[2].name}'s scrim`,
       lobbyName: 'Scrim 1 Custom Game (NA)',
-      lobbyHost: users[0],
+      lobbyHost: users[2],
       teamWon: 'Team 2 (Red Side)',
     },
   ];
