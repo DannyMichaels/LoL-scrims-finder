@@ -13,6 +13,12 @@ export const appTheme = createTheme({
       main: '#FBC02D',
       contrastText: '#000',
     },
+
+    secondary: {
+      main: '#f44336',
+      constrastText: '#fff',
+    },
+
     background: {
       default: '#303030',
       paper: '#424242',
@@ -74,6 +80,13 @@ export const appTheme = createTheme({
     },
   },
 
+  defaultTheme: {
+    pallete: {
+      common: {
+        white: '#fff',
+      },
+    },
+  },
   overrides: {
     MuiAppBar: {
       colorDefault: {

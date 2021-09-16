@@ -7,7 +7,7 @@ import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new202
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-// components
+// Mui components
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import AppBar from '@mui/material/AppBar';
@@ -25,6 +25,7 @@ import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
 import FormHelperText from '@mui/material/FormHelperText';
 
+// components
 import { Link } from 'react-router-dom';
 import NavbarDrawer from './NavbarDrawer';
 import moment from 'moment';
