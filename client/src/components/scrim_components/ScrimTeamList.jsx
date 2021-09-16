@@ -5,7 +5,7 @@ import { useAuth } from './../../context/currentUser';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 import { useAlerts } from '../../context/alertsContext';
 
-// mui components
+// MUI components
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
@@ -35,11 +35,11 @@ import {
 } from '../../services/scrims';
 
 // icons
-import SwapIcon from '@material-ui/icons/SwapHoriz';
-import JoinIcon from '@material-ui/icons/MeetingRoom';
-import ExitIcon from '@material-ui/icons/NoMeetingRoom';
-import KickIcon from '@material-ui/icons/HighlightOff';
-import InfoIcon from '@material-ui/icons/Info';
+import SwapIcon from '@mui/icons-material/SwapHoriz';
+import JoinIcon from '@mui/icons-material/MeetingRoom';
+import ExitIcon from '@mui/icons-material/NoMeetingRoom';
+import KickIcon from '@mui/icons-material/HighlightOff';
+import InfoIcon from '@mui/icons-material/Info';
 
 const getRankImage = (user) => {
   // replace number with empty string: Diamond 1 => Diamond

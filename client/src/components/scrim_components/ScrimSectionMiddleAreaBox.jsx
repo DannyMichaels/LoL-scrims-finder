@@ -5,16 +5,19 @@ import { useScrims } from './../../context/scrimsContext';
 // components
 import CountdownTimer from './CountdownTimer';
 import UploadPostGameImage from './UploadPostGameImage';
+import Tooltip from '../shared/Tooltip';
+
+// Mui components
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
-import Tooltip from '../shared/Tooltip';
+import Typography from '@mui/material/Typography';
 
 //icons
 import InfoIcon from '@mui/icons-material/Info';
 
 // utils
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
 import pluralize from 'pluralize';
 import { updateScrim } from '../../services/scrims';
 

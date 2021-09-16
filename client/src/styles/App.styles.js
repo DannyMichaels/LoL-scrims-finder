@@ -1,5 +1,5 @@
 // utils
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
 
 import BgImage from '../assets/images/summoners_rift.jpg';
 import { COLORS } from './../appTheme';

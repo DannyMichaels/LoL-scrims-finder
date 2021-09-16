@@ -1,4 +1,4 @@
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
 import Tooltip from '@mui/material/Tooltip';
 
 const useStyles = makeStyles((theme) => ({

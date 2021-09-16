@@ -7,11 +7,15 @@ export const COLORS = {
 
 export const appTheme = createTheme({
   palette: {
-    type: 'dark',
+    mode: 'dark',
 
     primary: {
       main: '#FBC02D',
       contrastText: '#000',
+    },
+    background: {
+      default: '#303030',
+      paper: '#424242',
     },
 
     // secondary: {},
@@ -35,9 +39,12 @@ export const appTheme = createTheme({
       fontWeight: 'bold',
       marginBlockStart: '0.83em',
       marginBlockEnd: '0.83em',
-      color: 'black',
+      color: '#fff',
     },
 
+    span: {
+      color: '#fff',
+    },
     h3: {
       display: 'block',
       fontSize: '1.17em',
@@ -70,8 +77,8 @@ export const appTheme = createTheme({
   overrides: {
     MuiAppBar: {
       colorDefault: {
-        backgroundColor: COLORS.DK_TEXT,
-        color: COLORS.PRIMARY,
+        backgroundColor: COLORS.DK_BLUE,
+        color: COLORS.DK_BLUE,
       },
     },
   },

@@ -253,14 +253,16 @@ export default function Intro() {
                 </Fragment>
               ))}
             </Grid>
-            <Stepper activeStep={currentFormIndex}>
+            <Stepper
+              style={{ background: '#424242', padding: '20px' }}
+              activeStep={currentFormIndex}>
               {steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};
 
                 if (index === 0) {
                   labelProps.optional = (
-                    <Typography variant="caption" key={label}>
+                    <Typography variant="caption text-white" key={label}>
                       ( Admin key optional )
                     </Typography>
                   );

@@ -6,7 +6,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Grid from '@mui/material/Grid';
 
 // utils
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   timer: {

@@ -19,7 +19,7 @@ import {
 } from './../components/shared/PageComponents';
 
 // services & utils
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
 import { updateUser, getAllUsers } from './../services/users';
 import { setAuthToken } from './../services/auth';
 

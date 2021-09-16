@@ -4,9 +4,8 @@ import { useAuth } from '../../../context/currentUser';
 import { useScrims } from '../../../context/scrimsContext';
 import { useLocation, useHistory } from 'react-router-dom';
 import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
-import useTheme from '@mui/material/styles/useTheme';
+import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import makeStyles from '@mui/styles/makeStyles';
 
 // components
 import Button from '@mui/material/Button';
@@ -45,8 +44,8 @@ const useStyles = makeStyles((theme) => ({
     top: '0',
     zIndex: '5',
     borderBottom: '1px solid white',
-    background: '#101820', // fallback
-    backgroundColor: 'rgba(18,25,35,.85)',
+    background: '#101820 !important', // fallback
+    backgroundColor: 'rgba(18,25,35,.85) !important',
     backdropFilter: 'blur(8px)',
   },
   toolbar: {

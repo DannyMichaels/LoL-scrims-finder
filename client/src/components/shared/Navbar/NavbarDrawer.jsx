@@ -36,7 +36,7 @@ import CreateIcon from '@mui/icons-material/BorderColor';
 import moment from 'moment';
 import clsx from 'clsx';
 import { KEYCODES } from '../../../utils/keycodes';
-import makeStyles from '@mui/styles/makeStyles';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   drawerRoot: {
