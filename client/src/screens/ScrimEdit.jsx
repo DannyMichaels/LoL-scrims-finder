@@ -319,6 +319,7 @@ export default function ScrimEdit() {
                           required
                           type="date"
                           name="gameStartDate"
+                          variant="standard"
                           value={moment(
                             new Date(scrimData.gameStartTime).toISOString()
                           ).format('yyyy-MM-DD')}
@@ -334,6 +335,7 @@ export default function ScrimEdit() {
                           required
                           type="time"
                           name="gameStartHours"
+                          variant="standard"
                           value={
                             moment(scrimData?.gameStartTime).format('HH:mm') ||
                             moment().format('HH:mm')
@@ -349,6 +351,7 @@ export default function ScrimEdit() {
                       onChange={handleChange}
                       required
                       name="title"
+                      variant="standard"
                       value={scrimData.title}
                       helperText={`Example: ${currentUser?.name}'s scrim`}
                     />
@@ -367,6 +370,7 @@ export default function ScrimEdit() {
                         required
                         type="text"
                         name="lobbyName"
+                        variant="standard"
                         value={scrimData.lobbyName}
                       />
                     </Grid>
@@ -380,6 +384,7 @@ export default function ScrimEdit() {
                       required
                       type="text"
                       name="lobbyPassword"
+                      variant="standard"
                       value={scrimData.lobbyPassword}
                     />
                   </Grid>
@@ -398,7 +403,8 @@ export default function ScrimEdit() {
                         value={scrimData.region}
                         className="text-white"
                         onChange={handleChange}
-                        fullWidth>
+                        fullWidth
+                        variant="standard">
                         {['NA', 'EUW', 'EUNE', 'LAN'].map((region, key) => (
                           <MenuItem value={region} key={key}>
                             {region}
@@ -413,6 +419,7 @@ export default function ScrimEdit() {
 
                     <Grid item>
                       <Select
+                        variant="standard"
                         name="_lobbyHost"
                         onChange={handleChange}
                         value={scrimData._lobbyHost || RANDOM_HOST_CODE}>
@@ -453,6 +460,7 @@ export default function ScrimEdit() {
                       Who Won?
                     </FormHelperText>
                     <Select
+                      variant="standard"
                       name="teamWon"
                       value={scrimData.teamWon || 'N/A'}
                       onChange={handleChange}>
