@@ -297,12 +297,13 @@ export default function ScrimEdit() {
                 container
                 direction="column"
                 alignItems="center"
-                spacing={4}>
+                spacing={4}
+                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                 <Grid
                   container
                   justifyContent="center"
-                  alignItems="flex-start"
-                  xs={8}
+                  alignItems="center"
+                  xs={4}
                   spacing={2}>
                   <Grid item>
                     <FormHelperText className="text-white">
@@ -341,16 +342,31 @@ export default function ScrimEdit() {
                 <Grid
                   mt={2}
                   container
+                  direction="column"
                   alignItems="center"
                   justifyContent="center"
                   spacing={2}
                   xs={4}>
-                  <Grid item xs={6}>
+                  <Grid item>
+                    <FormHelperText className="text-white">
+                      Scrim Title
+                    </FormHelperText>
+                    <TextField
+                      onChange={handleChange}
+                      required
+                      type="text"
+                      name="title"
+                      variant="standard"
+                      value={scrimData.title}
+                      helperText={`Example: ${scrimData?.createdBy?.name}'s Scrim`}
+                    />
+                  </Grid>
+
+                  <Grid item>
                     <FormHelperText className="text-white">
                       Lobby Name
                     </FormHelperText>
                     <TextField
-                      fullWidth
                       onChange={handleChange}
                       required
                       type="text"
@@ -360,12 +376,11 @@ export default function ScrimEdit() {
                     />
                   </Grid>
 
-                  <Grid item xs={6}>
+                  <Grid item>
                     <FormHelperText className="text-white">
                       Lobby Password
                     </FormHelperText>
                     <TextField
-                      fullWidth
                       onChange={handleChange}
                       required
                       type="text"
@@ -376,25 +391,6 @@ export default function ScrimEdit() {
                   </Grid>
 
                   {/*  */}
-                </Grid>
-
-                <Grid container xs={4} item direction="column">
-                  {/* <Grid item>
-                    <FormHelperText className="text-white">
-                      Lobby Name
-                    </FormHelperText>
-                  </Grid>
-                  <Grid item sm={12}>
-                    <TextField
-                      fullWidth
-                      onChange={handleChange}
-                      required
-                      type="text"
-                      name="lobbyName"
-                      variant="standard"
-                      value={scrimData.lobbyName}
-                    />
-                  </Grid> */}
                 </Grid>
 
                 <Grid
