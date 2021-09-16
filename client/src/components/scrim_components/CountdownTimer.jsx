@@ -1,10 +1,12 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {
-  makeStyles,
-  Typography,
-  LinearProgress,
-  Grid,
-} from '@material-ui/core';
+
+// components
+import Typography from '@mui/material/Typography';
+import LinearProgress from '@mui/material/LinearProgress';
+import Grid from '@mui/material/Grid';
+
+// utils
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles((theme) => ({
   timer: {
