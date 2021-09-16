@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
 async function connect(dbURI, options = {}) {
+  mongoose.set('useCreateIndex', true);
+
   return mongoose
     .connect(dbURI, options)
     .then(() => {
