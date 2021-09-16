@@ -1,4 +1,4 @@
-const request = require('supertest');
+const supertest = require('supertest');
 const createServer = require('../server.js');
 const mongoose = require('mongoose');
 const databaseName = 'scrimsTestDatabase';
@@ -64,19 +64,34 @@ beforeAll(async () => {
   console.log(`Created ${createdUsers.length} new users!`);
 });
 
-const app = createServer();
-
 let user;
 
-describe('/api/users', () => {
-  it('should show all users', async (done) => {
-    const res = await request(app).get('/api/users');
-    expect(res.statusCode).toEqual(200);
-    user = res.body[0];
-    expect(res.body[0]).toHaveProperty('_id');
+const app = createServer();
+
+describe('GET /', () => {
+  it('should show welcome with instructions on how to use api', async (done) => {
+    let response = await supertest(app).get('/').expect(200);
+
+    expect(response.text).toBe(
+      '<h1>LOL BOOTCAMP SCRIMS FINDER</h1> <h2>How to use: go to /api/scrims to find all scrims.</h2>'
+    );
+
     done();
   });
 });
+
+// describe('/api/users', () => {
+//   it('should show all users', async (done) => {
+//     const app = await createServer();
+
+//     const res = await request(app).get('/api/users');
+//     console.log('res', res);
+//     expect(res.statusCode).toEqual(200);
+//     user = res.body[0];
+//     expect(res.body[0]).toHaveProperty('_id');
+//     done();
+//   });
+// });
 
 afterAll(async () => {
   // clear database and close after tests are over
