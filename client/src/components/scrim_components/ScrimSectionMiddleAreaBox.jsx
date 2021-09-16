@@ -71,9 +71,7 @@ export default function ScrimSectionMiddleAreaBox({
               {!gameEnded && (
                 <>
                   {/* show lobby name and pswd only to players in lobby or admins */}
-                  {playerEntered ||
-                  casterEntered ||
-                  process.env.REACT_APP_ADMIN_KEY === currentUser?.adminKey ? (
+                  {playerEntered || casterEntered || isCurrentUserAdmin ? (
                     <>
                       <Grid item container direction="row" alignItems="center">
                         <Typography variant="h2">
