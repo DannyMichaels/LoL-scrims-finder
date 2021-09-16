@@ -5,6 +5,7 @@ const databaseName = 'scrimsTestDatabase';
 const User = require('../models/user');
 const faker = require('faker');
 const sample = require('../utils/sample');
+const connect = require('../db/connection');
 
 // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
 const makeUuid = () => {
@@ -19,19 +20,10 @@ let conn;
 
 beforeAll(async () => {
   const MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
-  conn = await mongoose
-    .connect(MONGODB_URI, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    })
-    .then((data) => {
-      console.log('Successfully connected to MongoDB on  ' + MONGODB_URI);
-
-      return data;
-    })
-    .catch((e) => {
-      console.error('Connection error', e.message);
-    });
+  conn = connect(MONGODB_URI, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
 
   const ranks = [
     'Diamond 2',
@@ -95,6 +87,6 @@ describe('GET /', () => {
 
 afterAll(async () => {
   // clear database and close after tests are over
-  await conn.connection.db.dropDatabase();
-  await conn.connection.close();
+  await mongoose.connection.db.dropDatabase();
+  await mongoose.connection.close();
 });

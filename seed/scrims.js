@@ -1,11 +1,8 @@
-const db = require('../db/connection');
 const faker = require('faker');
 const Scrim = require('../models/scrim');
 const setHours = require('../utils/setHours');
 const sample = require('../utils/sample');
 // const User = require('../models/user'); // maybe need this?
-
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 const main = async () => {
   const roles = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];

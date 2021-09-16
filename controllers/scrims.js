@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const db = require('../db/connection');
+
 // models
 const Scrim = require('../models/scrim');
 const User = require('../models/user');

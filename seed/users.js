@@ -1,9 +1,6 @@
-const db = require('../db/connection');
 const faker = require('faker');
 const sample = require('../utils/sample');
 const User = require('../models/user');
-
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
 const makeUuid = () => {
