@@ -5,11 +5,14 @@ import { useScrims } from './../../context/scrimsContext';
 // components
 import CountdownTimer from './CountdownTimer';
 import UploadPostGameImage from './UploadPostGameImage';
-import { Box, Button, Grid, makeStyles, Typography } from '@material-ui/core';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import makeStyles from '@mui/material/makeStyles';
 import Tooltip from '../shared/Tooltip';
 
 //icons
-import InfoIcon from '@material-ui/icons/Info';
+import InfoIcon from '@mui/icons-material';
 
 // utils
 import pluralize from 'pluralize';
