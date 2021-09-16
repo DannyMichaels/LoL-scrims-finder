@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 // utils
 import makeStyles from '@mui/styles/makeStyles';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
   timer: {
     background: 'white',
     color: '#000',
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     color: 'green',
     fontSize: '22px',
   },
-}));
+});
 
 const Text = ({ children }) => {
   const classes = useStyles();
