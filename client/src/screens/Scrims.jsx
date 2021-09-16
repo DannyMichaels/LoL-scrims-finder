@@ -1,25 +1,26 @@
 import { useAuth } from './../context/currentUser';
 import { useState, useEffect, Fragment, useMemo } from 'react';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import useTheme from '@mui/styles/useTheme';
 
 // components
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import { showEarliestFirst, showLatestFirst } from '../utils/getSortedScrims';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 import { InnerColumn, PageContent } from '../components/shared/PageComponents';
 import ScrimSection from '../components/scrim_components/ScrimSection';
 import Loading from '../components/shared/Loading';
 import Navbar from '../components/shared/Navbar/Navbar';
-import { useTheme, useMediaQuery } from '@material-ui/core';
 import Tooltip from '../components/shared/Tooltip';
 
 // utils
+import { showEarliestFirst, showLatestFirst } from '../utils/getSortedScrims';
 import moment from 'moment';
 import 'moment-timezone';
 import { compareDateWithCurrentTime } from './../utils/compareDateWithCurrentTime';
 
 // icons
-import HelpIcon from '@material-ui/icons/Help';
+import HelpIcon from '@mui/icons-material/Help';
 import { useScrims } from './../context/scrimsContext';
 
 // compare scrim start time with now.
