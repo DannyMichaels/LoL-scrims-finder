@@ -131,13 +131,21 @@ export const removeCasterFromScrim = async ({ scrimId, userId }) => {
   }
 };
 
-export const addImageToScrim = async (id, data) => {
+export const addImageToScrim = async (id, data, setAlert) => {
   try {
     const response = await api.patch(`/scrims/${id}/add-image`, data);
     return response.data;
   } catch (error) {
-    const errorMsg = error.response.data.error;
-    alert(errorMsg);
+    const errorMsg = error.response.data?.error;
+
+    if (typeof setAlert === 'function') {
+      return setAlert({
+        type: 'Error',
+        message: errorMsg ?? error.message ?? error,
+      });
+    }
+
+    return alert(errorMsg);
   }
 };
 

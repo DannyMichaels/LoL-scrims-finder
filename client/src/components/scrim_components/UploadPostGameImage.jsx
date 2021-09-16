@@ -109,7 +109,11 @@ export default function UploadPostGameImage({ scrim, isUploaded }) {
         uploadedBy: { ...currentUser },
       };
 
-      const addedImg = await addImageToScrim(scrim._id, dataSending);
+      const addedImg = await addImageToScrim(
+        scrim._id,
+        dataSending,
+        setCurrentAlert
+      );
       if (addedImg) {
         console.log(
           '%csuccessfully uploaded an image for scrim: ' + scrim._id,
