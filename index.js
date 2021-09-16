@@ -1,5 +1,6 @@
 const createServer = require('./server');
 const connect = require('./db/connection');
+const mongoose = require('mongoose');
 
 const PORT = process.env.PORT || 3000;
 
@@ -12,9 +13,17 @@ app.listen(PORT, () => {
   console.log(`Express server listening on port ${PORT}`);
 });
 
-let connection = connect(MONGODB_URI, {
+connect(MONGODB_URI, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
 });
 
-// connection.on(`error`, console.error.bind(console, `connection error:`));
+mongoose.connection.on(
+  `error`,
+  console.error.bind(console, `connection error:`)
+);
+
+mongoose.connection.once(`open`, () => {
+  // we`re connected!
+  console.log(`index.js: MongoDB connected on "  ${MONGODB_URI}`);
+});
