@@ -16,6 +16,7 @@ const makeUuid = () => {
 };
 
 let conn;
+
 beforeAll(async () => {
   const MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
   conn = await mongoose
@@ -78,6 +79,7 @@ describe('/api/users', () => {
 });
 
 afterAll(async () => {
-  // await conn.dropDatabase();
-  // await conn.close();
+  // clear database and close after tests are over
+  await conn.connection.db.dropDatabase();
+  await conn.connection.close();
 });
