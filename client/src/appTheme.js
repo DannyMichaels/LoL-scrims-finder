@@ -1,4 +1,4 @@
-import createTheme from '@material-ui/core/styles/createTheme';
+import { createTheme } from '@mui/material/styles';
 
 export const COLORS = {
   DK_BLUE: '#101820',
