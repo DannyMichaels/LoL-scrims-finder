@@ -13,6 +13,7 @@ const getAllUsers = async (req, res) => {
       const users = await User.find({ region }).select([
         'discord',
         'name',
+        'rank',
         'region',
         'createdAt',
         'updatedAt',
@@ -27,6 +28,7 @@ const getAllUsers = async (req, res) => {
       const users = await User.find().select([
         'discord',
         'name',
+        'rank',
         'region',
         'createdAt',
         'updatedAt',

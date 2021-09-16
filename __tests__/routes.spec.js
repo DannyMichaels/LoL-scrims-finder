@@ -216,6 +216,10 @@ describe('/api/users', () => {
 
     user = response.body[0];
     expect(response.body[0]).toHaveProperty('_id');
+    expect(response.body[0]).toHaveProperty('discord');
+    expect(response.body[0]).toHaveProperty('rank');
+    expect(response.body[0]).toHaveProperty('name');
+
     expect(response.body[0]).not.toHaveProperty('randomProperty');
 
     done();
