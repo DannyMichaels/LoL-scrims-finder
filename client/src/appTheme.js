@@ -92,13 +92,4 @@ export const appTheme = createTheme({
       fontSize: '22px',
     },
   },
-
-  overrides: {
-    MuiAppBar: {
-      colorDefault: {
-        backgroundColor: COLORS.DK_BLUE,
-        color: COLORS.DK_BLUE,
-      },
-    },
-  },
 });

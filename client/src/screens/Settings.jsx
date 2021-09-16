@@ -314,6 +314,7 @@ export default function Settings() {
                 <Grid item>
                   <FormHelperText>Rank Division</FormHelperText>
                   <Select
+                    variant="standard"
                     name="rankDivision"
                     required
                     value={rankData.rankDivision}
@@ -346,6 +347,7 @@ export default function Settings() {
                   <Grid item>
                     <FormHelperText>Rank Number</FormHelperText>
                     <Select
+                      variant="standard"
                       name="rankNumber"
                       required={divisionsWithNumbers.includes(
                         rankData.rankDivision
