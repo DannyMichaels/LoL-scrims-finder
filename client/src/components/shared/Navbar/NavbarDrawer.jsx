@@ -40,7 +40,7 @@ import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
   drawerRoot: {
-    backgroundColor: 'rgba(18,25,35)',
+    background: 'rgba(18,25,35) !important',
   },
   drawerList: {
     width: 250,
@@ -82,7 +82,6 @@ export default function NavbarDrawer({
     [matchesLg]
   );
 
-  console.dir({ theme });
   // this is terrible but I'm doing it this way because it will cause an error that it can't find props of undefined
   let hidePreviousScrims = hideProps?.hidePreviousScrims,
     hideCurrentScrims = hideProps?.hideCurrentScrims,
@@ -207,6 +206,7 @@ export default function NavbarDrawer({
                   {/* date and regions filters */}
                   <Grid item>
                     <TextField
+                      variant="standard"
                       id="date"
                       required
                       label="Scrims Date"
@@ -235,6 +235,7 @@ export default function NavbarDrawer({
                     <InputLabel className="text-white">Region</InputLabel>
 
                     <Select
+                      variant="standard"
                       value={scrimsRegion}
                       className="text-white"
                       onChange={onSelectRegion}>
@@ -273,6 +274,7 @@ export default function NavbarDrawer({
                         <Checkbox
                           // the UI says "show X scrims", so in this case we are reversing the boolean for checked, lol.
                           // doesn't matter functionally.
+
                           checked={!hideCurrentScrims}
                           color="primary"
                           onChange={() =>

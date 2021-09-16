@@ -37,6 +37,7 @@ import Tooltip from '../Tooltip';
 // icons
 import KeyIcon from '@mui/icons-material/VpnKey';
 import MenuIcon from '@mui/icons-material/Menu'; // burger icon
+import GoBackIcon from '@mui/icons-material/ArrowBack';
 
 const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.offset,
@@ -176,6 +177,7 @@ export default function Navbar({
                     {renderBackButton() ? (
                       <Grid item>
                         <Button
+                          startIcon={<GoBackIcon />}
                           className="mr-3"
                           variant="contained"
                           color="primary"
