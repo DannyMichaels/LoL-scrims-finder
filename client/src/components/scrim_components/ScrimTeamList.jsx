@@ -5,7 +5,7 @@ import { useAuth } from './../../context/currentUser';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 import { useAlerts } from '../../context/alertsContext';
 
-// components
+// mui components
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
@@ -16,9 +16,11 @@ import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import ListSubheader from '@mui/material/ListSubheader';
+
+// components
 import Tooltip from '../shared/Tooltip';
 import AdminArea from '../shared/AdminArea';
-import ListSubheader from '@material-ui/core/ListSubheader';
 
 // utils
 import { RANK_IMAGES, ROLE_IMAGES } from '../../utils/imageMaps';
