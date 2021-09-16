@@ -4,29 +4,28 @@ import { useAuth } from '../../../context/currentUser';
 import { useScrims } from '../../../context/scrimsContext';
 import { useLocation, useHistory } from 'react-router-dom';
 import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
-import { useTheme } from '@material-ui/core';
-import { useMediaQuery } from '@material-ui/core';
+import useTheme from '@mui/material/styles/useTheme';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import makeStyles from '@mui/styles/makeStyles';
 
 // components
-import {
-  Button,
-  Grid,
-  makeStyles,
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  MenuItem,
-  Box,
-  Select,
-  Hidden,
-  FormControlLabel,
-  FormGroup,
-  Checkbox,
-  InputLabel,
-  TextField,
-  FormHelperText,
-} from '@material-ui/core';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import Select from '@mui/material/Select';
+import Hidden from '@mui/material/Hidden';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
+import Checkbox from '@mui/material/Checkbox';
+import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import FormHelperText from '@mui/material/FormHelperText';
+
 import { Link } from 'react-router-dom';
 import NavbarDrawer from './NavbarDrawer';
 import moment from 'moment';
@@ -36,8 +35,8 @@ import { InnerColumn } from '../PageComponents';
 import Tooltip from '../Tooltip';
 
 // icons
-import KeyIcon from '@material-ui/icons/VpnKey';
-import MenuIcon from '@material-ui/icons/Menu'; // burger icon
+import KeyIcon from '@mui/icons-material/VpnKey';
+import MenuIcon from '@mui/icons-material/Menu'; // burger icon
 
 const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.offset,
