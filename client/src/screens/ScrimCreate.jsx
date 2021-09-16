@@ -149,6 +149,7 @@ export default function ScrimCreate() {
                     </FormHelperText>
                   </Grid>
                   <TextField
+                    variant="standard"
                     onChange={handleChange}
                     required
                     name="title"
@@ -169,6 +170,7 @@ export default function ScrimCreate() {
                       Game Start Date
                     </FormHelperText>
                     <TextField
+                      variant="standard"
                       onChange={handleChange}
                       required
                       type="date"
@@ -185,6 +187,7 @@ export default function ScrimCreate() {
                     </FormHelperText>
 
                     <TextField
+                      variant="standard"
                       onChange={handleChange}
                       required
                       type="time"
@@ -206,6 +209,7 @@ export default function ScrimCreate() {
                   spacing={2}>
                   <Grid item xs={12} sm={2} md={2}>
                     <Select
+                      variant="standard"
                       label="region"
                       name="region"
                       value={scrimData.region}
@@ -226,6 +230,7 @@ export default function ScrimCreate() {
 
                   <Grid item>
                     <Select
+                      variant="standard"
                       name="lobbyHost"
                       onChange={(e) =>
                         setScrimData((prevState) => ({
@@ -238,7 +243,7 @@ export default function ScrimCreate() {
                         <MenuItem value={value} key={key}>
                           {value === currentUser
                             ? 'I will host the lobby'
-                            : 'Choose a random player from the teams to host'}
+                            : 'Random host!'}
                         </MenuItem>
                       ))}
                     </Select>
