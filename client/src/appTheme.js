@@ -6,6 +6,16 @@ export const COLORS = {
 };
 
 export const appTheme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+    },
+  },
+
   palette: {
     mode: 'dark',
 
@@ -22,6 +32,8 @@ export const appTheme = createTheme({
     background: {
       default: '#303030',
       paper: '#424242',
+      // default: 'rgba(18,25,35)',
+      // paper: 'rgba(18,25,35)',
     },
 
     // secondary: {},

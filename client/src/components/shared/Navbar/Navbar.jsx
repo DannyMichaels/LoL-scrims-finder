@@ -174,13 +174,15 @@ export default function Navbar({
                      | means or.
                     */}
                     {renderBackButton() ? (
-                      <Button
-                        className="mr-3"
-                        variant="contained"
-                        color="primary"
-                        onClick={() => history.goBack()}>
-                        Go Back
-                      </Button>
+                      <Grid item>
+                        <Button
+                          className="mr-3"
+                          variant="contained"
+                          color="primary"
+                          onClick={() => history.goBack()}>
+                          Go Back
+                        </Button>
+                      </Grid>
                     ) : null}
 
                     {/* BURGER ICON */}
@@ -285,6 +287,7 @@ export default function Navbar({
                           {/* date regions and filters */}
                           <Grid item>
                             <TextField
+                              variant="standard"
                               id="date"
                               required
                               label="Scrims Date"
@@ -314,6 +317,7 @@ export default function Navbar({
                             </InputLabel>
 
                             <Select
+                              variant="standard"
                               value={scrimsRegion}
                               className="text-white"
                               onChange={onSelectRegion}>

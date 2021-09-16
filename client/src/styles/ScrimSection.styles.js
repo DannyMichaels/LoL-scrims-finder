@@ -32,7 +32,7 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
     cursor: 'pointer',
     position: 'absolute',
     top: '10%',
-    right: '16.5px',
+    right: '28px',
   },
   teamsContainer: {
     display: 'grid',
