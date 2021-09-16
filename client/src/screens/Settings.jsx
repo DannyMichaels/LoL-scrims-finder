@@ -1,16 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
-import {
-  Grid,
-  TextField,
-  Button,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControl,
-  makeStyles,
-  FormHelperText,
-  Typography,
-} from '@material-ui/core';
+import { useAuth } from '../context/currentUser';
+import { useAlerts } from '../context/alertsContext';
+
+// components
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import Typography from '@mui/material/Typography';
 import Navbar from '../components/shared/Navbar/Navbar';
 import {
   InnerColumn,
@@ -18,10 +19,9 @@ import {
 } from './../components/shared/PageComponents';
 
 // services & utils
-import { useAuth } from '../context/currentUser';
+import makeStyles from '@mui/styles/makeStyles';
 import { updateUser, getAllUsers } from './../services/users';
 import { setAuthToken } from './../services/auth';
-import { useAlerts } from '../context/alertsContext';
 
 // remove spaces from # in discord name
 const removeSpaces = (str) => {
