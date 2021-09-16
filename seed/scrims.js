@@ -46,6 +46,7 @@ const main = async () => {
       createdBy: users[0],
       teamOne,
       teamTwo,
+      casters: [],
       lobbyHost: users[2],
       lobbyPassword: await generatePassword(),
       gameStartTime: Date.now(),
@@ -60,6 +61,7 @@ const main = async () => {
       teamOne: teamTwo,
       teamTwo: teamOne,
       lobbyHost: users[4],
+      casters: [],
       lobbyPassword: await generatePassword(),
       gameStartTime: toIsoString(
         new Date(today.setHours(today.getHours() + 1))
@@ -67,7 +69,7 @@ const main = async () => {
       title: `${users[2].name}'s scrim`,
       lobbyName: 'Scrim 1 Custom Game (NA)',
       lobbyHost: users[2],
-      teamWon: 'Team 2 (Red Side)',
+      teamWon: null,
     },
   ];
 

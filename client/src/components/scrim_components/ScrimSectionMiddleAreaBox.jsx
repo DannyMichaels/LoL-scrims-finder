@@ -9,7 +9,7 @@ import { Box, Button, Grid, makeStyles, Typography } from '@material-ui/core';
 import Tooltip from '../shared/Tooltip';
 
 //icons
-import InfoIcon from '@material-ui/icons/Help';
+import InfoIcon from '@material-ui/icons/Info';
 
 // utils
 import pluralize from 'pluralize';
