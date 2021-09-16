@@ -4,17 +4,16 @@ import { useAlerts } from './../context/alertsContext';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';
-import {
-  Grid,
-  TextField,
-  Box,
-  MenuItem,
-  FormHelperText,
-  Button,
-} from '@material-ui/core';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import MenuItem from '@mui/material/MenuItem';
+import FormHelperText from '@mui/material/FormHelperText';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+
 import { Redirect } from 'react-router';
 import { useAuth } from './../context/currentUser';
-import { Select } from '@material-ui/core';
 import {
   InnerColumn,
   PageContent,
