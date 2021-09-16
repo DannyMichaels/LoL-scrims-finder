@@ -25,10 +25,20 @@ const makeUuid = () => {
   });
 };
 
+let connection;
 beforeAll(async () => {
   //  seed users and scrims beforeAll
   const TEST_ENV_MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
-  mongooseConnect.dbConnect(TEST_ENV_MONGODB_URI);
+  connection = mongooseConnect.dbConnect(TEST_ENV_MONGODB_URI);
+
+  connection.on(`error`, console.error.bind(console, `connection error:`));
+
+  connection.once(`open`, () => {
+    // we`re connected!
+    console.log(
+      `routes.spec.js: MongoDB connected on "  ${TEST_ENV_MONGODB_URI}`
+    );
+  });
 
   const ranks = [
     'Diamond 2',
@@ -229,6 +239,6 @@ describe('/api/users', () => {
 afterAll(async () => {
   // clear database and close after tests are over
   console.log('dropping test database');
-  await mongoose.connection.db.dropDatabase();
-  await mongoose.connection.close();
+  await connection.dropDatabase();
+  await connection.close();
 });
