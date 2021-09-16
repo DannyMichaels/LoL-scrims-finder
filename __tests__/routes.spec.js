@@ -1,12 +1,14 @@
 const createServer = require('../server.js');
 const mongoose = require('mongoose');
 const databaseName = 'scrimsTestDatabase';
-const User = require('../models/user');
 const faker = require('faker');
 const sample = require('../utils/sample');
 const connect = require('../db/connection');
-
+const generatePassword = require('../utils/generatePassword');
 const KEYS = require('../config/keys');
+
+const User = require('../models/user');
+const Scrim = require('../models/scrim');
 
 let request = require('supertest');
 let headers = { 'x-api-key': KEYS.API_KEY };
@@ -57,6 +59,46 @@ beforeAll(async () => {
 
   console.log(
     `Created ${createdUsers.length} new users (testing environment)!`
+  );
+
+  const firstFivePlayers = [...createdUsers].slice(0, 5);
+  const secondFivePlayers = [...createdUsers].slice(-5);
+
+  const roles = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
+
+  const teamOne = firstFivePlayers.map((user, idx) => ({
+    role: roles[idx],
+    team: { name: 'teamOne' },
+    _user: {
+      ...user,
+    },
+  }));
+
+  const teamTwo = secondFivePlayers.map((user, idx) => ({
+    role: roles[idx],
+    team: { name: 'teamOne' },
+    _user: {
+      ...user,
+    },
+  }));
+
+  let scrims = [
+    {
+      createdBy: createdUsers[0],
+      teamOne,
+      teamTwo,
+      lobbyHost: createdUsers[2],
+      lobbyPassword: await generatePassword(),
+      gameStartTime: Date.now(),
+      title: `${createdUsers[0].name}'s scrim`,
+      lobbyName: 'Scrim 1 Custom Game (NA)',
+    },
+  ];
+
+  let createdScrims = await Scrim.insertMany(scrims);
+
+  console.log(
+    `Created ${createdScrims.length} new scrims (testing environment)!`
   );
 });
 
