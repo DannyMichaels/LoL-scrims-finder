@@ -1,8 +1,10 @@
+// models
 const Scrim = require('../models/scrim');
 const User = require('../models/user');
-const mongoose = require('mongoose');
+
+// utils
 const { MONGODB_URI } = require('../utils/constants');
-const connect = require('../db/connection');
+const mongooseConnect = require('../db/connection');
 const generatePassword = require('../utils/generatePassword');
 const toIsoString = require('../utils/toIsoString');
 
@@ -75,13 +77,15 @@ const main = async () => {
 };
 
 const run = async () => {
-  connect(MONGODB_URI, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
+  let connection = mongooseConnect.dbConnect(MONGODB_URI);
+  connection.once('open', () =>
+    console.log('running mongoose to seed files on ' + MONGODB_URI)
+  );
+  connection.on('error', (error) => done(error));
 
   await main();
-  await mongoose.connection.close();
+
+  await connection.close();
 };
 
 run();

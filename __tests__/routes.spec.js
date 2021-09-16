@@ -1,12 +1,15 @@
+// utils
 const createServer = require('../server.js');
 const mongoose = require('mongoose');
-const databaseName = 'scrimsTestDatabase';
 const faker = require('faker');
 const sample = require('../utils/sample');
-const connect = require('../db/connection');
+const mongooseConnect = require('../db/connection');
 const generatePassword = require('../utils/generatePassword');
 const KEYS = require('../config/keys');
 
+const databaseName = 'scrimsTestDatabase';
+
+// models
 const User = require('../models/user');
 const Scrim = require('../models/scrim');
 
@@ -24,11 +27,8 @@ const makeUuid = () => {
 
 beforeAll(async () => {
   //  seed users and scrims beforeAll
-  const MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
-  connect(MONGODB_URI, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-  });
+  const TEST_ENV_MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
+  mongooseConnect.dbConnect(TEST_ENV_MONGODB_URI);
 
   const ranks = [
     'Diamond 2',
