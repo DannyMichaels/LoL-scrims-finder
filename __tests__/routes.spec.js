@@ -6,6 +6,7 @@ const mongooseConnect = require('../db/connection');
 const generatePassword = require('../utils/generatePassword');
 const KEYS = require('../config/keys');
 const databaseName = 'scrimsTestDatabase';
+const makeUuid = require('../utils/makeUuid');
 
 // models
 const User = require('../models/user');
@@ -13,15 +14,6 @@ const Scrim = require('../models/scrim');
 
 let request = require('supertest');
 let headers = { 'x-api-key': KEYS.API_KEY };
-
-// https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
-const makeUuid = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-};
 
 let connection;
 beforeAll(async () => {
