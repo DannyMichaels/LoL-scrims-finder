@@ -1,8 +1,10 @@
-import { FormHelperText, useMediaQuery, useTheme } from '@material-ui/core';
-import { Select } from '@material-ui/core';
-import { MenuItem } from '@material-ui/core';
-import { TextField } from '@material-ui/core';
-import { Grid } from '@material-ui/core';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import FormHelperText from '@mui/material/FormHelperText';
 
 export default function IntroForms({
   handleChange,
