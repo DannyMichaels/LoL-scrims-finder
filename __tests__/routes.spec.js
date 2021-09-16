@@ -1,4 +1,3 @@
-const supertest = require('supertest');
 const createServer = require('../server.js');
 const mongoose = require('mongoose');
 const databaseName = 'scrimsTestDatabase';
@@ -6,6 +5,11 @@ const User = require('../models/user');
 const faker = require('faker');
 const sample = require('../utils/sample');
 const connect = require('../db/connection');
+
+const KEYS = require('../config/keys');
+
+let request = require('supertest');
+let headers = { 'x-api-key': KEYS.API_KEY };
 
 // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
 const makeUuid = () => {
@@ -60,7 +64,7 @@ const app = createServer();
 
 describe('GET /', () => {
   it('should show welcome with instructions on how to use api', async (done) => {
-    const response = await supertest(app).get('/').expect(200);
+    const response = await request(app).get('/').set(headers).expect(200);
 
     expect(response.text).toBe(
       '<h1>LOL BOOTCAMP SCRIMS FINDER</h1> <h2>How to use: go to /api/scrims to find all scrims.</h2>'
@@ -72,7 +76,10 @@ describe('GET /', () => {
 
 describe('/api/users', () => {
   it('should show all users', async (done) => {
-    const response = await supertest(app).get('/api/users').expect(200);
+    const response = await request(app)
+      .get('/api/users')
+      .set(headers)
+      .expect(200);
     console.log({ response });
 
     done();
