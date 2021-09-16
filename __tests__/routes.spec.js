@@ -23,6 +23,7 @@ const makeUuid = () => {
 };
 
 beforeAll(async () => {
+  //  seed users and scrims beforeAll
   const MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
   connect(MONGODB_URI, {
     useUnifiedTopology: true,
@@ -76,7 +77,7 @@ beforeAll(async () => {
 
   const teamTwo = secondFivePlayers.map((user, idx) => ({
     role: roles[idx],
-    team: { name: 'teamOne' },
+    team: { name: 'teamTwo' },
     _user: {
       ...user,
     },
