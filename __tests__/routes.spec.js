@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const databaseName = 'scrimsTestDatabase';
 const User = require('../models/user');
 const faker = require('faker');
+const sample = require('../utils/sample');
 
 // https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
 const makeUuid = () => {
@@ -18,7 +19,7 @@ let conn;
 beforeAll(async () => {
   const MONGODB_URI = `mongodb://127.0.0.1/${databaseName}`;
   conn = await mongoose
-    .createConnection(MONGODB_URI, {
+    .connect(MONGODB_URI, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     })
@@ -57,9 +58,9 @@ beforeAll(async () => {
     };
   });
 
-  await User.insertMany(users);
+  let createdUsers = await User.insertMany(users);
 
-  console.log('Created users!', createdUsers.length);
+  console.log(`Created ${createdUsers.length} new users!`);
 });
 
 const app = createServer();
@@ -77,6 +78,6 @@ describe('/api/users', () => {
 });
 
 afterAll(async () => {
-  await conn.dropDatabase();
-  await conn.close();
+  // await conn.dropDatabase();
+  // await conn.close();
 });
