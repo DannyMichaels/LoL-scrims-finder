@@ -133,7 +133,7 @@ export const removeCasterFromScrim = async ({ scrimId, userId }) => {
 
 export const addImageToScrim = async (id, data) => {
   try {
-    const response = await api.put(`/scrims/${id}/add-image`, data);
+    const response = await api.patch(`/scrims/${id}/add-image`, data);
     return response.data;
   } catch (error) {
     const errorMsg = error.response.data.error;
@@ -143,7 +143,7 @@ export const addImageToScrim = async (id, data) => {
 
 export const removeImageFromScrim = async (id) => {
   try {
-    const response = await api.put(`/scrims/${id}/remove-image`);
+    const response = await api.patch(`/scrims/${id}/remove-image`);
     return response.data;
   } catch (error) {
     console.error(error);

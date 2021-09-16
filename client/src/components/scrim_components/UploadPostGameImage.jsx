@@ -11,6 +11,10 @@ import S3FileUpload from 'react-s3';
 import { addImageToScrim, removeImageFromScrim } from '../../services/scrims';
 import { useAlerts } from '../../context/alertsContext';
 
+// icons
+import UploadIcon from '@material-ui/icons/CloudUpload';
+
+// constants
 const MAX_FILE_SIZE_MIB = 0.953674; // 1 megabyte (in Memibyte format)
 
 // can also delete image here... maybe needs renaming
@@ -152,6 +156,7 @@ export default function UploadPostGameImage({ scrim, isUploaded }) {
           <Button
             variant="contained"
             color="primary"
+            startIcon={<UploadIcon />}
             disabled={buttonDisabled}
             component="label">
             Upload
