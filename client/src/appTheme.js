@@ -57,12 +57,13 @@ export const appTheme = createTheme({
       fontWeight: 'bold',
       marginBlockStart: '0.83em',
       marginBlockEnd: '0.83em',
-      color: '#fff',
+      color: '#000',
     },
 
     span: {
       color: '#fff',
     },
+
     h3: {
       display: 'block',
       fontSize: '1.17em',
@@ -92,13 +93,6 @@ export const appTheme = createTheme({
     },
   },
 
-  defaultTheme: {
-    pallete: {
-      common: {
-        white: '#fff',
-      },
-    },
-  },
   overrides: {
     MuiAppBar: {
       colorDefault: {

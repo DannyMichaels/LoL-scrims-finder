@@ -202,7 +202,7 @@ export default function Navbar({
 
                 {/* checkboxes for hide/show scrims, repeating in drawer, need separate component */}
                 {!showLess && (
-                  <Hidden mdDown>
+                  <Hidden lgDown>
                     <Grid
                       container
                       alignItems="center"
@@ -211,7 +211,7 @@ export default function Navbar({
                       item
                       xs={12}>
                       {showCheckboxes && (
-                        <Hidden mdDown>
+                        <>
                           {/* Show scrims (current, previous, upcoming) buttons */}
                           <Grid item xs={7} alignItems="center" container>
                             <FormGroup
@@ -271,7 +271,7 @@ export default function Navbar({
                               />
                             </FormGroup>
                           </Grid>
-                        </Hidden>
+                        </>
                       )}
 
                       {/* date filter and region filter */}
