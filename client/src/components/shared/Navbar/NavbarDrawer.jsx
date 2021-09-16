@@ -82,6 +82,7 @@ export default function NavbarDrawer({
     [matchesMd]
   );
 
+  console.dir({ theme });
   // this is terrible but I'm doing it this way because it will cause an error that it can't find props of undefined
   let hidePreviousScrims = hideProps?.hidePreviousScrims,
     hideCurrentScrims = hideProps?.hideCurrentScrims,
