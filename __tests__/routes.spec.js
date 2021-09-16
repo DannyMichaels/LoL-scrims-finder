@@ -92,6 +92,8 @@ beforeAll(async () => {
       gameStartTime: Date.now(),
       title: `${createdUsers[0].name}'s scrim`,
       lobbyName: 'Scrim 1 Custom Game (NA)',
+      lobbyHost: createdUsers[0],
+      teamWon: 'Team 2 (Red Side)',
     },
   ];
 
@@ -134,6 +136,7 @@ describe('/api/users', () => {
   });
 });
 
+// get all scrims
 describe('/api/scrims', () => {
   it('should show all scrims', async (done) => {
     const response = await request(app)
@@ -146,6 +149,20 @@ describe('/api/scrims', () => {
     expect(response.body[0]).toHaveProperty('teamOne');
     expect(response.body[0]).toHaveProperty('teamTwo');
     expect(response.body[0]).toHaveProperty('gameStartTime');
+    expect(response.body[0]).toHaveProperty('lobbyHost');
+    expect(response.body[0]).toHaveProperty('lobbyName');
+    expect(response.body[0]).toHaveProperty('lobbyPassword');
+    expect(response.body[0]).toHaveProperty('teamWon');
+
+    const teamOne = response.body[0].teamOne;
+    expect(teamOne[0]).toHaveProperty('_user');
+    expect(teamOne[0]).toHaveProperty('role');
+    expect(teamOne[0]).toHaveProperty('team');
+
+    const teamTwo = response.body[0].teamOne;
+    expect(teamTwo[0]).toHaveProperty('_user');
+    expect(teamTwo[0]).toHaveProperty('role');
+    expect(teamTwo[0]).toHaveProperty('team');
 
     expect(response.body[0]).not.toHaveProperty('randomProperty');
 
@@ -153,6 +170,42 @@ describe('/api/scrims', () => {
   });
 });
 
+// get one scrim by id
+describe('/api/scrims/:id', () => {
+  it('should show one scrim by id', async (done) => {
+    const response = await request(app)
+      .get(`/api/scrims/${scrim._id}`)
+      .set(headers)
+      .expect(200);
+
+    const oneScrim = response.body;
+
+    expect(oneScrim).toHaveProperty('_id');
+    expect(oneScrim).toHaveProperty('teamOne');
+    expect(oneScrim).toHaveProperty('teamTwo');
+    expect(oneScrim).toHaveProperty('gameStartTime');
+    expect(oneScrim).toHaveProperty('lobbyHost');
+    expect(oneScrim).toHaveProperty('lobbyName');
+    expect(oneScrim).toHaveProperty('lobbyPassword');
+    expect(oneScrim).toHaveProperty('teamWon');
+
+    const teamOne = oneScrim.teamOne;
+    expect(teamOne[0]).toHaveProperty('_user');
+    expect(teamOne[0]).toHaveProperty('role');
+    expect(teamOne[0]).toHaveProperty('team');
+
+    const teamTwo = oneScrim.teamOne;
+    expect(teamTwo[0]).toHaveProperty('_user');
+    expect(teamTwo[0]).toHaveProperty('role');
+    expect(teamTwo[0]).toHaveProperty('team');
+
+    expect(oneScrim).not.toHaveProperty('randomProperty');
+
+    done();
+  });
+});
+
+// get all users
 describe('/api/users', () => {
   it('should show all users', async (done) => {
     const response = await request(app)
