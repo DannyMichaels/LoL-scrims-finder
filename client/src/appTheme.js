@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, adaptV4Theme } from '@mui/material/styles';
 
 export const COLORS = {
   DK_BLUE: '#101820',
@@ -20,8 +20,8 @@ export const appTheme = createTheme({
     mode: 'dark',
 
     primary: {
-      main: '#FBC02D',
-      contrastText: '#000',
+      main: '#d1dcde',
+      contrastText: '#573625',
     },
 
     secondary: {
@@ -32,6 +32,8 @@ export const appTheme = createTheme({
     background: {
       default: '#303030',
       paper: '#424242',
+      // default: "#04323a",
+      // paper: "#04323a",
       // default: 'rgba(18,25,35)',
       // paper: 'rgba(18,25,35)',
     },
