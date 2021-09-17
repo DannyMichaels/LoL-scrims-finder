@@ -103,7 +103,7 @@ export const appTheme = createTheme({
         root: {
           // Some CSS
           fontSize: '1rem',
-          fontWeight: 500,
+          fontWeight: 600,
         },
       },
     },
