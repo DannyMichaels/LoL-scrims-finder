@@ -95,6 +95,7 @@ export const appTheme = createTheme({
     },
   },
 
+  // https://mui.com/customization/theme-components/
   components: {
     // Name of the component
     MuiButton: {
