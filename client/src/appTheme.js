@@ -1,4 +1,4 @@
-import { createTheme, adaptV4Theme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 
 export const COLORS = {
   DK_BLUE: '#101820',
@@ -6,6 +6,11 @@ export const COLORS = {
 };
 
 export const appTheme = createTheme({
+  overrides: {
+    MuiButton: {
+      fontSize: 700,
+    },
+  },
   breakpoints: {
     values: {
       xs: 0,
@@ -25,7 +30,7 @@ export const appTheme = createTheme({
     },
 
     secondary: {
-      main: '#f44336',
+      main: '#573625',
       constrastText: '#fff',
     },
 
