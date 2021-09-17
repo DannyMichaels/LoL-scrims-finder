@@ -31,10 +31,9 @@ const useStyles = makeStyles({
   },
 
   timerText: {
-    fontFamily: ['Montserrat', 'sans-serif'].join(','),
     fontWeight: 600,
     color: 'green',
-    fontSize: '22px',
+    fontSize: '22px !important',
   },
 });
 
