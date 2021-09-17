@@ -6,11 +6,6 @@ export const COLORS = {
 };
 
 export const appTheme = createTheme({
-  overrides: {
-    MuiButton: {
-      fontSize: 700,
-    },
-  },
   breakpoints: {
     values: {
       xs: 0,
@@ -97,6 +92,20 @@ export const appTheme = createTheme({
       marginInlineStart: '0px',
       marginInlineEnd: '0px',
       fontSize: '22px',
+    },
+  },
+
+  components: {
+    // Name of the component
+    MuiButton: {
+      styleOverrides: {
+        // Name of the slot
+        root: {
+          // Some CSS
+          fontSize: '1rem',
+          fontWeight: 500,
+        },
+      },
     },
   },
 });
