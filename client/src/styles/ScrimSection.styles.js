@@ -20,6 +20,14 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
       imageUploaded === scrim?._id ? '100% 100%' : 'cover',
     border: '1px solid white',
   },
+  scrimSectionHeader: {
+    background: '#101820 !important', // fallback
+    backgroundColor: 'rgba(18,25,35,.85) !important',
+    // background: 'rgba(240,234,240,0.8)'import { useScrimSectionStyles } from './../../styles/ScrimSection.styles';
+
+    padding: '10px',
+    backdropFilter: 'blur(8px)',
+  },
   iconButton: {
     color: theme.primary,
     cursor: 'pointer',

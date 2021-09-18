@@ -240,7 +240,7 @@ export default function ScrimTeamList({
                             href={`https://${userInfo?.region}.op.gg/summoner/userName=${userInfo?.name}`}
                             target="_blank"
                             style={{
-                              fontSize: isSmScreen ? 'inherit' : '0.875rem',
+                              fontSize: isSmScreen ? 'inherit' : '0.9rem',
                             }}
                             rel="noreferrer">
                             {isSmScreen

@@ -59,7 +59,7 @@ export const appTheme = createTheme({
       fontWeight: 'bold',
       marginBlockStart: '0.83em',
       marginBlockEnd: '0.83em',
-      color: '#000',
+      color: '#fff',
     },
 
     span: {
