@@ -238,9 +238,7 @@ export default function Intro() {
                 </Fragment>
               ))}
             </Grid>
-            <Stepper
-              style={{ background: '#424242', padding: '20px' }}
-              activeStep={currentFormIndex}>
+            <Stepper style={{}} activeStep={currentFormIndex}>
               {steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};

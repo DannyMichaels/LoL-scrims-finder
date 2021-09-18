@@ -1,8 +1,16 @@
 import { createTheme } from '@mui/material/styles';
 
 export const COLORS = {
-  DK_BLUE: '#101820',
-  DK_BLUE_TRANSPARENT: 'rgba(0, 0, 0, 0.61)', // dark filter to darken bg image
+  DARK: '#101820',
+  DARK_TRANSPARENT: 'rgba(0, 0, 0, 0.61)', // dark filter to darken bg image
+
+  DK_BLUE: 'rgba(18,25,35,.85)',
+  DK_BLUE_TRANSPARENT: 'rgba(18,25,35,.85)', // dark filter to darken bg image
+
+  LIGHT_BLUE: '#d1dcde',
+  BROWN: '#573625',
+  GREY_DEFAULT: '#303030',
+  GREY_PAPER: '#424242',
 };
 
 export const appTheme = createTheme({
@@ -105,6 +113,16 @@ export const appTheme = createTheme({
           // Some CSS
           fontSize: '1rem',
           fontWeight: 600,
+        },
+      },
+    },
+
+    MuiStepper: {
+      styleOverrides: {
+        root: {
+          background: '#424242',
+          padding: '20px',
+          borderRadius: '4px',
         },
       },
     },
