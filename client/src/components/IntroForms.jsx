@@ -149,8 +149,8 @@ export default function IntroForms({
 
       <Box m={2}>
         <Typography variant="body2">
-          If you're sure you want to sign up, click create my account with
-          google. <br />
+          If you're sure you want to sign up with these details, click create my
+          account with google. <br />
         </Typography>
       </Box>
     </Grid>
