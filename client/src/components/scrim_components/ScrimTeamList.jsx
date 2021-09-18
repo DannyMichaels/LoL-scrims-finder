@@ -185,7 +185,7 @@ export default function ScrimTeamList({
         className={classes.teamList}
         subheader={
           <>
-            <ListSubheader component="div" style={{ color: '#fff' }}>
+            <ListSubheader component="div" className={classes.teamListHeader}>
               {teamTitleName}
             </ListSubheader>
             <Divider />
@@ -213,16 +213,15 @@ export default function ScrimTeamList({
                   className={classes.teamListItem}
                   style={{
                     // fallback for non-supporting browsers
-                    background:
-                      isLobbyHost && gameStarted ? '#63d471' : '#424242',
+                    background: isLobbyHost && gameStarted && '#63d471',
 
                     // if game has started, but the game didn't end, and the player is the lobby host, make his background green.
                     // we don't care if the guy is the lobby host if game ended.
                     // eslint-disable-next-line
                     background:
-                      isLobbyHost && gameStarted
-                        ? 'linear-gradient(315deg, #63d471 0%, #233329 74%)'
-                        : '#424242',
+                      isLobbyHost &&
+                      gameStarted &&
+                      'linear-gradient(315deg, #63d471 0%, #233329 74%)',
                   }}>
                   <ListItemAvatar>
                     <Avatar

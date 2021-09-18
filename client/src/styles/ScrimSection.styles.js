@@ -23,8 +23,6 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
   scrimSectionHeader: {
     background: '#101820 !important', // fallback
     backgroundColor: 'rgba(18,25,35,.85) !important',
-    // background: 'rgba(240,234,240,0.8)'import { useScrimSectionStyles } from './../../styles/ScrimSection.styles';
-
     padding: '10px',
     backdropFilter: 'blur(8px)',
   },
@@ -53,15 +51,23 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
       gridTemplateRows: '1fr 1fr 1fr',
     },
   },
+  teamListHeader: {
+    color: '#fff !important',
+    background: '#101820 !important', // fallback
+    backgroundColor: 'rgba(18,25,35, .85) !important',
+    backdropFilter: 'blur(8px)',
+  },
   teamList: {
     width: '100%',
     maxWidth: '36ch',
-    backgroundColor: theme.palette.background.paper,
-    opacity: '0.99',
+    background: '#101820 !important', // fallback
+    backgroundColor: 'rgba(18,25,35, .97) !important',
+    backdropFilter: 'blur(10px)',
+
     transition: 'all 250ms ease-in-out',
     paddingBottom: 0,
     '&:hover': {
-      opacity: '1',
+      backgroundColor: 'rgba(18,25,35) !important',
     },
     '@media screen and (max-width: 630px)': {
       maxWidth: '100%',
