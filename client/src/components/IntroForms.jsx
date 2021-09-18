@@ -131,7 +131,7 @@ export default function IntroForms({
 
   const regionForm = (
     <Grid item sm={12}>
-      <Box m={2}>
+      <Box>
         <Typography variant="h1">Account details:</Typography>
       </Box>
 
@@ -140,17 +140,17 @@ export default function IntroForms({
       {userData.rank} \n Region: ${userData.region} \n Email: ${newUser.email}
       `); */}
       {Object.entries(userData).map(([k, v]) => (
-        <Box m={2}>
+        <Box>
           <Typography variant="h3">
             {k.charAt(0).toUpperCase() + k.substring(1)}: {v}
           </Typography>
         </Box>
       ))}
 
-      <Box m={2}>
+      <Box>
         <Typography variant="body2">
           If you're sure you want to sign up with these details, click create my
-          account with google. <br />
+          account with google.
         </Typography>
       </Box>
     </Grid>
@@ -161,6 +161,7 @@ export default function IntroForms({
   return (
     <Grid
       mt={4}
+      ml={2}
       container
       justifyContent="flex-start"
       direction={matchesSm ? 'column' : 'row'}

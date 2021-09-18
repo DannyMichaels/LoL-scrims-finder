@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Fragment } from 'react';
+import { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
 import { useAlerts } from '../context/alertsContext';
 import { useAuth } from './../context/currentUser';
 
@@ -161,21 +161,23 @@ export default function Intro() {
     async (e) => {
       e.preventDefault();
 
-      let newUser = await createGoogleAccount(); // google pop up verify acc
+      let userCredentials = await createGoogleAccount(); // google pop up verify acc
 
-      if (newUser) {
+      if (userCredentials) {
         // HANDLE SIGN UP.
-        let decodedUser = await registerUser(newUser);
-        setCurrentUser(decodedUser);
+        let createdUser = await registerUser(userCredentials, setCurrentAlert);
+        if (createdUser) {
+          setCurrentUser(createdUser);
 
-        setCurrentAlert({
-          type: 'Success',
-          message: 'Account created successfully, welcome!',
-        });
-        return decodedUser;
+          setCurrentAlert({
+            type: 'Success',
+            message: 'Account created successfully, welcome!',
+          });
+          return createdUser;
+        }
       }
     },
-    [createGoogleAccount, setCurrentUser]
+    [createGoogleAccount, setCurrentUser, setCurrentAlert]
   );
 
   useEffect(() => {
@@ -204,6 +206,11 @@ export default function Intro() {
     goPreviousStep,
     steps.length,
   ]);
+
+  let isLastStep = useMemo(
+    () => currentFormIndex === steps.length - 1,
+    [currentFormIndex, steps.length]
+  );
 
   if (currentUser) {
     console.log('redirecting to /');
@@ -256,47 +263,33 @@ export default function Intro() {
                 divisionsWithNumbers={divisionsWithNumbers}
               />
               <div className="page-break" />
-              {currentFormIndex === steps.length - 1 ? (
-                <Grid container item spacing={2}>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={goPreviousStep}>
-                      Previous
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      onClick={handleSubmit}
-                      variant="contained"
-                      color="primary"
-                      type="submit">
-                      Create my account with google
-                    </Button>
-                  </Grid>
+
+              <Grid container item spacing={2} ml={0}>
+                <Grid item>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    disabled={currentFormIndex === 0}
+                    onClick={goPreviousStep}>
+                    Previous
+                  </Button>
                 </Grid>
-              ) : (
-                <Grid container item spacing={2}>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      disabled={currentFormIndex === 0}
-                      onClick={goPreviousStep}>
-                      Previous
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={goNextStep}>
-                      Next
-                    </Button>
-                  </Grid>
+                <Grid item>
+                  <Button
+                    onClick={(e) => {
+                      if (isLastStep) {
+                        return handleSubmit(e);
+                      }
+
+                      return goNextStep(e);
+                    }}
+                    variant="contained"
+                    color="primary"
+                    type="submit">
+                    {isLastStep ? 'Create my account with google' : 'Next'}
+                  </Button>
                 </Grid>
-              )}
+              </Grid>
             </form>
           </InnerColumn>
         </PageSection>
