@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, Fragment } from 'react';
+import { useAlerts } from '../context/alertsContext';
+import { useAuth } from './../context/currentUser';
 
 // components
 import { Redirect } from 'react-router-dom';
@@ -19,7 +21,6 @@ import IntroForms from '../components/IntroForms';
 
 // utils
 import { auth, provider } from '../firebase';
-import { useAuth } from './../context/currentUser';
 import { KEYCODES } from './../utils/keycodes';
 
 // services
@@ -27,9 +28,9 @@ import { registerUser } from '../services/auth';
 
 function getSteps() {
   return [
-    'Summoner Name and Discord',
-    'Rank division and number',
-    'Region and sign up with google',
+    'Summoner Name, region and Discord',
+    'Rank division and / or number',
+    'Verification and sign-up',
   ];
 }
 
@@ -43,14 +44,13 @@ export default function Intro() {
     rank: '',
     region: 'NA',
     discord: '',
-    // need to be admin to create scrims
-    adminKey: '',
   });
   const [rankData, setRankData] = useState({
     rankDivision: 'Iron',
     rankNumber: '4',
   });
   const [currentFormIndex, setCurrentFormIndex] = useState(0);
+  const { setCurrentAlert } = useAlerts();
   const [errors, setErrors] = useState(new Map()); // using a map to keep unique errors.
   const steps = getSteps();
 
@@ -66,26 +66,23 @@ export default function Intro() {
   const handleErrors = useCallback(() => {
     /* if the text input value is empty and the errors map doesn't have it as a key:
     add it as a key and it's value as the message to the error map */
-    Object.entries(userData)
-      // don't throw errors for adminKey, it's not a required field.
-      .filter(([k]) => k !== 'adminKey')
-      .map(([key, value]) =>
-        // if value is empty and errors DON'T already have the key, add it to the errors map state.
-        value === ''
-          ? !errors.has(key) &&
-            setErrors(
-              (prevState) => new Map(prevState.set(key, `${key} is empty!`))
-            )
-          : errors.has(key) &&
-            // else if they do have the key, remove it from the errors map state.
-            setErrors((prevState) => {
-              /* else if the text input value isn't empty and the key exists (input.name) in the errors map, 
+    Object.entries(userData).map(([key, value]) =>
+      // if value is empty and errors DON'T already have the key, add it to the errors map state.
+      value === ''
+        ? !errors.has(key) &&
+          setErrors(
+            (prevState) => new Map(prevState.set(key, `${key} is empty!`))
+          )
+        : errors.has(key) &&
+          // else if they do have the key, remove it from the errors map state.
+          setErrors((prevState) => {
+            /* else if the text input value isn't empty and the key exists (input.name) in the errors map, 
               remove it from the errors map */
-              let newState = new Map(prevState);
-              newState.delete(key);
-              return newState;
-            })
-      );
+            let newState = new Map(prevState);
+            newState.delete(key);
+            return newState;
+          })
+    );
   }, [errors, userData]);
 
   const handleChange = ({ target }, setter) => {
@@ -148,7 +145,6 @@ export default function Intro() {
           region: userData.region,
           discord: userData.discord,
           rank: userData.rank,
-          adminKey: userData.adminKey?.trim() ?? '',
           email: result.user.email,
           // refreshToken: result.user.refreshToken, // prob don't need.
         };
@@ -168,36 +164,18 @@ export default function Intro() {
       let newUser = await createGoogleAccount(); // google pop up verify acc
 
       if (newUser) {
-        // has to confirm.
-        // settimeout so google popup doesn't cover confirmation alert.
-        // google popup closes by then.
-        setTimeout(async () => {
-          let yes =
-            window.confirm(`Are you sure you want to create this account? \n
-        Summoner Name: ${userData.name} \n
-        Discord: ${userData.discord} \n
-        Rank: ${userData.rank} \n
-        Region: ${userData.region} \n
-        Email: ${newUser.email} 
-        `);
+        // HANDLE SIGN UP.
+        let decodedUser = await registerUser(newUser);
+        setCurrentUser(decodedUser);
 
-          if (!yes) return;
-
-          // HANDLE SIGN UP.
-          let decodedUser = await registerUser(newUser);
-          setCurrentUser(decodedUser);
-          return decodedUser;
-        }, 200);
+        setCurrentAlert({
+          type: 'Success',
+          message: 'Account created successfully, welcome!',
+        });
+        return decodedUser;
       }
     },
-    [
-      createGoogleAccount,
-      setCurrentUser,
-      userData.name,
-      userData.discord,
-      userData.rank,
-      userData.region,
-    ]
+    [createGoogleAccount, setCurrentUser]
   );
 
   useEffect(() => {
@@ -259,14 +237,6 @@ export default function Intro() {
               {steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};
-
-                if (index === 0) {
-                  labelProps.optional = (
-                    <Typography variant="caption text-white" key={label}>
-                      ( Admin key optional )
-                    </Typography>
-                  );
-                }
 
                 return (
                   <Step key={index} {...stepProps}>
