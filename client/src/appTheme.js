@@ -40,13 +40,7 @@ export const appTheme = createTheme({
     background: {
       default: '#303030',
       paper: '#424242',
-      // default: "#04323a",
-      // paper: "#04323a",
-      // default: 'rgba(18,25,35)',
-      // paper: 'rgba(18,25,35)',
     },
-
-    // secondary: {},
   },
   typography: {
     // Use the system font instead of the default Roboto font.
@@ -120,7 +114,8 @@ export const appTheme = createTheme({
     MuiStepper: {
       styleOverrides: {
         root: {
-          background: '#424242',
+          backgroundColor: 'rgba(18,25,35)', // dark filter to darken bg image
+          boxShadow: '1px 0px 7px 1px #fff',
           padding: '20px',
           borderRadius: '4px',
         },
