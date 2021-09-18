@@ -61,8 +61,8 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
     width: '100%',
     maxWidth: '36ch',
     background: '#101820 !important', // fallback
-    backgroundColor: 'rgba(18,25,35, .97) !important',
-    backdropFilter: 'blur(10px)',
+    backgroundColor: 'rgba(18,25,35, .85) !important',
+    backdropFilter: 'blur(20px)',
 
     transition: 'all 250ms ease-in-out',
     paddingBottom: 0,
