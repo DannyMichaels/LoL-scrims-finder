@@ -34,14 +34,19 @@ export const useSetScrimsRegion = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (scrimsRegion === currentUser.region) return;
+    if (!currentUser?.region) return; // don't run this when we don't have a user yet.
 
-    if (scrimsLoaded && scrimsRegion === currentUser.region) return;
+    // if the scrims region is already equal to the currentUsers region, don't proceed
+    if (scrimsRegion === currentUser?.region) return;
 
+    // if the scrims have loaded, but the users region is already equal to the scrims region return.
+    if (scrimsLoaded && scrimsRegion === currentUser?.region) return;
+
+    // set the scrims region on mount when user is available, or when user changes his region in the settings.
     dispatch({ type: 'scrims/setScrimsRegion', payload: currentUser?.region });
 
     // eslint-disable-next-line
-  }, [currentUser, scrimsLoaded, scrimsRegion]);
+  }, [currentUser?.region, scrimsLoaded, scrimsRegion]);
 
   return null;
 };

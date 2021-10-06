@@ -4,7 +4,11 @@ import './App.css';
 import { useEffect } from 'react';
 import useAlerts from './hooks/useAlerts';
 import useAuth from './hooks/useAuth';
-import { useSetScrimsRegion } from './hooks/useScrims';
+import {
+  useFetchScrims,
+  useFetchScrimsInterval,
+  useSetScrimsRegion,
+} from './hooks/useScrims';
 
 // styles
 import { appTheme } from './appTheme';
@@ -25,7 +29,9 @@ function App() {
   const { currentAlert, closeAlert } = useAlerts();
   const classes = useAppStyles();
 
-  useSetScrimsRegion();
+  useFetchScrims(); // fetch scrims on mount or path change
+  useFetchScrimsInterval(); // fetch scrims on 10 sec interval
+  useSetScrimsRegion(); // set scrims region to users region on mount and when user changes it on settings
 
   useEffect(() => {
     handleVerify();

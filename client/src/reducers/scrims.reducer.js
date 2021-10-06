@@ -2,7 +2,7 @@ const initialState = {
   scrims: [],
   scrimsLoaded: false,
   fetch: false,
-  scrimsRegion: '',
+  scrimsRegion: 'NA',
 };
 
 export default function scrimsReducer(state = initialState, action) {
