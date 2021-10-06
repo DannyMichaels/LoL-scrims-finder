@@ -4,7 +4,6 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { AlertsProvider } from './hooks/useAlerts';
 import { ScrimsProvider } from './context/scrimsContext';
 import ReactComment from './components/shared/ReactComment';
 import { creditsComment } from './creditsComment';
@@ -23,13 +22,11 @@ ReactDOM.render(
 
     <Router>
       <Provider store={store}>
-        <>
-          <ScrimsProvider>
-            {/* the only way I know to render a comment in react */}
-            <ReactComment text={creditsComment} trim={false} />
-            <App />
-          </ScrimsProvider>
-        </>
+        <ScrimsProvider>
+          {/* the only way I know to render a comment in react */}
+          <ReactComment text={creditsComment} trim={false} />
+          <App />
+        </ScrimsProvider>
       </Provider>
     </Router>
   </>,
