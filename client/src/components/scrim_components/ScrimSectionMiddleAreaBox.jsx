@@ -41,7 +41,6 @@ export default function ScrimSectionMiddleAreaBox({
   playerEntered,
   casterEntered,
 }) {
-  // const { currentUser, isCurrentUserAdmin } = useAuth();
   const { currentUser, isCurrentUserAdmin } = useAuth();
 
   const classes = useStyles({ gameStarted, imageUploaded });
