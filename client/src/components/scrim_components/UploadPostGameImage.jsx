@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useScrims } from './../../context/scrimsContext';
 import useAuth from './../../hooks/useAuth';
-import { useAlerts } from '../../context/alertsContext';
+import useAlerts from '../../hooks/useAlerts';
 
 // components
 import AdminArea from '../shared/AdminArea';

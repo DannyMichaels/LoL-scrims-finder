@@ -3,7 +3,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useScrims } from './../../context/scrimsContext';
 import useAuth from './../../hooks/useAuth';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
-import { useAlerts } from '../../context/alertsContext';
+import useAlerts from './../../hooks/useAlerts';
 
 // MUI components
 import List from '@mui/material/List';

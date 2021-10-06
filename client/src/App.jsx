@@ -2,7 +2,7 @@ import './App.css';
 
 // hooks
 import { useEffect } from 'react';
-import { useAlerts } from './context/alertsContext';
+import useAlerts from './hooks/useAlerts';
 import useAuth from './hooks/useAuth';
 
 // styles

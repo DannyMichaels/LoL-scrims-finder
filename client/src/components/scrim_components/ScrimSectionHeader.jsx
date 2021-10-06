@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { useAlerts } from '../../context/alertsContext';
+import useAlerts from './../../hooks/useAlerts';
 import useTheme from '@mui/styles/useTheme';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 
 // components
 import Moment from 'react-moment';
@@ -19,7 +20,6 @@ import AdminArea from './../shared/AdminArea';
 // icons
 import ShareIcon from '@mui/icons-material/Share';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 
 const MAX_CASTER_AMOUNT = 2;
 

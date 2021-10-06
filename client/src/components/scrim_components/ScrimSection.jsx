@@ -1,8 +1,9 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useScrims } from './../../context/scrimsContext';
 import useAuth from '../../hooks/useAuth';
+import useAlerts from './../../hooks/useAlerts';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
-import { useAlerts } from '../../context/alertsContext';
+
 import { useHistory } from 'react-router-dom';
 
 //  components

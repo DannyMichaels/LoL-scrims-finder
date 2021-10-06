@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useScrims } from './../context/scrimsContext';
-import { useAlerts } from './../context/alertsContext';
+import useAlerts from './../hooks/useAlerts';
 import useAuth from './../hooks/useAuth';
 
 // components

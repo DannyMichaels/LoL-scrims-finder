@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useAlerts } from '../context/alertsContext';
+import useAlerts from '../hooks/useAlerts';
 
 // components
 import Grid from '@mui/material/Grid';

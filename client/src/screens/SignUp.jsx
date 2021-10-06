@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
-import { useAlerts } from '../context/alertsContext';
+import useAlerts from '../hooks/useAlerts';
 import useAuth from '../hooks/useAuth';
 
 // components

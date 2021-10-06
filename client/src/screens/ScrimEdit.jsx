@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useScrims } from './../context/scrimsContext';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
-import { useAlerts } from '../context/alertsContext';
+import useAlerts from '../hooks/useAlerts';
 import useAuth from './../hooks/useAuth';
 
 // components
