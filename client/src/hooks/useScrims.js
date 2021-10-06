@@ -25,6 +25,27 @@ export default function useScrims() {
   };
 }
 
+// sets the scrim region to the users scrim region
+export const useSetScrimsRegion = () => {
+  const [{ scrimsLoaded, scrimsRegion }, currentUser] = useSelector(
+    ({ scrims, auth }) => [scrims, auth?.currentUser]
+  );
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (scrimsRegion === currentUser.region) return;
+
+    if (scrimsLoaded && scrimsRegion === currentUser.region) return;
+
+    dispatch({ type: 'scrims/setScrimsRegion', payload: currentUser?.region });
+
+    // eslint-disable-next-line
+  }, [currentUser, scrimsLoaded, scrimsRegion]);
+
+  return null;
+};
+
 export const useFetchScrims = () => {
   const { fetch } = useSelector(({ scrims }) => scrims);
   const dispatch = useDispatch();
@@ -67,4 +88,6 @@ export const useFetchScrimsInterval = () => {
   };
 
   useInterval(loadScrims, FETCH_INTERVAL);
+
+  return null;
 };

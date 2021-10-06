@@ -4,6 +4,7 @@ import './App.css';
 import { useEffect } from 'react';
 import useAlerts from './hooks/useAlerts';
 import useAuth from './hooks/useAuth';
+import { useSetScrimsRegion } from './hooks/useScrims';
 
 // styles
 import { appTheme } from './appTheme';
@@ -23,6 +24,8 @@ function App() {
 
   const { currentAlert, closeAlert } = useAlerts();
   const classes = useAppStyles();
+
+  useSetScrimsRegion();
 
   useEffect(() => {
     handleVerify();

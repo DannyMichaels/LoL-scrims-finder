@@ -2,6 +2,7 @@ const initialState = {
   scrims: [],
   scrimsLoaded: false,
   fetch: false,
+  scrimsRegion: '',
 };
 
 export default function scrimsReducer(state = initialState, action) {
@@ -43,6 +44,13 @@ export default function scrimsReducer(state = initialState, action) {
       return {
         ...state,
         fetch: !state.fetch,
+      };
+    }
+
+    case 'scrims/setScrimsRegion': {
+      return {
+        ...state,
+        scrimsRegion: payload,
       };
     }
 
