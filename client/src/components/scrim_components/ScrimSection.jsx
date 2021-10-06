@@ -3,7 +3,7 @@ import useScrims from '../../hooks/useScrims';
 import useAuth from '../../hooks/useAuth';
 import useAlerts from './../../hooks/useAlerts';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
-
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 //  components
@@ -34,7 +34,7 @@ const compareDates = (scrim) => {
 const MAX_CASTER_AMOUNT = 2;
 
 export default function ScrimSection({ scrim, isInDetail }) {
-  const { setScrims, fetchScrims } = useScrims();
+  const { fetchScrims } = useScrims();
   const { currentUser } = useAuth();
   const { setCurrentAlert } = useAlerts();
 
@@ -43,6 +43,8 @@ export default function ScrimSection({ scrim, isInDetail }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [imageUploaded, setImageUploaded] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false); // for when players spam joining or leaving.
+
+  const dispatch = useDispatch();
 
   // if the scrim has a winning team, it means it has ended.
   const gameEnded = useMemo(() => scrim.teamWon, [scrim.teamWon]);
@@ -156,7 +158,8 @@ export default function ScrimSection({ scrim, isInDetail }) {
       let deletedScrim = await deleteScrim(scrim._id);
 
       if (deletedScrim) {
-        setScrims((prevState) => prevState.filter((s) => s._id !== scrim._id));
+        // setScrims((prevState) => prevState.filter((s) => s._id !== scrim._id));
+        dispatch({ type: 'scrims/deleteScrim', payload: scrim });
 
         setCurrentAlert({
           type: 'Success',
