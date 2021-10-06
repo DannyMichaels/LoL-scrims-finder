@@ -8,7 +8,7 @@ import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 // utils
-import { handleLogin } from '../../../actions/authActions';
+import { handleLogin } from '../../../actions/currentUser.actions';
 
 // Mui components
 import Button from '@mui/material/Button';
@@ -64,7 +64,7 @@ export default function Navbar({
   hideProps,
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { currentUser } = useSelector(({ currentUser }) => currentUser);
+  const { currentUser } = useSelector(({ auth }) => auth);
 
   const classes = useStyles();
   const { pathname } = useLocation();

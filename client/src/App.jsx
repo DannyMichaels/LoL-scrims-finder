@@ -18,11 +18,11 @@ import Footer from './components/shared/Footer';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-import { handleVerify } from './actions/authActions';
+import { handleVerify } from './actions/currentUser.actions';
 
 function App() {
   // const { loading: verifyingUser } = useAuth();
-  const { isVerifyingUser } = useSelector(({ currentUser }) => currentUser);
+  const { isVerifyingUser } = useSelector(({ auth }) => auth);
   const dispatch = useDispatch();
   const history = useHistory();
 

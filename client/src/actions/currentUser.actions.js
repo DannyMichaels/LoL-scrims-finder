@@ -1,8 +1,8 @@
-import devLog from './../utils/devLog';
+import devLog from '../utils/devLog';
 import { auth, provider } from '../firebase';
 import { loginUser, verifyUser } from '../services/auth';
 import jwt_decode from 'jwt-decode';
-import { setAuthToken, removeToken } from './../services/auth';
+import { setAuthToken, removeToken } from '../services/auth';
 
 export const handleLogin = async (history, dispatch) => {
   devLog('logging in...');
@@ -20,19 +20,19 @@ export const handleLogin = async (history, dispatch) => {
     const decodedUser = await loginUser(googleParams); // get the jwt token from backend with params
 
     if (decodedUser) {
-      dispatch({ type: 'currentUser/setCurrentUser', payload: decodedUser });
+      dispatch({ type: 'auth/setCurrentUser', payload: decodedUser });
       history.push('/');
     }
   }
 };
 
-export const handleLogout = async (history, dispatch) => {
+export const handleLogout = (history) => (dispatch) => {
   devLog('logging out...');
   auth.signOut();
   localStorage.removeItem('jwtToken'); // remove token from localStorage
   removeToken();
-  dispatch({ type: 'currentUser/logout' });
   history.push('/signup'); // push back to signup
+  dispatch({ type: 'auth/logout' });
 };
 
 export const handleVerify = async (history, dispatch) => {
@@ -53,7 +53,7 @@ export const handleVerify = async (history, dispatch) => {
     if (data?.token) {
       localStorage.setItem('jwtToken', data?.token);
       // Set user
-      dispatch({ type: 'currentUser/setCurrentUser', payload: data?.user });
+      dispatch({ type: 'auth/setCurrentUser', payload: data?.user });
 
       // Check for expired token
       const currentTime = Date.now() / 1000; // to get in milliseconds
@@ -66,5 +66,5 @@ export const handleVerify = async (history, dispatch) => {
       }
     }
   }
-  dispatch({ type: 'currentUser/setIsVerifyingUser', payload: false });
+  dispatch({ type: 'auth/setIsVerifyingUser', payload: false });
 };

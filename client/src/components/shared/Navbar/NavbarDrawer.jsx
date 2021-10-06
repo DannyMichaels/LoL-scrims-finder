@@ -1,11 +1,12 @@
 // hooks
 import { useMemo } from 'react';
 import useOnKeyDown from './../../../hooks/useOnKeyDown';
-import { useAuth } from '../../../context/currentUser';
 import { useHistory } from 'react-router-dom';
 import { useScrims } from '../../../context/scrimsContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // components
 import { InnerColumn } from '../PageComponents';
@@ -38,6 +39,7 @@ import moment from 'moment';
 import clsx from 'clsx';
 import { KEYCODES } from '../../../utils/keycodes';
 import { makeStyles } from '@mui/styles';
+import { handleLogout } from './../../../actions/currentUser.actions';
 
 const useStyles = makeStyles({
   drawerRoot: {
@@ -68,12 +70,12 @@ export default function NavbarDrawer({
   scrimsDate, // the date the scrims are going to be filtered by
   setScrimsDate,
 }) {
-  const { currentUser, logOutUser } = useAuth();
+  const { currentUser } = useSelector(({ auth }) => auth);
   const { fetchScrims } = useScrims();
 
   const classes = useStyles();
   const history = useHistory();
-
+  const dispatch = useDispatch();
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
@@ -165,7 +167,9 @@ export default function NavbarDrawer({
             {/* Log out button */}
             {currentUser?.uid && (
               <>
-                <ListItem button onClick={logOutUser}>
+                <ListItem
+                  button
+                  onClick={() => handleLogout(history, dispatch)}>
                   <ListItemIcon>
                     <ExitIcon />
                   </ListItemIcon>
