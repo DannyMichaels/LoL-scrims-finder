@@ -158,7 +158,6 @@ export default function ScrimSection({ scrim, isInDetail }) {
       let deletedScrim = await deleteScrim(scrim._id);
 
       if (deletedScrim) {
-        // setScrims((prevState) => prevState.filter((s) => s._id !== scrim._id));
         dispatch({ type: 'scrims/deleteScrim', payload: scrim });
 
         setCurrentAlert({
