@@ -9,11 +9,9 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import { InnerColumn, PageContent } from '../components/shared/PageComponents';
-import ScrimSection from '../components/scrim_components/ScrimSection';
 import Loading from '../components/shared/Loading';
 import Navbar from '../components/shared/Navbar/Navbar';
 import Tooltip from '../components/shared/Tooltip';
-import { Fade } from 'react-awesome-reveal'; // intersection observer fade on scrim box reveal.
 
 // utils
 import { showEarliestFirst, showLatestFirst } from '../utils/getSortedScrims';
@@ -152,70 +150,33 @@ export default function Scrims() {
           {filteredScrims.length > 0 ? (
             <>
               {/* CURRENT SCRIMS */}
-              <ScrimsColumn
-                headerText="Current Scrims"
-                scrims={currentScrims}
-                show={showCurrentScrims}
-              />
+              {currentScrims.length > 0 ? (
+                <ScrimsColumn
+                  headerText="Current Scrims"
+                  scrims={currentScrims}
+                  show={showCurrentScrims}
+                />
+              ) : null}
 
               {/* CURRENT SCRIMS END */}
 
               {/* UPCOMING SCRIMS */}
-              {showUpcomingScrims && (
-                <>
-                  <InnerColumn>
-                    <div
-                      style={{
-                        marginBottom: '40px',
-                        borderBottom: '1px solid white',
-                      }}>
-                      <Typography align="center" variant="h1" gutterBottom>
-                        {upcomingScrims.length > 0
-                          ? 'Upcoming scrims'
-                          : 'No upcoming scrims'}
-                      </Typography>
-                    </div>
-                  </InnerColumn>
-
-                  {upcomingScrims.map((scrim) => (
-                    <Fragment key={scrim._id}>
-                      <Fade triggerOnce>
-                        <ScrimSection scrim={scrim} />
-                      </Fade>
-                      <div className="page-break" />
-                    </Fragment>
-                  ))}
-                  <div className="page-break" />
-                </>
-              )}
-              {/* UPCOMING SCRIMS END */}
+              <ScrimsColumn
+                headerText="Upcoming Scrims"
+                altText="No upcoming scrims"
+                scrims={upcomingScrims}
+                show={showUpcomingScrims}
+              />
 
               {/* PREVIOUS SCRIMS */}
-              {showPreviousScrims && (
-                <>
-                  {previousScrims.length > 0 ? (
-                    <InnerColumn style={{ marginTop: '20px' }}>
-                      <div
-                        style={{
-                          marginBottom: '40px',
-                          borderBottom: '1px solid white',
-                        }}>
-                        <Typography align="center" variant="h1">
-                          Previous scrims
-                        </Typography>
-                      </div>
-                    </InnerColumn>
-                  ) : null}
-                  {previousScrims.map((scrim) => (
-                    <Fragment key={scrim._id}>
-                      <Fade triggerOnce>
-                        <ScrimSection scrim={scrim} />
-                      </Fade>
-                      <div className="page-break" />
-                    </Fragment>
-                  ))}
-                </>
-              )}
+
+              {previousScrims.length ? (
+                <ScrimsColumn
+                  scrims={previousScrims}
+                  headerText="Previous scrims"
+                  show={showPreviousScrims}
+                />
+              ) : null}
             </>
           ) : (
             // if filteredScrims.length is <= 0
