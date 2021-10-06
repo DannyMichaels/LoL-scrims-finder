@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment, useMemo } from 'react';
+import { useEffect, Fragment, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useScrims from './../hooks/useScrims';
@@ -46,9 +46,9 @@ export default function Scrims() {
     scrimsLoaded,
     scrimsDate,
     scrimsRegion,
-    hidePreviousScrims,
-    hideCurrentScrims,
-    hideUpcomingScrims,
+    showPreviousScrims,
+    showCurrentScrims,
+    showUpcomingScrims,
     filteredScrims,
   } = useScrims();
 
@@ -121,10 +121,12 @@ export default function Scrims() {
   useEffect(() => {
     // if scrimsDate < currentTime
     if (compareDateWithCurrentTime(scrimsDate) > 0) {
+      if (!showUpcomingScrims) return;
       // if the scrim is in the past compared to filtered scrims date.
-      dispatch({ type: 'scrims/setHideScrims', showUpcoming: false });
+      dispatch({ type: 'scrims/setShowScrims', showUpcoming: false });
     } else {
-      dispatch({ type: 'scrims/setHideScrims', showUpcoming: true });
+      if (showUpcomingScrims) return;
+      dispatch({ type: 'scrims/setShowScrims', showUpcoming: true });
     }
 
     // eslint-disable-next-line
@@ -149,7 +151,7 @@ export default function Scrims() {
           {filteredScrims.length > 0 ? (
             <>
               {/* CURRENT SCRIMS */}
-              {!hideCurrentScrims && (
+              {showCurrentScrims && (
                 <>
                   {currentScrims.length > 0 ? (
                     <>
@@ -181,7 +183,7 @@ export default function Scrims() {
               {/* CURRENT SCRIMS END */}
 
               {/* UPCOMING SCRIMS */}
-              {!hideUpcomingScrims && (
+              {showUpcomingScrims && (
                 <>
                   <InnerColumn>
                     <div
@@ -211,7 +213,7 @@ export default function Scrims() {
               {/* UPCOMING SCRIMS END */}
 
               {/* PREVIOUS SCRIMS */}
-              {!hidePreviousScrims && (
+              {showPreviousScrims && (
                 <>
                   {previousScrims.length > 0 ? (
                     <InnerColumn style={{ marginTop: '20px' }}>

@@ -1,12 +1,9 @@
 // hooks
 import { useState } from 'react';
-import useScrims from '../../../hooks/useScrims';
 import { useLocation, useHistory } from 'react-router-dom';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useAuth from './../../../hooks/useAuth';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
 
 // Mui components
 import Button from '@mui/material/Button';

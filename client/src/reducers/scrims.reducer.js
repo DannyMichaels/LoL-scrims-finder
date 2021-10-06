@@ -86,7 +86,7 @@ export default function scrimsReducer(state = initialState, action) {
       };
     }
 
-    case 'scrims/setHideScrims': {
+    case 'scrims/setShowScrims': {
       const { showPrevious, showCurrent, showUpcoming } = action;
 
       return {
