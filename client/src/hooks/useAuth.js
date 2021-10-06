@@ -41,7 +41,7 @@ export default function useAuth() {
       const decodedUser = await loginUser(googleParams); // get the jwt token from backend with params
 
       if (decodedUser) {
-        dispatch({ type: 'auth/setCurrentUser', payload: decodedUser });
+        setCurrentUser(decodedUser);
         history.push('/');
       }
     }
@@ -65,14 +65,13 @@ export default function useAuth() {
       if (data?.token) {
         localStorage.setItem('jwtToken', data?.token);
         // Set user
-        dispatch({ type: 'auth/setCurrentUser', payload: data?.user });
-
+        setCurrentUser(data?.user);
         // Check for expired token
         const currentTime = Date.now() / 1000; // to get in milliseconds
         if (decodedUser.exp < currentTime) {
           // if time passed expiration
           // Logout user
-          handleLogout(history, dispatch);
+          handleLogout();
           // Redirect to login
           history.push('/signup');
         }
