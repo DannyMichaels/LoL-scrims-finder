@@ -4,7 +4,7 @@ import { useScrims } from '../../../context/scrimsContext';
 import { useLocation, useHistory } from 'react-router-dom';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import useAuth from './../../../actions/auth.actions';
+import useAuth from './../../../hooks/useAuth';
 
 // Mui components
 import Button from '@mui/material/Button';

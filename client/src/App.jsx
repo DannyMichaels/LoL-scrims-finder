@@ -16,7 +16,7 @@ import Footer from './components/shared/Footer';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-import useAuth from './actions/auth.actions';
+import useAuth from './hooks/useAuth';
 
 function App() {
   // const { loading: verifyingUser } = useAuth();
