@@ -268,9 +268,6 @@ export default function NavbarDrawer({
                     <FormControlLabel
                       control={
                         <Checkbox
-                          // the UI says "show X scrims", so in this case we are reversing the boolean for checked, lol.
-                          // doesn't matter functionally.
-
                           checked={showCurrentScrims}
                           color="primary"
                           onChange={toggleShowScrims}
