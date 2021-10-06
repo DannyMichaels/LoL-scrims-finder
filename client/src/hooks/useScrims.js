@@ -6,7 +6,7 @@ import devLog from '../utils/devLog';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function useScrims() {
-  const { scrims, scrimsLoaded } = useSelector(({ scrims }) => scrims);
+  const { scrims, scrimsLoaded, ...rest } = useSelector(({ scrims }) => scrims);
 
   const dispatch = useDispatch();
 
@@ -22,6 +22,7 @@ export default function useScrims() {
     setScrims,
     scrimsLoaded,
     fetchScrims,
+    ...rest,
   };
 }
 

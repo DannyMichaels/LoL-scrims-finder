@@ -67,14 +67,29 @@ export default function scrimsReducer(state = initialState, action) {
       };
     }
 
+    case 'scrims/setScrimsDate': {
+      return {
+        ...state,
+        scrimsDate: payload,
+      };
+    }
+
+    // toggle show scrims button on navbar
+    case 'scrims/toggleHideScrims': {
+      return {
+        ...state,
+        [payload]: !state[payload],
+      };
+    }
+
     case 'scrims/setHideScrims': {
       const { hidePrevious, hideCurrent, hideUpcoming } = action;
 
       return {
         ...state,
-        hidePreviousScrims: hidePrevious || state.hidePreviousScrims,
-        hideCurrentScrims: hideCurrent || state.hideCurrentScrims,
-        hideUpcomingScrims: hideUpcoming || state.hideUpcomingScrims,
+        hidePreviousScrims: hidePrevious ?? state.hidePreviousScrims,
+        hideCurrentScrims: hideCurrent ?? state.hideCurrentScrims,
+        hideUpcomingScrims: hideUpcoming ?? state.hideUpcomingScrims,
       };
     }
 

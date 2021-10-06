@@ -51,18 +51,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Navbar({
-  setScrimsRegion,
-  scrimsDate,
-  setScrimsDate,
-  showDropdowns,
-  showLess,
-  showCheckboxes,
-  hideProps,
-}) {
+export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const { scrimsRegion } = useSelector(({ scrims }) => scrims);
+  const {
+    scrimsRegion,
+    scrimsDate,
+    hidePreviousScrims,
+    hideCurrentScrims,
+    hideUpcomingScrims,
+  } = useSelector(({ scrims }) => scrims);
   const dispatch = useDispatch();
 
   const classes = useStyles();
@@ -100,7 +98,12 @@ export default function Navbar({
   };
 
   const onSelectDate = (e) => {
-    setScrimsDate(moment(e.target.value));
+    const newDateValue = moment(e.target.value);
+    dispatch({ type: 'scrims/setScrimsDate', payload: newDateValue });
+  };
+
+  const toggleShowScrims = (e) => {
+    dispatch({ type: 'scrims/toggleHideScrims', payload: e.target.name });
   };
 
   return (
@@ -220,13 +223,9 @@ export default function Navbar({
                                   <Checkbox
                                     // the UI says "show X scrims", so in this case we are reversing the boolean for checked, lol.
                                     // doesn't matter functionally.
-                                    checked={!hideProps?.hideCurrentScrims}
+                                    checked={!hideCurrentScrims}
                                     color="primary"
-                                    onChange={() =>
-                                      hideProps?.setHideCurrentScrims(
-                                        (prevState) => !prevState
-                                      )
-                                    }
+                                    onChange={toggleShowScrims}
                                     name="hideCurrentScrims"
                                   />
                                 }
@@ -237,13 +236,9 @@ export default function Navbar({
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={!hideProps?.hideUpcomingScrims}
+                                    checked={!hideUpcomingScrims}
                                     color="primary"
-                                    onChange={() =>
-                                      hideProps?.setHideUpcomingScrims(
-                                        (prevState) => !prevState
-                                      )
-                                    }
+                                    onChange={toggleShowScrims}
                                     name="hideUpcomingScrims"
                                   />
                                 }
@@ -254,12 +249,8 @@ export default function Navbar({
                                 control={
                                   <Checkbox
                                     color="primary"
-                                    checked={!hideProps?.hidePreviousScrims}
-                                    onChange={() =>
-                                      hideProps?.setHidePreviousScrims(
-                                        (prevState) => !prevState
-                                      )
-                                    }
+                                    checked={!hidePreviousScrims}
+                                    onChange={toggleShowScrims}
                                     name="hidePreviousScrims"
                                   />
                                 }
@@ -345,11 +336,8 @@ export default function Navbar({
         showCheckboxes={showCheckboxes}
         showDropdowns={showDropdowns}
         showLess={showLess}
-        hideProps={hideProps}
         scrimsRegion={scrimsRegion}
-        setScrimsRegion={setScrimsRegion}
         scrimsDate={scrimsDate}
-        setScrimsDate={setScrimsDate}
       />
 
       <div className={classes.offset} />

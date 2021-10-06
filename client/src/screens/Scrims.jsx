@@ -1,8 +1,8 @@
 import { useState, useEffect, Fragment, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
-import useAuth from './../hooks/useAuth';
 import useScrims from './../hooks/useScrims';
+import { useDispatch } from 'react-redux';
 
 // components
 import Typography from '@mui/material/Typography';
@@ -17,7 +17,6 @@ import { Fade } from 'react-awesome-reveal'; // intersection observer fade on sc
 
 // utils
 import { showEarliestFirst, showLatestFirst } from '../utils/getSortedScrims';
-import moment from 'moment';
 import 'moment-timezone';
 import { compareDateWithCurrentTime } from './../utils/compareDateWithCurrentTime';
 
@@ -42,32 +41,19 @@ const compareDates = (scrim) => {
 };
 
 export default function Scrims() {
-  const today = useMemo(() => moment(), []); // not necessary to use useMemo.
-  const { currentUser } = useAuth();
+  const {
+    scrims,
+    scrimsLoaded,
+    scrimsDate,
+    scrimsRegion,
+    hidePreviousScrims,
+    hideCurrentScrims,
+    hideUpcomingScrims,
+  } = useScrims();
 
-  const { scrims, scrimsLoaded } = useScrims();
+  const dispatch = useDispatch();
 
   const [filteredScrims, setFilteredScrims] = useState([]); // the array of filtered scrims (both scrimsDate and scrimsRegion)
-
-  /**
-   * @stateName {scrimsDate}
-   * @return {Date} the date value to filter the scrims by
-   */
-  const [scrimsDate, setScrimsDate] = useState(today); // the date value for the date to filter scrims by
-
-  /**
-   * @stateName {scrimsRegion}
-   * @return {String} the string value to filter the scrims by
-   */
-  const [scrimsRegion, setScrimsRegion] = useState(
-    // the value for the region to filter scrims by
-    () => currentUser?.region ?? 'NA'
-  );
-
-  // the hide/unhide toggle buttons on the drawer navbar.
-  const [hidePreviousScrims, setHidePreviousScrims] = useState(false);
-  const [hideCurrentScrims, setHideCurrentScrims] = useState(false);
-  const [hideUpcomingScrims, setHideUpcomingScrims] = useState(false);
 
   const theme = useTheme();
   const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
@@ -133,9 +119,9 @@ export default function Scrims() {
     // if scrimsDate < currentTime
     // if the scrim is in the past compared to filtered scrims date.
     if (compareDateWithCurrentTime(scrimsDate) > 0) {
-      setHideUpcomingScrims(true);
+      dispatch({ type: 'scrims/setHideScrims', hideUpcoming: true });
     } else {
-      setHideUpcomingScrims(false);
+      dispatch({ type: 'scrims/setHideScrims', hideUpcoming: false });
     }
   }, [scrimsDate]);
 
@@ -147,19 +133,9 @@ export default function Scrims() {
     <>
       <Navbar
         scrimsRegion={scrimsRegion}
-        setScrimsRegion={setScrimsRegion}
         scrimsDate={scrimsDate}
-        setScrimsDate={setScrimsDate}
         showDropdowns
         showCheckboxes
-        hideProps={{
-          hidePreviousScrims,
-          hideCurrentScrims,
-          hideUpcomingScrims,
-          setHidePreviousScrims,
-          setHideCurrentScrims,
-          setHideUpcomingScrims,
-        }}
       />
       <div className="page-break" />
 

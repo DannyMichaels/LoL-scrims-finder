@@ -2,6 +2,7 @@ export const compareDateWithCurrentTime = (date) => {
   let currentTime = new Date();
   let selectedTime = new Date(date);
 
+  console.log({ currentTime, selectedTime });
   // compare only date, not time.
   currentTime.setHours(0, 0, 0, 0);
   selectedTime.setHours(0, 0, 0, 0);
