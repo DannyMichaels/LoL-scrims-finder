@@ -1,7 +1,9 @@
 import './App.css';
 // hooks
-import { useAuth } from './context/currentUser';
+import { useEffect } from 'react';
 import { useAlerts } from './context/alertsContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 // styles
 import { appTheme } from './appTheme';
@@ -16,12 +18,26 @@ import Footer from './components/shared/Footer';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
+import { handleVerify } from './actions/authActions';
+
 function App() {
-  const { loading: verifyingUser } = useAuth();
+  // const { loading: verifyingUser } = useAuth();
+  const { isVerifyingUser } = useSelector(({ currentUser }) => currentUser);
+  const dispatch = useDispatch();
+  const history = useHistory();
+
   const { currentAlert, closeAlert } = useAlerts();
   const classes = useAppStyles();
 
-  if (verifyingUser) {
+  useEffect(() => {
+    handleVerify(history, dispatch);
+
+    return () => {
+      handleVerify(history, dispatch);
+    };
+  }, [history, dispatch]);
+
+  if (isVerifyingUser) {
     return (
       <div className={classes.root}>
         <Loading text="Verifying user..." />;

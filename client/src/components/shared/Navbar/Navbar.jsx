@@ -1,11 +1,14 @@
 // hooks
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useState } from 'react';
-import { useAuth } from '../../../context/currentUser';
 import { useScrims } from '../../../context/scrimsContext';
 import { useLocation, useHistory } from 'react-router-dom';
-import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+
+// utils
+import { handleLogin } from '../../../actions/authActions';
 
 // Mui components
 import Button from '@mui/material/Button';
@@ -35,6 +38,7 @@ import { InnerColumn } from '../PageComponents';
 import Tooltip from '../Tooltip';
 
 // icons
+import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
 import KeyIcon from '@mui/icons-material/VpnKey';
 import MenuIcon from '@mui/icons-material/Menu'; // burger icon
 import GoBackIcon from '@mui/icons-material/ArrowBack';
@@ -60,13 +64,16 @@ export default function Navbar({
   hideProps,
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { currentUser, logInUser } = useAuth();
+  const { currentUser } = useSelector(({ currentUser }) => currentUser);
+
   const classes = useStyles();
   const { pathname } = useLocation();
   const history = useHistory();
   const { fetchScrims } = useScrims();
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const dispatch = useDispatch();
 
   const noBackButtonPaths = [/^\/signup/, /^\/scrims$/, /^\/scrims\/$/, /^\/$/];
 
@@ -150,7 +157,8 @@ export default function Navbar({
                     {!currentUser?.uid && (
                       <Grid item>
                         <Button
-                          onClick={logInUser}
+                          // onClick={logInUser}
+                          onClick={() => handleLogin(history, dispatch)}
                           variant="contained"
                           startIcon={<KeyIcon />}
                           color="primary">
