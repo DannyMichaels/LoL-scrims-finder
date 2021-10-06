@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useInterval from '../hooks/useInterval';
 import { getAllScrims } from './../services/scrims';
@@ -6,7 +6,8 @@ import devLog from '../utils/devLog';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function useScrims() {
-  const { scrims, scrimsLoaded, ...rest } = useSelector(({ scrims }) => scrims);
+  const { scrims, scrimsRegion, scrimsDate, scrimsLoaded, ...rest } =
+    useSelector(({ scrims }) => scrims);
 
   const dispatch = useDispatch();
 
@@ -17,11 +18,32 @@ export default function useScrims() {
   const setScrims = (newScrimsValue) =>
     dispatch({ type: 'scrims/setScrims', payload: newScrimsValue });
 
+  const dateFilteredScrims = useMemo(
+    () =>
+      scrims.filter(({ gameStartTime }) => {
+        //  if gameStartTime equals to the scrimsDate, show it.
+        return (
+          new Date(gameStartTime).toLocaleDateString() ===
+          new Date(scrimsDate).toLocaleDateString()
+        );
+      }),
+    // change date filtered scrims whenever scrims and scrimsDate changes.
+    [scrims, scrimsDate]
+  );
+
+  const filteredScrimsByDateAndRegion = useMemo(
+    () => dateFilteredScrims.filter((scrim) => scrim.region === scrimsRegion),
+    // change filteredScrimsByDateAndRegion whenever dateFilteredScrims and scrimsRegion changes
+    [dateFilteredScrims, scrimsRegion]
+  );
+
   return {
     scrims,
     setScrims,
     scrimsLoaded,
     fetchScrims,
+    dateFilteredScrims,
+    filteredScrimsByDateAndRegion,
     ...rest,
   };
 }

@@ -49,6 +49,7 @@ export default function Scrims() {
     showCurrentScrims,
     showUpcomingScrims,
     filteredScrims,
+    filteredScrimsByDateAndRegion,
   } = useScrims();
 
   const dispatch = useDispatch();
@@ -56,31 +57,12 @@ export default function Scrims() {
   const theme = useTheme();
   const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
 
-  const dateFilteredScrims = useMemo(
-    () =>
-      scrims.filter(({ gameStartTime }) => {
-        //  if gameStartTime equals to the scrimsDate, show it.
-        return (
-          new Date(gameStartTime).toLocaleDateString() ===
-          new Date(scrimsDate).toLocaleDateString()
-        );
-      }),
-    // change date filtered scrims whenever scrims and scrimsDate changes.
-    [scrims, scrimsDate]
-  );
-
-  const filteredScrimsByDateAndRegion = useMemo(
-    () => dateFilteredScrims.filter((scrim) => scrim.region === scrimsRegion),
-    // change filteredScrimsByDateAndRegion whenever dateFilteredScrims and scrimsRegion changes
-    [dateFilteredScrims, scrimsRegion]
-  );
-
   useEffect(() => {
     dispatch({
       type: 'scrims/setFilteredScrims',
       payload: filteredScrimsByDateAndRegion,
     });
-    // this runs everytime scrimsRegion and datefilteredScrims changes.
+    // this runs everytime scrimsRegion and dateFilteredScrims changes.
 
     // eslint-disable-next-line
   }, [filteredScrimsByDateAndRegion]);
