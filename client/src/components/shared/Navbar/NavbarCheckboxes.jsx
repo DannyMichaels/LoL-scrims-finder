@@ -7,7 +7,7 @@ import Checkbox from '@mui/material/Checkbox';
 
 /* Show scrims (current, previous, upcoming) buttons */
 
-export default function NavbarCheckboxes() {
+export default function NavbarCheckboxes({ xs }) {
   const dispatch = useDispatch();
 
   const { showPreviousScrims, showCurrentScrims, showUpcomingScrims } =
@@ -18,7 +18,7 @@ export default function NavbarCheckboxes() {
   };
 
   return (
-    <Grid item xs={7} alignItems="center" container>
+    <Grid item xs={xs} alignItems="center" container>
       <FormGroup
         row
         className="text-white"

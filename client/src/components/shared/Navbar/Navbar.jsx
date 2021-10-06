@@ -15,22 +15,12 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
-import Select from '@mui/material/Select';
 import Hidden from '@mui/material/Hidden';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
-import Checkbox from '@mui/material/Checkbox';
-import InputLabel from '@mui/material/InputLabel';
-import TextField from '@mui/material/TextField';
-import FormHelperText from '@mui/material/FormHelperText';
 
 // components
 import { Link } from 'react-router-dom';
 import NavbarDrawer from './NavbarDrawer';
-import moment from 'moment';
-import 'moment-timezone';
 import HideOnScroll from '../HideOnScroll';
 import { InnerColumn } from '../PageComponents';
 import Tooltip from '../Tooltip';
@@ -41,6 +31,7 @@ import KeyIcon from '@mui/icons-material/VpnKey';
 import MenuIcon from '@mui/icons-material/Menu'; // burger icon
 import GoBackIcon from '@mui/icons-material/ArrowBack';
 import NavbarCheckboxes from './NavbarCheckboxes';
+import NavbarInputFilters from './NavbarInputFilters';
 
 const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.offset,
@@ -55,14 +46,9 @@ const useStyles = makeStyles((theme) => ({
 export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const { scrimsRegion, scrimsDate } = useSelector(({ scrims }) => scrims);
-
-  const dispatch = useDispatch();
-
   const classes = useStyles();
   const { pathname } = useLocation();
   const history = useHistory();
-  const { fetchScrims } = useScrims();
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -77,25 +63,6 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
       }
     }
     return true;
-  };
-
-  let allRegions = ['NA', 'EUW', 'EUNE', 'LAN'];
-
-  let selectRegions = [
-    currentUser?.region,
-    ...allRegions.filter((r) => r !== currentUser?.region),
-  ];
-
-  const onSelectRegion = (e) => {
-    const region = e.target.value;
-    fetchScrims(); // not necessary, trying to ping the server.
-    // setScrimsRegion(region); // set the navbar select value to selected region
-    dispatch({ type: 'scrims/setScrimsRegion', payload: region });
-  };
-
-  const onSelectDate = (e) => {
-    const newDateValue = moment(e.target.value);
-    dispatch({ type: 'scrims/setScrimsDate', payload: newDateValue });
   };
 
   return (
@@ -202,67 +169,10 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                       justifyContent="space-between"
                       item
                       xs={12}>
-                      {showCheckboxes && <NavbarCheckboxes />}
+                      {showCheckboxes && <NavbarCheckboxes xs={7} />}
 
                       {/* date filter and region filter */}
-                      {showDropdowns && (
-                        <Grid
-                          item
-                          container
-                          md={12}
-                          lg={4}
-                          justifyContent="flex-end"
-                          alignItems="center"
-                          id="nav__selects--container">
-                          {/* date regions and filters */}
-                          <Grid item>
-                            <TextField
-                              variant="standard"
-                              id="date"
-                              required
-                              label="Scrims Date"
-                              type="date"
-                              name="scrimsDate"
-                              InputLabelProps={{
-                                shrink: true,
-                              }}
-                              value={
-                                moment(new Date(scrimsDate)).format(
-                                  'yyyy-MM-DD'
-                                ) || moment().format('yyyy-MM-DD')
-                              }
-                              onChange={onSelectDate}
-                            />
-
-                            <FormHelperText className="text-white">
-                              Filter scrims by date
-                            </FormHelperText>
-                          </Grid>
-
-                          <Box marginRight={4} />
-
-                          <Grid item id="nav__region-filter--container">
-                            <InputLabel className="text-white">
-                              Region
-                            </InputLabel>
-
-                            <Select
-                              variant="standard"
-                              value={scrimsRegion}
-                              className="text-white"
-                              onChange={onSelectRegion}>
-                              {selectRegions.map((region, key) => (
-                                <MenuItem value={region} key={key}>
-                                  {region}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                            <FormHelperText className="text-white">
-                              Filter scrims by region
-                            </FormHelperText>
-                          </Grid>
-                        </Grid>
-                      )}
+                      {showDropdowns && <NavbarInputFilters />}
                     </Grid>
                   </Hidden>
                 )}
