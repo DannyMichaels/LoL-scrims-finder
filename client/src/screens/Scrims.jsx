@@ -23,6 +23,7 @@ import { compareDateWithCurrentTime } from './../utils/compareDateWithCurrentTim
 // icons
 import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
+import ScrimsColumn from '../components/scrim_components/ScrimsColumn';
 
 // compare scrim start time with now.
 const compareDates = (scrim) => {
@@ -151,35 +152,12 @@ export default function Scrims() {
           {filteredScrims.length > 0 ? (
             <>
               {/* CURRENT SCRIMS */}
-              {showCurrentScrims && (
-                <>
-                  {currentScrims.length > 0 ? (
-                    <>
-                      <InnerColumn>
-                        <div
-                          style={{
-                            marginBottom: '40px',
-                            borderBottom: '1px solid white',
-                          }}>
-                          <Typography align="center" variant="h1" gutterBottom>
-                            {currentScrims.length > 0 && 'Current scrims'}
-                          </Typography>
-                        </div>
-                      </InnerColumn>
+              <ScrimsColumn
+                headerText="Current Scrims"
+                scrims={currentScrims}
+                show={showCurrentScrims}
+              />
 
-                      {currentScrims.map((scrim) => (
-                        <Fragment key={scrim._id}>
-                          <Fade triggerOnce>
-                            <ScrimSection scrim={scrim} />
-                          </Fade>
-                          <div className="page-break" />
-                        </Fragment>
-                      ))}
-                      <div className="page-break" />
-                    </>
-                  ) : null}
-                </>
-              )}
               {/* CURRENT SCRIMS END */}
 
               {/* UPCOMING SCRIMS */}
