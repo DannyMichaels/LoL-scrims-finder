@@ -11,6 +11,13 @@ export default function useAuth() {
   const dispatch = useDispatch();
   const { currentUser, isVerifyingUser } = useSelector((state) => state.auth);
 
+  const setCurrentUser = (currentUserValue) => {
+    dispatch({
+      type: 'auth/setCurrentUser',
+      payload: currentUserValue,
+    });
+  };
+
   const handleLogout = async () => {
     devLog('logging out...');
     auth.signOut();
@@ -86,5 +93,6 @@ export default function useAuth() {
     handleLogin,
     handleLogout,
     handleVerify,
+    setCurrentUser,
   };
 }

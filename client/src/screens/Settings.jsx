@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '../context/currentUser';
 import { useAlerts } from '../context/alertsContext';
 
 // components
@@ -22,6 +21,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import { updateUser, getAllUsers } from './../services/users';
 import { setAuthToken } from './../services/auth';
+import useAuth from './../hooks/useAuth';
 
 // remove spaces from # in discord name
 const removeSpaces = (str) => {
