@@ -109,8 +109,6 @@ export default function ScrimSection({ scrim, isInDetail }) {
     if (casterEntered) return;
     if (casters.length === MAX_CASTER_AMOUNT) return;
 
-    fetchScrims();
-
     setButtonsDisabled(true);
 
     const updatedScrim = await insertCasterInScrim({
@@ -124,14 +122,13 @@ export default function ScrimSection({ scrim, isInDetail }) {
         `%cadded ${currentUser?.name} as a caster for scrim: ${scrim._id}`,
         'color: #99ff99'
       );
-      fetchScrims();
       setButtonsDisabled(false);
     }
+
+    fetchScrims();
   };
 
   const leaveCast = async () => {
-    fetchScrims();
-
     setButtonsDisabled(true);
 
     const updatedScrim = await removeCasterFromScrim({
@@ -145,9 +142,10 @@ export default function ScrimSection({ scrim, isInDetail }) {
         `%cremoved ${currentUser?.name} from the caster list for scrim: ${scrim._id}`,
         'color: #99ff99'
       );
-      fetchScrims();
       setButtonsDisabled(false);
     }
+
+    fetchScrims();
   };
 
   const handleDeleteScrim = async () => {
