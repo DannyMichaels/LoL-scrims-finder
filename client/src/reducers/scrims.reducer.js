@@ -2,20 +2,17 @@ import moment from 'moment';
 
 const initialState = {
   scrims: [],
+  filteredScrims: [], // filtered scrims by date and region
   scrimsLoaded: false,
   fetch: false,
-  scrimsRegion: 'NA',
+
+  scrimsRegion: 'NA', // the region value to filter the scrims by
   scrimsDate: moment(), // the date value to filter the scrims by
 
-  // the hide/unhide toggle buttons on the drawer navbar.
+  // the show toggle buttons on the drawer navbar.
   showPreviousScrims: true,
   showCurrentScrims: true,
   showUpcomingScrims: true,
-
-  dateFilteredScrims: [],
-  regionFilteredScrims: [],
-
-  filteredScrims: [], //filtered scrims by date and region
 };
 
 export default function scrimsReducer(state = initialState, action) {
@@ -34,6 +31,13 @@ export default function scrimsReducer(state = initialState, action) {
       return {
         ...state,
         scrims: payload,
+      };
+    }
+
+    case 'scrims/setFilteredScrims': {
+      return {
+        ...state,
+        filteredScrims: payload, // date and region filtered scrims
       };
     }
 
