@@ -8,7 +8,7 @@ import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 // utils
-import { handleLogin } from '../../../actions/currentUser.actions';
+import { handleLogin } from '../../../actions/auth.actions';
 
 // Mui components
 import Button from '@mui/material/Button';

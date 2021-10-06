@@ -3,6 +3,8 @@ import { auth, provider } from '../firebase';
 import { loginUser, verifyUser } from '../services/auth';
 import jwt_decode from 'jwt-decode';
 import { setAuthToken, removeToken } from '../services/auth';
+import { useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 export const handleLogin = async (history, dispatch) => {
   devLog('logging in...');
@@ -21,12 +23,11 @@ export const handleLogin = async (history, dispatch) => {
 
     if (decodedUser) {
       dispatch({ type: 'auth/setCurrentUser', payload: decodedUser });
-      history.push('/');
     }
   }
 };
 
-export const handleLogout = (history) => (dispatch) => {
+export const handleLogout = async (history, dispatch) => {
   devLog('logging out...');
   auth.signOut();
   localStorage.removeItem('jwtToken'); // remove token from localStorage
@@ -68,3 +69,19 @@ export const handleVerify = async (history, dispatch) => {
   }
   dispatch({ type: 'auth/setIsVerifyingUser', payload: false });
 };
+
+export default function useAuth() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    devLog('logging out...');
+    auth.signOut();
+    localStorage.removeItem('jwtToken'); // remove token from localStorage
+    removeToken();
+    dispatch({ type: 'auth/logout' });
+    history.push('/signup'); // push back to signup
+  };
+
+  return { handleLogout };
+}

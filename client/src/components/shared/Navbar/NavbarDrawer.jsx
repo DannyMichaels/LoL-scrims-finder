@@ -39,7 +39,8 @@ import moment from 'moment';
 import clsx from 'clsx';
 import { KEYCODES } from '../../../utils/keycodes';
 import { makeStyles } from '@mui/styles';
-import { handleLogout } from './../../../actions/currentUser.actions';
+// import { handleLogout } from './../../../actions/currentUser.actions';
+import useAuth from '../../../actions/auth.actions';
 
 const useStyles = makeStyles({
   drawerRoot: {
@@ -80,6 +81,8 @@ export default function NavbarDrawer({
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
   const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
+
+  const { handleLogout } = useAuth();
 
   const drawerAnchor = useMemo(
     () => (matchesLg ? 'top' : 'right'),
