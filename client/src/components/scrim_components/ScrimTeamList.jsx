@@ -40,6 +40,8 @@ import JoinIcon from '@mui/icons-material/MeetingRoom';
 import ExitIcon from '@mui/icons-material/NoMeetingRoom';
 import KickIcon from '@mui/icons-material/HighlightOff';
 import InfoIcon from '@mui/icons-material/Info';
+import { useSelector } from 'react-redux';
+import { checkAdmin } from '../../reducers/auth.reducer';
 
 const getRankImage = (user) => {
   // replace number with empty string: Diamond 1 => Diamond
@@ -57,7 +59,8 @@ export default function ScrimTeamList({
   setButtonsDisabled,
 }) {
   const { fetchScrims } = useScrims();
-  const { currentUser, isCurrentUserAdmin } = useAuth();
+  const { currentUser } = useSelector(({ currentUser }) => currentUser);
+  const isCurrentUserAdmin = checkAdmin(currentUser);
   const { setCurrentAlert } = useAlerts();
 
   const classes = useScrimSectionStyles({ scrim });

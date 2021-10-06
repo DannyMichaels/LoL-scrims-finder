@@ -24,6 +24,7 @@ import { compareDateWithCurrentTime } from './../utils/compareDateWithCurrentTim
 // icons
 import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useSelector } from 'react-redux';
 
 // compare scrim start time with now.
 const compareDates = (scrim) => {
@@ -43,8 +44,7 @@ const compareDates = (scrim) => {
 
 export default function Scrims() {
   const today = useMemo(() => moment(), []); // not necessary to use useMemo.
-
-  const { currentUser } = useAuth();
+  const { currentUser } = useSelector(({ auth }) => auth);
 
   const { scrims, scrimsLoaded } = useScrims();
 

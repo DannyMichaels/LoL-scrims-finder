@@ -1,14 +1,10 @@
 // hooks
-import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import { useScrims } from '../../../context/scrimsContext';
 import { useLocation, useHistory } from 'react-router-dom';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
-// utils
-import { handleLogin } from '../../../actions/auth.actions';
+import useAuth from './../../../actions/auth.actions';
 
 // Mui components
 import Button from '@mui/material/Button';
@@ -64,7 +60,6 @@ export default function Navbar({
   hideProps,
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { currentUser } = useSelector(({ auth }) => auth);
 
   const classes = useStyles();
   const { pathname } = useLocation();
@@ -73,7 +68,7 @@ export default function Navbar({
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const dispatch = useDispatch();
+  const { handleLogin, currentUser } = useAuth();
 
   const noBackButtonPaths = [/^\/signup/, /^\/scrims$/, /^\/scrims\/$/, /^\/$/];
 
@@ -157,8 +152,7 @@ export default function Navbar({
                     {!currentUser?.uid && (
                       <Grid item>
                         <Button
-                          // onClick={logInUser}
-                          onClick={() => handleLogin(history, dispatch)}
+                          onClick={handleLogin}
                           variant="contained"
                           startIcon={<KeyIcon />}
                           color="primary">

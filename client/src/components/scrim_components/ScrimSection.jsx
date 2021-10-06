@@ -14,6 +14,7 @@ import { PageSection } from '../shared/PageComponents';
 // utils / services
 import { deleteScrim, removeCasterFromScrim } from '../../services/scrims';
 import { insertCasterInScrim } from '../../services/scrims';
+import { useSelector } from 'react-redux';
 
 const compareDates = (scrim) => {
   let currentTime = new Date().getTime();
@@ -34,7 +35,7 @@ const MAX_CASTER_AMOUNT = 2;
 
 export default function ScrimSection({ scrim, isInDetail }) {
   const { setScrims, fetchScrims } = useScrims();
-  const { currentUser } = useAuth();
+  const { currentUser } = useSelector(({ auth }) => auth);
   const { setCurrentAlert } = useAlerts();
 
   const [playerEntered, setPlayerEntered] = useState(false);

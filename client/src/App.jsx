@@ -2,8 +2,6 @@ import './App.css';
 // hooks
 import { useEffect } from 'react';
 import { useAlerts } from './context/alertsContext';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 
 // styles
 import { appTheme } from './appTheme';
@@ -18,22 +16,20 @@ import Footer from './components/shared/Footer';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-import { handleVerify } from './actions/auth.actions';
+import useAuth from './actions/auth.actions';
 
 function App() {
   // const { loading: verifyingUser } = useAuth();
-  const { isVerifyingUser, currentUser } = useSelector(({ auth }) => auth);
-  const dispatch = useDispatch();
-  const history = useHistory();
+  const { isVerifyingUser, currentUser, handleVerify } = useAuth();
 
   const { currentAlert, closeAlert } = useAlerts();
   const classes = useAppStyles();
 
   useEffect(() => {
-    handleVerify(history, dispatch);
+    handleVerify();
 
     return () => {
-      handleVerify(history, dispatch);
+      handleVerify();
     };
     //
   }, []);

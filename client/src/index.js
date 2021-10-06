@@ -25,11 +25,11 @@ ReactDOM.render(
       <Provider store={store}>
         <AlertsProvider>
           <ScrimsProvider>
-            <CurrentUserProvider>
-              {/* the only way I know to render a comment in react */}
-              <ReactComment text={creditsComment} trim={false} />
-              <App />
-            </CurrentUserProvider>
+            {/* <CurrentUserProvider> */}
+            {/* the only way I know to render a comment in react */}
+            <ReactComment text={creditsComment} trim={false} />
+            <App />
+            {/* </CurrentUserProvider> */}
           </ScrimsProvider>
         </AlertsProvider>
       </Provider>
