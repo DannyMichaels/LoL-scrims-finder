@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 export default function PrivateRoute({ component: Component, ...rest }) {
   const { currentUser } = useSelector(({ auth }) => auth);
 
-  // const jwtToken = localStorage.jwtToken;
-
   return (
     <Route
       {...rest}
