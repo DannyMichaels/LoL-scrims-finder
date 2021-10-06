@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useAuth from './../hooks/useAuth';
-import useScrims from './../hooks/useScrims';
+import useScrims, { useFetchScrims } from './../hooks/useScrims';
 
 // components
 import Typography from '@mui/material/Typography';
@@ -45,7 +45,10 @@ export default function Scrims() {
   const today = useMemo(() => moment(), []); // not necessary to use useMemo.
   const { currentUser } = useAuth();
 
-  const { scrims, scrimsLoaded } = useScrims();
+  const { scrims, scrimsLoaded, useFetchScrimsInterval } = useScrims();
+
+  useFetchScrims();
+  useFetchScrimsInterval();
 
   const [filteredScrims, setFilteredScrims] = useState([]); // the array of filtered scrims (both scrimsDate and scrimsRegion)
 
