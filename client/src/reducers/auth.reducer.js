@@ -3,7 +3,7 @@ const initialState = {
   isVerifyingUser: true,
 };
 
-export default function currentUserReducer(state = initialState, action) {
+export default function authReducer(state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {
