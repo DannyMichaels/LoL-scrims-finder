@@ -111,6 +111,8 @@ export default function ScrimSection({ scrim, isInDetail }) {
 
     fetchScrims();
 
+    setButtonsDisabled(true);
+
     const updatedScrim = await insertCasterInScrim({
       scrimId: scrim._id,
       userId: currentUser?._id,
@@ -123,11 +125,14 @@ export default function ScrimSection({ scrim, isInDetail }) {
         'color: #99ff99'
       );
       fetchScrims();
+      setButtonsDisabled(false);
     }
   };
 
   const leaveCast = async () => {
     fetchScrims();
+
+    setButtonsDisabled(true);
 
     const updatedScrim = await removeCasterFromScrim({
       scrimId: scrim._id,
@@ -141,6 +146,7 @@ export default function ScrimSection({ scrim, isInDetail }) {
         'color: #99ff99'
       );
       fetchScrims();
+      setButtonsDisabled(false);
     }
   };
 
@@ -181,6 +187,7 @@ export default function ScrimSection({ scrim, isInDetail }) {
           handleDeleteScrim={handleDeleteScrim}
           gameEnded={gameEnded}
           casterEntered={casterEntered}
+          buttonsDisabled={buttonsDisabled}
         />
 
         <div className={classes.teamsContainer}>

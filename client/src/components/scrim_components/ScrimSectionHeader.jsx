@@ -31,6 +31,7 @@ export default function ScrimSectionHeader({
   joinCast,
   leaveCast,
   handleDeleteScrim,
+  buttonsDisabled,
 }) {
   const { casters } = scrim;
   const { setCurrentAlert } = useAlerts();
@@ -159,7 +160,9 @@ export default function ScrimSectionHeader({
                     variant="contained"
                     color="primary"
                     disabled={
-                      casters.length === MAX_CASTER_AMOUNT || casterEntered
+                      casters.length === MAX_CASTER_AMOUNT ||
+                      casterEntered ||
+                      buttonsDisabled
                     }
                     onClick={joinCast}>
                     join cast
@@ -172,6 +175,7 @@ export default function ScrimSectionHeader({
                   <Button
                     color="secondary"
                     variant="contained"
+                    disabled={buttonsDisabled}
                     onClick={leaveCast}>
                     Leave cast
                   </Button>
