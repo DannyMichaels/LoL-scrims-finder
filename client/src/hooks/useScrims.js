@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import useToggle from './../hooks/useToggle';
 import useInterval from '../hooks/useInterval';
 import { getAllScrims } from './../services/scrims';
 import devLog from '../utils/devLog';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function useScrims() {
-  const [fetch, setFetch] = useState(false);
-  const fetchScrims = () => setFetch((prev) => !prev);
-
   const { scrims, scrimsLoaded } = useSelector(({ scrims }) => scrims);
+
   const dispatch = useDispatch();
+
+  const fetchScrims = () => {
+    console.log('test');
+    dispatch({ type: 'scrims/toggleFetch' });
+  };
 
   const initScrims = (newScrimsValue) =>
     dispatch({ type: 'scrims/fetchScrims', payload: newScrimsValue });
@@ -38,7 +40,6 @@ export default function useScrims() {
   return {
     scrims,
     setScrims,
-    fetch,
     scrimsLoaded,
     fetchScrims,
     loadScrims,
@@ -48,10 +49,16 @@ export default function useScrims() {
 }
 
 export const useFetchScrims = () => {
-  const { initScrims, fetch } = useScrims();
+  const { fetch } = useSelector(({ scrims }) => scrims);
+  const dispatch = useDispatch();
+
+  const initScrims = (newScrimsValue) =>
+    dispatch({ type: 'scrims/fetchScrims', payload: newScrimsValue });
+
   const { pathname } = useLocation();
 
   useEffect(() => {
+    console.log('f', fetch);
     const fetchScrims = async () => {
       devLog('fetching scrims');
       const scrimsData = await getAllScrims();

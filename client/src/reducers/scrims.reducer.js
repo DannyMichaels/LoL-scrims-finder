@@ -1,6 +1,7 @@
 const initialState = {
   scrims: [],
   scrimsLoaded: false,
+  fetch: false,
 };
 
 export default function scrimsReducer(state = initialState, action) {
@@ -35,6 +36,13 @@ export default function scrimsReducer(state = initialState, action) {
         scrims: state.scrims.map((scrim) =>
           scrim._id !== payload._id ? scrim : payload
         ),
+      };
+    }
+
+    case 'scrims/toggleFetch': {
+      return {
+        ...state,
+        fetch: !state.fetch,
       };
     }
 

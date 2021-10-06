@@ -114,7 +114,6 @@ export default function ScrimTeamList({
 
   const handleMovePlayer = async (teamName, role) => {
     toggleDisableButtons();
-    fetchScrims();
 
     const updatedScrim = await movePlayerInScrim({
       scrimId: scrim._id,
@@ -131,8 +130,9 @@ export default function ScrimTeamList({
         `%cswapped ${currentUser?.name} in scrim: ${scrim._id} to: ${teamName} as ${role}`,
         'color: #99ff99'
       );
-      fetchScrims();
     }
+
+    fetchScrims();
   };
 
   const leaveGame = async () => {
