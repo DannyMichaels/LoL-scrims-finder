@@ -40,6 +40,7 @@ import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new202
 import KeyIcon from '@mui/icons-material/VpnKey';
 import MenuIcon from '@mui/icons-material/Menu'; // burger icon
 import GoBackIcon from '@mui/icons-material/ArrowBack';
+import NavbarCheckboxes from './NavbarCheckboxes';
 
 const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.offset,
@@ -54,13 +55,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const {
-    scrimsRegion,
-    scrimsDate,
-    showPreviousScrims,
-    showCurrentScrims,
-    showUpcomingScrims,
-  } = useSelector(({ scrims }) => scrims);
+  const { scrimsRegion, scrimsDate } = useSelector(({ scrims }) => scrims);
 
   const dispatch = useDispatch();
 
@@ -101,10 +96,6 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
   const onSelectDate = (e) => {
     const newDateValue = moment(e.target.value);
     dispatch({ type: 'scrims/setScrimsDate', payload: newDateValue });
-  };
-
-  const toggleShowScrims = (e) => {
-    dispatch({ type: 'scrims/toggleHideScrims', payload: e.target.name });
   };
 
   return (
@@ -211,58 +202,7 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                       justifyContent="space-between"
                       item
                       xs={12}>
-                      {showCheckboxes && (
-                        <>
-                          {/* Show scrims (current, previous, upcoming) buttons */}
-                          <Grid item xs={7} alignItems="center" container>
-                            <FormGroup
-                              row
-                              className="text-white"
-                              style={{ justifyContent: 'center' }}>
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    color="primary"
-                                    checked={showPreviousScrims}
-                                    onChange={toggleShowScrims}
-                                    name="showPreviousScrims"
-                                  />
-                                }
-                                label="Show previous scrims"
-                                labelPlacement="bottom"
-                              />
-
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    // the UI says "show X scrims", so in this case we are reversing the boolean for checked, lol.
-                                    // doesn't matter functionally.
-                                    checked={showCurrentScrims}
-                                    color="primary"
-                                    onChange={toggleShowScrims}
-                                    name="showCurrentScrims"
-                                  />
-                                }
-                                label="Show current scrims"
-                                labelPlacement="bottom"
-                              />
-
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    checked={showUpcomingScrims}
-                                    color="primary"
-                                    onChange={toggleShowScrims}
-                                    name="showUpcomingScrims"
-                                  />
-                                }
-                                label="Show upcoming scrims"
-                                labelPlacement="bottom"
-                              />
-                            </FormGroup>
-                          </Grid>
-                        </>
-                      )}
+                      {showCheckboxes && <NavbarCheckboxes />}
 
                       {/* date filter and region filter */}
                       {showDropdowns && (
