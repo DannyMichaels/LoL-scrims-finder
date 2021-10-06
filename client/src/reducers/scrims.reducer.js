@@ -8,9 +8,9 @@ const initialState = {
   scrimsDate: moment(), // the date value to filter the scrims by
 
   // the hide/unhide toggle buttons on the drawer navbar.
-  hidePreviousScrims: false,
-  hideCurrentScrims: false,
-  hideUpcomingScrims: false,
+  showPreviousScrims: true,
+  showCurrentScrims: true,
+  showUpcomingScrims: true,
 
   dateFilteredScrims: [],
   regionFilteredScrims: [],
@@ -83,13 +83,13 @@ export default function scrimsReducer(state = initialState, action) {
     }
 
     case 'scrims/setHideScrims': {
-      const { hidePrevious, hideCurrent, hideUpcoming } = action;
+      const { showPrevious, showCurrent, showUpcoming } = action;
 
       return {
         ...state,
-        hidePreviousScrims: hidePrevious ?? state.hidePreviousScrims,
-        hideCurrentScrims: hideCurrent ?? state.hideCurrentScrims,
-        hideUpcomingScrims: hideUpcoming ?? state.hideUpcomingScrims,
+        showPreviousScrims: showPrevious ?? state.showPreviousScrims,
+        showCurrentScrims: showCurrent ?? state.showCurrentScrims,
+        showUpcomingScrims: showUpcoming ?? state.showUpcomingScrims,
       };
     }
 

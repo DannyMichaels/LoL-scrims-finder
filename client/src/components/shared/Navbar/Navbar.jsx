@@ -57,10 +57,11 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
   const {
     scrimsRegion,
     scrimsDate,
-    hidePreviousScrims,
-    hideCurrentScrims,
-    hideUpcomingScrims,
+    showPreviousScrims,
+    showCurrentScrims,
+    showUpcomingScrims,
   } = useSelector(({ scrims }) => scrims);
+
   const dispatch = useDispatch();
 
   const classes = useStyles();
@@ -223,10 +224,10 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                                   <Checkbox
                                     // the UI says "show X scrims", so in this case we are reversing the boolean for checked, lol.
                                     // doesn't matter functionally.
-                                    checked={!hideCurrentScrims}
+                                    checked={showCurrentScrims}
                                     color="primary"
                                     onChange={toggleShowScrims}
-                                    name="hideCurrentScrims"
+                                    name="showCurrentScrims"
                                   />
                                 }
                                 label="Show current scrims"
@@ -236,10 +237,10 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                               <FormControlLabel
                                 control={
                                   <Checkbox
-                                    checked={!hideUpcomingScrims}
+                                    checked={showUpcomingScrims}
                                     color="primary"
                                     onChange={toggleShowScrims}
-                                    name="hideUpcomingScrims"
+                                    name="showUpcomingScrims"
                                   />
                                 }
                                 label="Show upcoming scrims"
@@ -249,9 +250,9 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                                 control={
                                   <Checkbox
                                     color="primary"
-                                    checked={!hidePreviousScrims}
+                                    checked={showPreviousScrims}
                                     onChange={toggleShowScrims}
-                                    name="hidePreviousScrims"
+                                    name="showPreviousScrims"
                                   />
                                 }
                                 label="Show previous scrims"

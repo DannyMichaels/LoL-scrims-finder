@@ -117,11 +117,11 @@ export default function Scrims() {
 
   useEffect(() => {
     // if scrimsDate < currentTime
-    // if the scrim is in the past compared to filtered scrims date.
     if (compareDateWithCurrentTime(scrimsDate) > 0) {
-      dispatch({ type: 'scrims/setHideScrims', hideUpcoming: true });
+      // if the scrim is in the past compared to filtered scrims date.
+      dispatch({ type: 'scrims/setHideScrims', showUpcoming: false });
     } else {
-      dispatch({ type: 'scrims/setHideScrims', hideUpcoming: false });
+      dispatch({ type: 'scrims/setHideScrims', showUpcoming: true });
     }
 
     // eslint-disable-next-line
