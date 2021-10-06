@@ -21,14 +21,14 @@ import NavbarDrawer from './NavbarDrawer';
 import HideOnScroll from '../HideOnScroll';
 import { InnerColumn } from '../PageComponents';
 import Tooltip from '../Tooltip';
+import NavbarCheckboxes from './NavbarCheckboxes';
+import NavbarInputFilters from './NavbarInputFilters';
 
 // icons
 import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
 import KeyIcon from '@mui/icons-material/VpnKey';
 import MenuIcon from '@mui/icons-material/Menu'; // burger icon
 import GoBackIcon from '@mui/icons-material/ArrowBack';
-import NavbarCheckboxes from './NavbarCheckboxes';
-import NavbarInputFilters from './NavbarInputFilters';
 
 const useStyles = makeStyles((theme) => ({
   offset: theme.mixins.offset,
