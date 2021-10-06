@@ -1,10 +1,11 @@
 import devLog from '../utils/devLog';
+import { useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { auth, provider } from '../firebase';
 import { loginUser, verifyUser } from '../services/auth';
 import jwt_decode from 'jwt-decode';
 import { setAuthToken, removeToken } from '../services/auth';
-import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 
 export default function useAuth() {
   const history = useHistory();
@@ -12,10 +13,7 @@ export default function useAuth() {
   const { currentUser, isVerifyingUser } = useSelector((state) => state.auth);
 
   const setCurrentUser = (currentUserValue) => {
-    dispatch({
-      type: 'auth/setCurrentUser',
-      payload: currentUserValue,
-    });
+    dispatch({ type: 'auth/setCurrentUser', payload: currentUserValue });
   };
 
   const handleLogout = async () => {
@@ -49,7 +47,7 @@ export default function useAuth() {
     }
   };
 
-  const handleVerify = async () => {
+  const handleVerify = useCallback(async () => {
     devLog('verifying user');
     if (localStorage.jwtToken) {
       // Set auth token header auth
@@ -81,7 +79,9 @@ export default function useAuth() {
       }
     }
     dispatch({ type: 'auth/setIsVerifyingUser', payload: false });
-  };
+
+    // eslint-disable-next-line
+  }, []);
 
   const isCurrentUserAdmin =
     currentUser?.adminKey === process.env.REACT_APP_ADMIN_KEY;
