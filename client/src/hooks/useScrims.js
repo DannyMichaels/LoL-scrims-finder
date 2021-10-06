@@ -46,7 +46,7 @@ export const useSetScrimsRegion = () => {
     dispatch({ type: 'scrims/setScrimsRegion', payload: currentUser?.region });
 
     // eslint-disable-next-line
-  }, [currentUser?.region, scrimsLoaded, scrimsRegion]);
+  }, [currentUser?.region, scrimsLoaded]);
 
   return null;
 };

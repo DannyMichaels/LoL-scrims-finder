@@ -5,6 +5,8 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useAuth from './../../../hooks/useAuth';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // Mui components
 import Button from '@mui/material/Button';
@@ -51,7 +53,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Navbar({
   setScrimsRegion,
-  scrimsRegion,
   scrimsDate,
   setScrimsDate,
   showDropdowns,
@@ -60,6 +61,9 @@ export default function Navbar({
   hideProps,
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const { scrimsRegion } = useSelector(({ scrims }) => scrims);
+  const dispatch = useDispatch();
 
   const classes = useStyles();
   const { pathname } = useLocation();
@@ -91,7 +95,8 @@ export default function Navbar({
   const onSelectRegion = (e) => {
     const region = e.target.value;
     fetchScrims(); // not necessary, trying to ping the server.
-    setScrimsRegion(region); // set the navbar select value to selected region
+    // setScrimsRegion(region); // set the navbar select value to selected region
+    dispatch({ type: 'scrims/setScrimsRegion', payload: region });
   };
 
   const onSelectDate = (e) => {
