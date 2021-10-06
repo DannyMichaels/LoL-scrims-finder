@@ -222,6 +222,19 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                               <FormControlLabel
                                 control={
                                   <Checkbox
+                                    color="primary"
+                                    checked={showPreviousScrims}
+                                    onChange={toggleShowScrims}
+                                    name="showPreviousScrims"
+                                  />
+                                }
+                                label="Show previous scrims"
+                                labelPlacement="bottom"
+                              />
+
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
                                     // the UI says "show X scrims", so in this case we are reversing the boolean for checked, lol.
                                     // doesn't matter functionally.
                                     checked={showCurrentScrims}
@@ -244,18 +257,6 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                                   />
                                 }
                                 label="Show upcoming scrims"
-                                labelPlacement="bottom"
-                              />
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    color="primary"
-                                    checked={showPreviousScrims}
-                                    onChange={toggleShowScrims}
-                                    name="showPreviousScrims"
-                                  />
-                                }
-                                label="Show previous scrims"
                                 labelPlacement="bottom"
                               />
                             </FormGroup>
@@ -337,8 +338,6 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
         showCheckboxes={showCheckboxes}
         showDropdowns={showDropdowns}
         showLess={showLess}
-        scrimsRegion={scrimsRegion}
-        scrimsDate={scrimsDate}
       />
 
       <div className={classes.offset} />

@@ -6,6 +6,7 @@ import useScrims from '../../../hooks/useScrims';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useAuth from './../../../hooks/useAuth';
+import { useSelector, useDispatch } from 'react-redux';
 
 // components
 import { InnerColumn } from '../PageComponents';
@@ -62,12 +63,16 @@ export default function NavbarDrawer({
   showCheckboxes,
   showDropdowns,
   showLess,
-  hideProps,
-  scrimsRegion, // the region the scrims are going to be filtered by
-  setScrimsRegion,
-  scrimsDate, // the date the scrims are going to be filtered by
-  setScrimsDate,
 }) {
+  const {
+    scrimsRegion,
+    scrimsDate,
+    showPreviousScrims,
+    showCurrentScrims,
+    showUpcomingScrims,
+  } = useSelector(({ scrims }) => scrims);
+  const dispatch = useDispatch();
+
   const { currentUser, handleLogout } = useAuth();
   const { fetchScrims } = useScrims();
 
@@ -82,14 +87,6 @@ export default function NavbarDrawer({
     () => (matchesLg ? 'top' : 'right'),
     [matchesLg]
   );
-
-  // this is terrible but I'm doing it this way because it will cause an error that it can't find props of undefined
-  let hidePreviousScrims = hideProps?.hidePreviousScrims,
-    hideCurrentScrims = hideProps?.hideCurrentScrims,
-    hideUpcomingScrims = hideProps?.hideUpcomingScrims,
-    setHidePreviousScrims = hideProps?.setHidePreviousScrims,
-    setHideCurrentScrims = hideProps?.setHideCurrentScrims,
-    setHideUpcomingScrims = hideProps?.setHideUpcomingScrims;
 
   const drawerNavPush = async (path) => {
     setIsDrawerOpen(false);
@@ -109,11 +106,17 @@ export default function NavbarDrawer({
   const onSelectRegion = (e) => {
     const region = e.target.value;
     fetchScrims(); // not necessary, trying to ping the server.
-    setScrimsRegion(region); // set the navbar select value to selected region
+    // setScrimsRegion(region); // set the navbar select value to selected region
+    dispatch({ type: 'scrims/setScrimsRegion', payload: region });
   };
 
   const onSelectDate = (e) => {
-    setScrimsDate(moment(e.target.value));
+    const newDateValue = moment(e.target.value);
+    dispatch({ type: 'scrims/setScrimsDate', payload: newDateValue });
+  };
+
+  const toggleShowScrims = (e) => {
+    dispatch({ type: 'scrims/toggleHideScrims', payload: e.target.name });
   };
 
   useOnKeyDown(
@@ -268,44 +271,38 @@ export default function NavbarDrawer({
                           // the UI says "show X scrims", so in this case we are reversing the boolean for checked, lol.
                           // doesn't matter functionally.
 
-                          checked={!hideCurrentScrims}
+                          checked={showCurrentScrims}
                           color="primary"
-                          onChange={() =>
-                            setHideCurrentScrims((prevState) => !prevState)
-                          }
-                          name="hideCurrentScrims"
+                          onChange={toggleShowScrims}
+                          name="showCurrentScrims"
                         />
                       }
                       label="Show current scrims"
+                      labelPlacement="bottom"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          color="primary"
+                          checked={showPreviousScrims}
+                          onChange={toggleShowScrims}
+                          name="showPreviousScrims"
+                        />
+                      }
+                      label="Show previous scrims"
                       labelPlacement="bottom"
                     />
 
                     <FormControlLabel
                       control={
                         <Checkbox
-                          checked={!hideUpcomingScrims}
+                          checked={showUpcomingScrims}
                           color="primary"
-                          onChange={() =>
-                            setHideUpcomingScrims((prevState) => !prevState)
-                          }
-                          name="hideUpcomingScrims"
+                          onChange={toggleShowScrims}
+                          name="showUpcomingScrims"
                         />
                       }
                       label="Show upcoming scrims"
-                      labelPlacement="bottom"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          color="primary"
-                          checked={!hidePreviousScrims}
-                          onChange={() =>
-                            setHidePreviousScrims((prevState) => !prevState)
-                          }
-                          name="hidePreviousScrims"
-                        />
-                      }
-                      label="Show previous scrims"
                       labelPlacement="bottom"
                     />
                   </FormGroup>
