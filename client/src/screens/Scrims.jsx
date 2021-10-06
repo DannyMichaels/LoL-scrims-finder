@@ -1,8 +1,8 @@
-import { useAuth } from './../context/currentUser';
 import { useState, useEffect, Fragment, useMemo } from 'react';
 import { useScrims } from './../context/scrimsContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
+import useAuth from './../hooks/useAuth';
 
 // components
 import Typography from '@mui/material/Typography';
@@ -24,7 +24,6 @@ import { compareDateWithCurrentTime } from './../utils/compareDateWithCurrentTim
 // icons
 import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useSelector } from 'react-redux';
 
 // compare scrim start time with now.
 const compareDates = (scrim) => {
@@ -44,7 +43,7 @@ const compareDates = (scrim) => {
 
 export default function Scrims() {
   const today = useMemo(() => moment(), []); // not necessary to use useMemo.
-  const { currentUser } = useSelector(({ auth }) => auth);
+  const { currentUser } = useAuth();
 
   const { scrims, scrimsLoaded } = useScrims();
 

@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useScrims } from './../context/scrimsContext';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
-import { useAuth } from './../context/currentUser';
 import { useAlerts } from '../context/alertsContext';
+import useAuth from './../hooks/useAuth';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';

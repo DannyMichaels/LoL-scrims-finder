@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
 import { useAlerts } from '../context/alertsContext';
-import { useAuth } from '../context/currentUser';
+import useAuth from '../hooks/useAuth';
 
 // components
 import { Redirect } from 'react-router-dom';

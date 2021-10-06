@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useAuth } from '../../context/currentUser';
+import useAuth from './../../hooks/useAuth';
 import { useScrims } from './../../context/scrimsContext';
 
 // components
@@ -21,8 +21,6 @@ import { makeStyles } from '@mui/styles';
 import pluralize from 'pluralize';
 import { updateScrim } from '../../services/scrims';
 import { COLORS } from './../../appTheme';
-import { useSelector } from 'react-redux';
-import { checkAdmin } from '../../reducers/auth.reducer';
 
 const useStyles = makeStyles({
   infoBoxRoot: {
@@ -44,8 +42,7 @@ export default function ScrimSectionMiddleAreaBox({
   casterEntered,
 }) {
   // const { currentUser, isCurrentUserAdmin } = useAuth();
-  const { currentUser } = useSelector(({ auth }) => auth);
-  const isCurrentUserAdmin = checkAdmin(currentUser);
+  const { currentUser, isCurrentUserAdmin } = useAuth();
 
   const classes = useStyles({ gameStarted, imageUploaded });
 

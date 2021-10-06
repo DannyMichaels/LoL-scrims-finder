@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useScrims } from './../context/scrimsContext';
 import { useAlerts } from './../context/alertsContext';
-import { useAuth } from './../context/currentUser';
+import useAuth from './../hooks/useAuth';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';

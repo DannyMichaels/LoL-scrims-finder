@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useScrims } from './../../context/scrimsContext';
-import { useAuth } from './../../context/currentUser';
+import useAuth from './../../hooks/useAuth';
+import { useAlerts } from '../../context/alertsContext';
 
 // components
 import AdminArea from '../shared/AdminArea';
@@ -9,10 +10,10 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
+
 // utils
 import S3FileUpload from 'react-s3';
 import { addImageToScrim, removeImageFromScrim } from '../../services/scrims';
-import { useAlerts } from '../../context/alertsContext';
 
 // icons
 import UploadIcon from '@mui/icons-material/CloudUpload';

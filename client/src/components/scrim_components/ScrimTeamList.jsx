@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useScrims } from './../../context/scrimsContext';
-import { useAuth } from './../../context/currentUser';
+import useAuth from './../../hooks/useAuth';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 import { useAlerts } from '../../context/alertsContext';
 
@@ -40,8 +40,6 @@ import JoinIcon from '@mui/icons-material/MeetingRoom';
 import ExitIcon from '@mui/icons-material/NoMeetingRoom';
 import KickIcon from '@mui/icons-material/HighlightOff';
 import InfoIcon from '@mui/icons-material/Info';
-import { useSelector } from 'react-redux';
-import { checkAdmin } from '../../reducers/auth.reducer';
 
 const getRankImage = (user) => {
   // replace number with empty string: Diamond 1 => Diamond
@@ -59,8 +57,7 @@ export default function ScrimTeamList({
   setButtonsDisabled,
 }) {
   const { fetchScrims } = useScrims();
-  const { currentUser } = useSelector(({ currentUser }) => currentUser);
-  const isCurrentUserAdmin = checkAdmin(currentUser);
+  const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
 
   const classes = useScrimSectionStyles({ scrim });

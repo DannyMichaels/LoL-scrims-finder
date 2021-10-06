@@ -4,16 +4,16 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { CurrentUserProvider } from './context/currentUser';
 import { AlertsProvider } from './context/alertsContext';
 import { ScrimsProvider } from './context/scrimsContext';
 import ReactComment from './components/shared/ReactComment';
 import { creditsComment } from './creditsComment';
-import { Provider } from 'react-redux';
-import configureStore from './store'; // index.js
-
 import Favicon from 'react-favicon';
 import Logo from './assets/images/bootcamp_llc_media_kit/coin_logo_new2021shd.png';
+
+//  store
+import { Provider } from 'react-redux';
+import configureStore from './store'; // index.js
 
 const store = configureStore();
 

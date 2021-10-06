@@ -29,6 +29,3 @@ export default function currentUserReducer(state = initialState, action) {
       return state;
   }
 }
-
-export const checkAdmin = (currentUser) =>
-  currentUser?.adminKey === process.env.REACT_APP_ADMIN_KEY;
