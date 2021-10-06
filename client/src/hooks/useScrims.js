@@ -23,14 +23,8 @@ const compareDates = (scrim) => {
 };
 
 export default function useScrims() {
-  const {
-    scrims,
-    scrimsRegion,
-    scrimsDate,
-    filteredScrims,
-    scrimsLoaded,
-    ...rest
-  } = useSelector(({ scrims }) => scrims);
+  const { scrims, scrimsRegion, scrimsDate, scrimsLoaded, ...rest } =
+    useSelector(({ scrims }) => scrims);
 
   const dispatch = useDispatch();
 
@@ -41,6 +35,49 @@ export default function useScrims() {
   const setScrims = (newScrimsValue) =>
     dispatch({ type: 'scrims/setScrims', payload: newScrimsValue });
 
+  return {
+    scrims,
+    setScrims,
+    scrimsLoaded,
+    fetchScrims,
+    ...rest,
+  };
+}
+
+// sets the scrim region to the users scrim region
+export const useSetScrimsRegion = () => {
+  const [{ scrimsLoaded, scrimsRegion }, currentUser] = useSelector(
+    ({ scrims, auth }) => [scrims, auth?.currentUser]
+  );
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!currentUser?.region) return; // don't run this when we don't have a user yet.
+
+    // if the scrims region is already equal to the currentUsers region, don't proceed
+    if (scrimsRegion === currentUser?.region) return;
+
+    // if the scrims have loaded, but the users region is already equal to the scrims region return.
+    if (scrimsLoaded && scrimsRegion === currentUser?.region) return;
+
+    // set the scrims region on mount when user is available, or when user changes his region in the settings.
+    dispatch({ type: 'scrims/setScrimsRegion', payload: currentUser?.region });
+
+    // eslint-disable-next-line
+  }, [currentUser?.region, scrimsLoaded]);
+
+  return null;
+};
+
+// separate these into a separate hook to avoid these values being recreated.
+export const useFilteredScrims = () => {
+  const { scrims, scrimsDate, scrimsRegion, filteredScrims } = useSelector(
+    ({ scrims }) => scrims
+  );
+
+  const dispatch = useDispatch();
+
   const dateFilteredScrims = useMemo(
     () =>
       scrims.filter(({ gameStartTime }) => {
@@ -50,6 +87,7 @@ export default function useScrims() {
           new Date(scrimsDate).toLocaleDateString()
         );
       }),
+
     // change date filtered scrims whenever scrims and scrimsDate changes.
     [scrims, scrimsDate]
   );
@@ -59,6 +97,16 @@ export default function useScrims() {
     // change filteredScrimsByDateAndRegion whenever dateFilteredScrims and scrimsRegion changes
     [dateFilteredScrims, scrimsRegion]
   );
+
+  useEffect(() => {
+    dispatch({
+      type: 'scrims/setFilteredScrims',
+      payload: filteredScrimsByDateAndRegion,
+    });
+    // this runs everytime scrimsRegion and dateFilteredScrims changes.
+
+    // eslint-disable-next-line
+  }, [filteredScrimsByDateAndRegion]);
 
   let upcomingScrims = useMemo(
     () =>
@@ -93,46 +141,14 @@ export default function useScrims() {
   );
 
   return {
-    scrims,
-    previousScrims,
     currentScrims,
+    previousScrims,
     upcomingScrims,
-    setScrims,
-    scrimsLoaded,
-    fetchScrims,
-    dateFilteredScrims,
-    filteredScrimsByDateAndRegion,
     filteredScrims,
-    ...rest,
   };
-}
-
-// sets the scrim region to the users scrim region
-export const useSetScrimsRegion = () => {
-  const [{ scrimsLoaded, scrimsRegion }, currentUser] = useSelector(
-    ({ scrims, auth }) => [scrims, auth?.currentUser]
-  );
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (!currentUser?.region) return; // don't run this when we don't have a user yet.
-
-    // if the scrims region is already equal to the currentUsers region, don't proceed
-    if (scrimsRegion === currentUser?.region) return;
-
-    // if the scrims have loaded, but the users region is already equal to the scrims region return.
-    if (scrimsLoaded && scrimsRegion === currentUser?.region) return;
-
-    // set the scrims region on mount when user is available, or when user changes his region in the settings.
-    dispatch({ type: 'scrims/setScrimsRegion', payload: currentUser?.region });
-
-    // eslint-disable-next-line
-  }, [currentUser?.region, scrimsLoaded]);
-
-  return null;
 };
 
+// hook to fetch scrims
 export const useFetchScrims = () => {
   const { fetch } = useSelector(({ scrims }) => scrims);
   const dispatch = useDispatch();
@@ -159,7 +175,7 @@ export const useFetchScrims = () => {
 
 const FETCH_INTERVAL = 10000;
 
-// // load scrims every 10 seconds
+// load scrims every 10 seconds
 export const useFetchScrimsInterval = () => {
   const { pathname } = useLocation();
   const dispatch = useDispatch();

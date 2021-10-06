@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
-import useScrims from './../hooks/useScrims';
+import useScrims, { useFilteredScrims } from './../hooks/useScrims';
 import { useDispatch } from 'react-redux';
 
 // components
@@ -29,27 +29,15 @@ export default function Scrims() {
     showPreviousScrims,
     showCurrentScrims,
     showUpcomingScrims,
-    filteredScrims,
-    currentScrims,
-    previousScrims,
-    upcomingScrims,
-    filteredScrimsByDateAndRegion,
   } = useScrims();
+
+  const { filteredScrims, currentScrims, previousScrims, upcomingScrims } =
+    useFilteredScrims();
 
   const dispatch = useDispatch();
 
   const theme = useTheme();
   const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
-
-  useEffect(() => {
-    dispatch({
-      type: 'scrims/setFilteredScrims',
-      payload: filteredScrimsByDateAndRegion,
-    });
-    // this runs everytime scrimsRegion and dateFilteredScrims changes.
-
-    // eslint-disable-next-line
-  }, [filteredScrimsByDateAndRegion]);
 
   useEffect(() => {
     // if scrimsDate < currentTime
