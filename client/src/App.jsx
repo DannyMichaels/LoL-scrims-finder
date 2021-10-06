@@ -8,7 +8,7 @@ import useAuth from './hooks/useAuth';
 // styles
 import { appTheme } from './appTheme';
 import { useAppStyles } from './styles/App.styles';
-
+import { Helmet } from 'react-helmet';
 // components
 import AppRouter from './navigation/AppRouter';
 import { ThemeProvider } from '@mui/material/styles';
@@ -42,32 +42,40 @@ function App() {
   }
 
   return (
-    <div className={classes.root}>
-      <ThemeProvider theme={appTheme}>
-        <CssBaseline />
+    <>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Bootcamp LoL Scrim Gym</title>
+        <meta name="description" content="Find LoL Custom Lobbies!" />
+      </Helmet>
 
-        {currentAlert && (
-          // if there is an alert in the context, show it
-          <Snackbar
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            autoHideDuration={6000} // autohide will set the current alert to null in the state.
-            open={currentAlert.message ? true : false}
-            onClose={closeAlert}
-            message={currentAlert.message}>
-            <Alert
-              variant="filled"
+      <div className={classes.root}>
+        <ThemeProvider theme={appTheme}>
+          <CssBaseline />
+
+          {currentAlert && (
+            // if there is an alert in the context, show it
+            <Snackbar
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              autoHideDuration={6000} // autohide will set the current alert to null in the state.
+              open={currentAlert.message ? true : false}
               onClose={closeAlert}
-              severity={currentAlert.type.toLowerCase()}>
-              {/* example: success - scrim created successfully! */}
-              <strong>{currentAlert.type}</strong> - {currentAlert.message}
-            </Alert>
-          </Snackbar>
-        )}
+              message={currentAlert.message}>
+              <Alert
+                variant="filled"
+                onClose={closeAlert}
+                severity={currentAlert.type.toLowerCase()}>
+                {/* example: success - scrim created successfully! */}
+                <strong>{currentAlert.type}</strong> - {currentAlert.message}
+              </Alert>
+            </Snackbar>
+          )}
 
-        <AppRouter />
-        <Footer />
-      </ThemeProvider>
-    </div>
+          <AppRouter />
+          <Footer />
+        </ThemeProvider>
+      </div>
+    </>
   );
 }
 
