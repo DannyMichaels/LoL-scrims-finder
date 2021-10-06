@@ -123,6 +123,8 @@ export default function Scrims() {
     } else {
       dispatch({ type: 'scrims/setHideScrims', hideUpcoming: false });
     }
+
+    // eslint-disable-next-line
   }, [scrimsDate]);
 
   if (!scrimsLoaded) {
