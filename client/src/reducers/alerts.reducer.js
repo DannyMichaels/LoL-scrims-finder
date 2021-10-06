@@ -3,7 +3,7 @@ const initialState = {
   currentAlert: null,
 };
 
-export default function currentAlertReducer(state = initialState, action) {
+export default function alertsReducer(state = initialState, action) {
   const { type, payload } = action;
 
   switch (type) {

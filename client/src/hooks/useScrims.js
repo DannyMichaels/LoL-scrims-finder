@@ -1,19 +1,22 @@
-import React, { useState, createContext, useEffect, useContext } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useToggle from './../hooks/useToggle';
 import useInterval from '../hooks/useInterval';
 import { getAllScrims } from './../services/scrims';
 import devLog from '../utils/devLog';
+import { useDispatch, useSelector } from 'react-redux';
 
-const ScrimsContext = createContext();
-ScrimsContext.displayName = 'ScrimsContext';
-
-export const useScrims = () => useContext(ScrimsContext);
-
-function ScrimsProvider({ children }) {
-  const [scrims, setScrims] = useState([]);
+export default function useScrims() {
   const [fetch, toggleFetch] = useToggle();
-  const [scrimsLoaded, setScrimsLoaded] = useState(false);
+
+  const { scrims, scrimsLoaded } = useSelector(({ scrims }) => scrims);
+  const dispatch = useDispatch();
+
+  const initScrims = (newScrimsValue) =>
+    dispatch({ type: 'scrims/fetchScrims', payload: newScrimsValue });
+
+  const setScrims = (newScrimsValue) =>
+    dispatch({ type: 'scrims/setScrims', payload: newScrimsValue });
 
   const { pathname } = useLocation();
 
@@ -21,37 +24,33 @@ function ScrimsProvider({ children }) {
     const fetchScrims = async () => {
       devLog('fetching scrims');
       const scrimsData = await getAllScrims();
-      setScrims(scrimsData);
-      setScrimsLoaded(true);
+      initScrims(scrimsData);
     };
 
     fetchScrims();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetch, pathname]);
 
-  const loadScrims = async () => {
+  const loadScrims = useCallback(async () => {
     if (pathname !== '/sign-up') {
       devLog('fetching scrims (interval)');
       const scrimsData = await getAllScrims();
       setScrims(scrimsData);
     }
-  };
+
+    // eslint-disable-next-line
+  }, []);
 
   // load scrims every 10 seconds
   const FETCH_INTERVAL = 10000;
   useInterval(loadScrims, FETCH_INTERVAL);
 
-  const value = {
+  return {
     scrims,
     setScrims,
     fetch,
-    toggleFetch,
     scrimsLoaded,
-    fetchScrims: toggleFetch, // rename toggleFetch to fetchScrims when imported from context
+    fetchScrims: toggleFetch,
   };
-
-  return (
-    <ScrimsContext.Provider value={value}>{children}</ScrimsContext.Provider>
-  );
 }
-
-export { ScrimsContext, ScrimsProvider };

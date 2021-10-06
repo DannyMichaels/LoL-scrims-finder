@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useScrims } from './../context/scrimsContext';
+import useScrims from './../hooks/useScrims';
 import { useParams, useHistory } from 'react-router-dom';
 import ScrimSection from '../components/scrim_components/ScrimSection';
 import Navbar from '../components/shared/Navbar/Navbar';

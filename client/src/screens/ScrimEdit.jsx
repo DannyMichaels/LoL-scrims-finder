@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useScrims } from './../context/scrimsContext';
+import useScrims from './../hooks/useScrims';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
 import useAlerts from '../hooks/useAlerts';
 import useAuth from './../hooks/useAuth';

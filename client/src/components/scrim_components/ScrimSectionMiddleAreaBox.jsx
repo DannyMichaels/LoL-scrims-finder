@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useAuth from './../../hooks/useAuth';
-import { useScrims } from './../../context/scrimsContext';
+import useScrims from './../../hooks/useScrims';
 
 // components
 import CountdownTimer from './CountdownTimer';

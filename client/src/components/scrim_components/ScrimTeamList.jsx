@@ -1,6 +1,6 @@
 import { Fragment, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useScrims } from './../../context/scrimsContext';
+import useScrims from './../../hooks/useScrims';
 import useAuth from './../../hooks/useAuth';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 import useAlerts from './../../hooks/useAlerts';

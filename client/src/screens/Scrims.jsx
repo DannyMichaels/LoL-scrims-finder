@@ -1,8 +1,8 @@
 import { useState, useEffect, Fragment, useMemo } from 'react';
-import { useScrims } from './../context/scrimsContext';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useAuth from './../hooks/useAuth';
+import useScrims from './../hooks/useScrims';
 
 // components
 import Typography from '@mui/material/Typography';

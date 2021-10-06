@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useScrims } from './../context/scrimsContext';
+import useScrims from './../hooks/useScrims';
 import useAlerts from './../hooks/useAlerts';
 import useAuth from './../hooks/useAuth';
 

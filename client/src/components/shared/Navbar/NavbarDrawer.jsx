@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import useOnKeyDown from './../../../hooks/useOnKeyDown';
 import { useHistory } from 'react-router-dom';
-import { useScrims } from '../../../context/scrimsContext';
+import useScrims from '../../../hooks/useScrims';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useAuth from './../../../hooks/useAuth';
