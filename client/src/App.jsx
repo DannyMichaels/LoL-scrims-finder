@@ -25,7 +25,6 @@ import Alert from '@mui/material/Alert';
 
 function App() {
   const { isVerifyingUser, handleVerify } = useAuth();
-
   const { currentAlert, closeAlert } = useAlerts();
   const classes = useAppStyles();
 
