@@ -182,7 +182,8 @@ export const useFetchScrimsInterval = () => {
     if (pathname !== '/sign-up') {
       devLog('fetching scrims (interval)');
       const scrimsData = await getAllScrims();
-      dispatch({ type: 'scrims/setScrims', payload: scrimsData });
+      // calling it fetchScrimsInterval so it's easier to distinguish in redux devtools
+      dispatch({ type: 'scrims/fetchScrimsInterval', payload: scrimsData });
     }
 
     // eslint-disable-next-line

@@ -27,6 +27,13 @@ export default function scrimsReducer(state = initialState, action) {
       };
     }
 
+    case 'scrims/fetchScrimsInterval': {
+      return {
+        ...state,
+        scrims: payload,
+      };
+    }
+
     case 'scrims/setScrims': {
       return {
         ...state,
@@ -45,15 +52,6 @@ export default function scrimsReducer(state = initialState, action) {
       return {
         ...state,
         scrims: state.scrims.filter((scrim) => scrim._id !== payload._id),
-      };
-    }
-
-    case 'scrims/updateScrim': {
-      return {
-        ...state,
-        scrims: state.scrims.map((scrim) =>
-          scrim._id !== payload._id ? scrim : payload
-        ),
       };
     }
 
