@@ -23,9 +23,10 @@ const compareDates = (scrim) => {
 };
 
 export default function useScrims() {
-  const { scrims, scrimsRegion, scrimsDate, scrimsLoaded, ...rest } =
-    useSelector(({ scrims }) => scrims);
+  return useSelector(({ scrims }) => scrims);
+}
 
+export function useScrimsActions() {
   const dispatch = useDispatch();
 
   const fetchScrims = () => {
@@ -36,11 +37,8 @@ export default function useScrims() {
     dispatch({ type: 'scrims/setScrims', payload: newScrimsValue });
 
   return {
-    scrims,
     setScrims,
-    scrimsLoaded,
     fetchScrims,
-    ...rest,
   };
 }
 

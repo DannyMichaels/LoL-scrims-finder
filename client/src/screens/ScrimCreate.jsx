@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import useScrims from './../hooks/useScrims';
+import { useScrimsActions } from './../hooks/useScrims';
 import useAlerts from './../hooks/useAlerts';
 import useAuth from './../hooks/useAuth';
 
@@ -27,7 +27,7 @@ import 'moment-timezone';
 import devLog from './../utils/devLog';
 
 export default function ScrimCreate() {
-  const { fetchScrims } = useScrims();
+  const { fetchScrims } = useScrimsActions();
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
 

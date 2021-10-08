@@ -1,6 +1,6 @@
 import { Fragment, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import useScrims from './../../hooks/useScrims';
+import { useScrimsActions } from './../../hooks/useScrims';
 import useAuth from './../../hooks/useAuth';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 import useAlerts from './../../hooks/useAlerts';
@@ -56,7 +56,7 @@ export default function ScrimTeamList({
   buttonsDisabled,
   setButtonsDisabled,
 }) {
-  const { fetchScrims } = useScrims();
+  const { fetchScrims } = useScrimsActions();
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
 

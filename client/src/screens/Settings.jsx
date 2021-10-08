@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import useAlerts from '../hooks/useAlerts';
+import useAuth, { useAuthActions } from './../hooks/useAuth';
 
 // components
 import Grid from '@mui/material/Grid';
@@ -21,7 +22,6 @@ import {
 import { makeStyles } from '@mui/styles';
 import { updateUser, getAllUsers } from './../services/users';
 import { setAuthToken } from './../services/auth';
-import useAuth from './../hooks/useAuth';
 
 // remove spaces from # in discord name
 const removeSpaces = (str) => {
@@ -44,7 +44,9 @@ const useStyles = makeStyles((theme) => ({
 
 // userEdit
 export default function Settings() {
-  const { currentUser, setCurrentUser } = useAuth();
+  const { currentUser } = useAuth();
+  const { setCurrentUser } = useAuthActions();
+
   const [allUsers, setAllUsers] = useState([]);
   const [userData, setUserData] = useState({
     name: currentUser?.name, // LoL summoner name

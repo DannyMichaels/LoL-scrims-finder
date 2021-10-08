@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useAuth from './../../hooks/useAuth';
-import useScrims from './../../hooks/useScrims';
+import { useScrimsActions } from './../../hooks/useScrims';
 
 // components
 import CountdownTimer from './CountdownTimer';
@@ -45,7 +45,7 @@ export default function ScrimSectionMiddleAreaBox({
 
   const classes = useStyles({ gameStarted, imageUploaded });
 
-  const { fetchScrims } = useScrims();
+  const { fetchScrims } = useScrimsActions();
 
   const { teamOne, teamTwo } = scrim;
 

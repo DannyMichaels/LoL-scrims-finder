@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import useScrims from './../../hooks/useScrims';
+import { useScrimsActions } from './../../hooks/useScrims';
 import useAuth from './../../hooks/useAuth';
 import useAlerts from '../../hooks/useAlerts';
 
@@ -44,7 +44,7 @@ const changeFileName = async (file, scrimId) => {
 export default function UploadPostGameImage({ scrim, isUploaded }) {
   const { currentUser } = useAuth();
   const fileInputRef = useRef();
-  const { fetchScrims } = useScrims();
+  const { fetchScrims } = useScrimsActions();
   const { setCurrentAlert } = useAlerts();
   const [buttonDisabled, setButtonDisabled] = useState(false); // disable when uploading / deleting img
 

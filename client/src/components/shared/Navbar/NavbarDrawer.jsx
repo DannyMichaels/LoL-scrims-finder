@@ -2,10 +2,10 @@
 import { useMemo } from 'react';
 import useOnKeyDown from './../../../hooks/useOnKeyDown';
 import { useHistory } from 'react-router-dom';
-import useScrims from '../../../hooks/useScrims';
+import { useScrimsActions } from '../../../hooks/useScrims';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
-import useAuth from './../../../hooks/useAuth';
+import useAuth, { useAuthActions } from './../../../hooks/useAuth';
 import { useSelector, useDispatch } from 'react-redux';
 
 // components
@@ -73,8 +73,9 @@ export default function NavbarDrawer({
   } = useSelector(({ scrims }) => scrims);
   const dispatch = useDispatch();
 
-  const { currentUser, handleLogout } = useAuth();
-  const { fetchScrims } = useScrims();
+  const { currentUser } = useAuth();
+  const { handleLogout } = useAuthActions();
+  const { fetchScrims } = useScrimsActions();
 
   const classes = useStyles();
   const history = useHistory();

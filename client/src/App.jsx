@@ -1,9 +1,8 @@
 import './App.css';
 
 // hooks
-import { useEffect } from 'react';
 import useAlerts from './hooks/useAlerts';
-import useAuth from './hooks/useAuth';
+import useAuth, { useAuthVerify } from './hooks/useAuth';
 import {
   useFetchScrims,
   useFetchScrimsInterval,
@@ -13,7 +12,7 @@ import {
 // styles
 import { appTheme } from './appTheme';
 import { useAppStyles } from './styles/App.styles';
-import { Helmet } from 'react-helmet';
+
 // components
 import AppRouter from './navigation/AppRouter';
 import { ThemeProvider } from '@mui/material/styles';
@@ -22,24 +21,17 @@ import Loading from './components/shared/Loading';
 import Footer from './components/shared/Footer';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { Helmet } from 'react-helmet';
 
 function App() {
-  const { isVerifyingUser, handleVerify } = useAuth();
+  const { isVerifyingUser } = useAuth();
   const { currentAlert, closeAlert } = useAlerts();
   const classes = useAppStyles();
 
+  useAuthVerify(); // verify user is authenticated.
   useFetchScrims(); // fetch scrims on mount or path change
   useFetchScrimsInterval(); // fetch scrims on 10 sec interval
   useSetScrimsRegion(); // set scrims region to users region on mount and when user changes it on settings
-
-  useEffect(() => {
-    handleVerify();
-    return () => {
-      handleVerify();
-    };
-
-    // handleVerify is wrapped in usecallback so it's okay
-  }, [handleVerify]);
 
   if (isVerifyingUser) {
     return (

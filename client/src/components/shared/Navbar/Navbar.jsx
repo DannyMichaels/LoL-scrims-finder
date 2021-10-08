@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import useAuth from './../../../hooks/useAuth';
+import useAuth, { useAuthActions } from './../../../hooks/useAuth';
 
 // Mui components
 import Button from '@mui/material/Button';
@@ -49,7 +49,8 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { handleLogin, currentUser } = useAuth();
+  const { currentUser } = useAuth();
+  const { handleLogin } = useAuthActions();
 
   const noBackButtonPaths = [/^\/signup/, /^\/scrims$/, /^\/scrims\/$/, /^\/$/];
 

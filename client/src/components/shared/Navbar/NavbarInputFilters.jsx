@@ -10,12 +10,14 @@ import moment from 'moment';
 import 'moment-timezone';
 
 import { useSelector, useDispatch } from 'react-redux';
-import useScrims from './../../../hooks/useScrims';
+import { useScrimsActions } from './../../../hooks/useScrims';
 
 export default function NavbarInputFilters() {
-  const { currentUser } = useSelector(({ auth }) => auth);
+  const [{ currentUser }, { scrimsDate, scrimsRegion }] = useSelector(
+    ({ auth, scrims }) => [auth, scrims]
+  );
 
-  const { fetchScrims, scrimsDate, scrimsRegion } = useScrims();
+  const { fetchScrims } = useScrimsActions();
 
   const dispatch = useDispatch();
 

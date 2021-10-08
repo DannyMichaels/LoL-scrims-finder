@@ -1,5 +1,5 @@
 import devLog from '../utils/devLog';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { auth, provider } from '../firebase';
@@ -8,9 +8,16 @@ import jwt_decode from 'jwt-decode';
 import { setAuthToken, removeToken } from '../services/auth';
 
 export default function useAuth() {
+  const auth = useSelector(({ auth }) => auth);
+
+  const isCurrentUserAdmin =
+    auth?.currentUser?.adminKey === process.env.REACT_APP_ADMIN_KEY;
+  return { ...auth, isCurrentUserAdmin };
+}
+
+export function useAuthActions() {
   const history = useHistory();
   const dispatch = useDispatch();
-  const { currentUser, isVerifyingUser } = useSelector((state) => state.auth);
 
   const setCurrentUser = (currentUserValue) => {
     dispatch({ type: 'auth/setCurrentUser', payload: currentUserValue });
@@ -47,6 +54,14 @@ export default function useAuth() {
     }
   };
 
+  return { handleLogin, handleLogout, setCurrentUser };
+}
+
+export function useAuthVerify() {
+  const history = useHistory();
+  const dispatch = useDispatch();
+  const { handleLogout, setCurrentUser } = useAuthActions();
+
   const handleVerify = useCallback(async () => {
     devLog('verifying user');
     if (localStorage.jwtToken) {
@@ -82,16 +97,14 @@ export default function useAuth() {
     // eslint-disable-next-line
   }, []);
 
-  const isCurrentUserAdmin =
-    currentUser?.adminKey === process.env.REACT_APP_ADMIN_KEY;
+  useEffect(() => {
+    handleVerify();
+    return () => {
+      handleVerify();
+    };
 
-  return {
-    isCurrentUserAdmin,
-    isVerifyingUser,
-    currentUser,
-    handleLogin,
-    handleLogout,
-    handleVerify,
-    setCurrentUser,
-  };
+    // handleVerify is wrapped in usecallback so it's okay
+  }, [handleVerify]);
+
+  return null;
 }
