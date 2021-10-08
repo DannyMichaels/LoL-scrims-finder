@@ -106,14 +106,14 @@ export default function NavbarDrawer({
 
   const onSelectRegion = (e) => {
     const region = e.target.value;
-    fetchScrims(); // not necessary, trying to ping the server.
-    // setScrimsRegion(region); // set the navbar select value to selected region
     dispatch({ type: 'scrims/setScrimsRegion', payload: region });
+    fetchScrims(); // not necessary, trying to ping the server.
   };
 
   const onSelectDate = (e) => {
     const newDateValue = moment(e.target.value);
     dispatch({ type: 'scrims/setScrimsDate', payload: newDateValue });
+    fetchScrims();
   };
 
   const toggleShowScrims = (e) => {
