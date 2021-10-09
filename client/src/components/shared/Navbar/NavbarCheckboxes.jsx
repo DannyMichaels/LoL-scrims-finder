@@ -60,23 +60,6 @@ export default function NavbarCheckboxes() {
         <FormControlLabel
           control={
             <Checkbox
-              checked={showCurrentScrims}
-              color="primary"
-              onChange={toggleShowScrims}
-              name="showCurrentScrims"
-            />
-          }
-          label={
-            <>
-              <Hidden mdDown>Show</Hidden> current scrims
-            </>
-          }
-          labelPlacement="bottom"
-        />
-
-        <FormControlLabel
-          control={
-            <Checkbox
               checked={showUpcomingScrims}
               color="primary"
               onChange={toggleShowScrims}
@@ -86,6 +69,23 @@ export default function NavbarCheckboxes() {
           label={
             <>
               <Hidden mdDown>Show</Hidden> upcoming scrims
+            </>
+          }
+          labelPlacement="bottom"
+        />
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={showCurrentScrims}
+              color="primary"
+              onChange={toggleShowScrims}
+              name="showCurrentScrims"
+            />
+          }
+          label={
+            <>
+              <Hidden mdDown>Show</Hidden> current scrims
             </>
           }
           labelPlacement="bottom"
