@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import useScrims from '../../hooks/useScrims';
+import { useScrimsActions } from '../../hooks/useScrims';
 import useAuth from '../../hooks/useAuth';
 import useAlerts from './../../hooks/useAlerts';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
@@ -34,7 +34,7 @@ const compareDates = (scrim) => {
 const MAX_CASTER_AMOUNT = 2;
 
 export default function ScrimSection({ scrim, isInDetail }) {
-  const { fetchScrims } = useScrims();
+  const { fetchScrims } = useScrimsActions();
   const { currentUser } = useAuth();
   const { setCurrentAlert } = useAlerts();
 
