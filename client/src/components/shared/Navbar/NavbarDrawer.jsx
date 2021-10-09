@@ -2,11 +2,9 @@
 import { useMemo } from 'react';
 import useOnKeyDown from './../../../hooks/useOnKeyDown';
 import { useHistory } from 'react-router-dom';
-import { useScrimsActions } from '../../../hooks/useScrims';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useAuth, { useAuthActions } from './../../../hooks/useAuth';
-import { useSelector, useDispatch } from 'react-redux';
 
 // components
 import { InnerColumn } from '../PageComponents';
@@ -28,7 +26,6 @@ import ExitIcon from '@mui/icons-material/ExitToApp';
 import CreateIcon from '@mui/icons-material/BorderColor';
 
 // utils
-import moment from 'moment';
 import clsx from 'clsx';
 import { KEYCODES } from '../../../utils/keycodes';
 import { makeStyles } from '@mui/styles';
@@ -57,24 +54,12 @@ export default function NavbarDrawer({
   showDropdowns,
   showLess,
 }) {
-  const {
-    scrimsRegion,
-    scrimsDate,
-    showPreviousScrims,
-    showCurrentScrims,
-    showUpcomingScrims,
-  } = useSelector(({ scrims }) => scrims);
-  const dispatch = useDispatch();
-
   const { currentUser } = useAuth();
   const { handleLogout } = useAuthActions();
-  const { fetchScrims } = useScrimsActions();
 
   const classes = useStyles();
   const history = useHistory();
   const theme = useTheme();
-  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
-  const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
   const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
 
   const drawerAnchor = useMemo(
@@ -88,29 +73,6 @@ export default function NavbarDrawer({
     // using sleep so the user sees the drawer close before the path gets redirected.
     await sleep(80);
     history.push(path);
-  };
-
-  let allRegions = ['NA', 'EUW', 'EUNE', 'LAN'];
-
-  let selectRegions = [
-    currentUser?.region,
-    ...allRegions.filter((r) => r !== currentUser?.region),
-  ];
-
-  const onSelectRegion = (e) => {
-    const region = e.target.value;
-    dispatch({ type: 'scrims/setScrimsRegion', payload: region });
-    fetchScrims(); // not necessary, trying to ping the server.
-  };
-
-  const onSelectDate = (e) => {
-    const newDateValue = moment(e.target.value);
-    dispatch({ type: 'scrims/setScrimsDate', payload: newDateValue });
-    fetchScrims();
-  };
-
-  const toggleShowScrims = (e) => {
-    dispatch({ type: 'scrims/toggleHideScrims', payload: e.target.name });
   };
 
   useOnKeyDown(
