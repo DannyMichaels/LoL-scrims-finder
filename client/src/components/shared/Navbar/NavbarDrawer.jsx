@@ -10,16 +10,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 // components
 import { InnerColumn } from '../PageComponents';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import Box from '@mui/material/Box';
-import FormHelperText from '@mui/material/FormHelperText';
-import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -28,6 +19,8 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Hidden from '@mui/material/Hidden';
 import AdminArea from '../AdminArea';
+import NavbarCheckboxes from './NavbarCheckboxes';
+import NavbarDropdowns from './NavbarDropdowns';
 
 // icons
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -190,122 +183,11 @@ export default function NavbarDrawer({
               direction="row"
               justifyContent="space-between"
               style={{ padding: '15px 10px 10px 10px' }}>
-              {showDropdowns && (
-                <Grid
-                  item
-                  container
-                  xs={6}
-                  md={4}
-                  alignItems={matchesSm ? 'flex-start' : 'center'}
-                  justifyContent="flex-start"
-                  direction={matchesSm ? 'column' : 'row'}
-                  id="nav__selects--container">
-                  {/* date and regions filters */}
-                  <Grid item>
-                    <TextField
-                      variant="standard"
-                      id="date"
-                      required
-                      label="Scrims Date"
-                      type="date"
-                      name="scrimsDate"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                      value={
-                        moment(new Date(scrimsDate)).format('yyyy-MM-DD') ||
-                        moment().format('yyyy-MM-DD')
-                      }
-                      onChange={onSelectDate}
-                    />
-
-                    <FormHelperText className="text-white">
-                      Filter scrims by date
-                    </FormHelperText>
-                  </Grid>
-
-                  <Hidden xsDown>
-                    <Box marginRight={4} />
-                  </Hidden>
-
-                  <Grid item id="nav__region-filter--container">
-                    <InputLabel className="text-white">Region</InputLabel>
-
-                    <Select
-                      variant="standard"
-                      value={scrimsRegion}
-                      className="text-white"
-                      onChange={onSelectRegion}>
-                      {selectRegions.map((region, key) => (
-                        <MenuItem value={region} key={key}>
-                          {region}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    <FormHelperText className="text-white">
-                      Filter scrims by region
-                    </FormHelperText>
-                  </Grid>
-                </Grid>
-              )}
-
               {/* Show scrims (current, previous, upcoming) buttons */}
-              {showCheckboxes && (
-                <Grid
-                  item
-                  alignItems="center"
-                  container
-                  justifyContent="flex-end"
-                  direction={matchesXs ? 'column' : 'row'}
-                  spacing={2}
-                  xs={6}
-                  md={8}>
-                  <FormGroup
-                    row
-                    className="text-white"
-                    style={{
-                      justifyContent: 'flex-end',
-                    }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={showCurrentScrims}
-                          color="primary"
-                          onChange={toggleShowScrims}
-                          name="showCurrentScrims"
-                        />
-                      }
-                      label="Show current scrims"
-                      labelPlacement="bottom"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          color="primary"
-                          checked={showPreviousScrims}
-                          onChange={toggleShowScrims}
-                          name="showPreviousScrims"
-                        />
-                      }
-                      label="Show previous scrims"
-                      labelPlacement="bottom"
-                    />
+              {showCheckboxes && <NavbarCheckboxes />}
 
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={showUpcomingScrims}
-                          color="primary"
-                          onChange={toggleShowScrims}
-                          name="showUpcomingScrims"
-                        />
-                      }
-                      label="Show upcoming scrims"
-                      labelPlacement="bottom"
-                    />
-                  </FormGroup>
-                </Grid>
-              )}
+              {/* region, date filters */}
+              {showDropdowns && <NavbarDropdowns />}
             </Grid>
           </Hidden>
         )}

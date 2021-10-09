@@ -1,14 +1,23 @@
+import useMediaQuery from '@mui/material/useMediaQuery';
+import useTheme from '@mui/styles/useTheme';
 import { useSelector, useDispatch } from 'react-redux';
 
+// components
 import Grid from '@mui/material/Grid';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Hidden from '@mui/material/Hidden';
 
 /* Show scrims (current, previous, upcoming) buttons */
 
-export default function NavbarCheckboxes({ xs }) {
+export default function NavbarCheckboxes() {
   const dispatch = useDispatch();
+
+  const theme = useTheme();
+  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
+  const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+  const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
 
   const { showPreviousScrims, showCurrentScrims, showUpcomingScrims } =
     useSelector(({ scrims }) => scrims);
@@ -18,11 +27,19 @@ export default function NavbarCheckboxes({ xs }) {
   };
 
   return (
-    <Grid item xs={xs} alignItems="center" container>
+    <Grid
+      item
+      alignItems="center"
+      container
+      justifyContent="flex-start"
+      direction={matchesXs ? 'column' : 'row'}
+      xs={6}
+      sm={4}
+      md={8}>
       <FormGroup
-        row
+        row={!matchesSm}
         className="text-white"
-        style={{ justifyContent: 'center' }}>
+        style={{ justifyContent: !matchesMd ? 'flex-start' : 'center' }}>
         <FormControlLabel
           control={
             <Checkbox
@@ -32,7 +49,11 @@ export default function NavbarCheckboxes({ xs }) {
               name="showPreviousScrims"
             />
           }
-          label="Show previous scrims"
+          label={
+            <>
+              <Hidden mdDown>Show</Hidden> previous scrims
+            </>
+          }
           labelPlacement="bottom"
         />
 
@@ -45,7 +66,11 @@ export default function NavbarCheckboxes({ xs }) {
               name="showCurrentScrims"
             />
           }
-          label="Show current scrims"
+          label={
+            <>
+              <Hidden mdDown>Show</Hidden> current scrims
+            </>
+          }
           labelPlacement="bottom"
         />
 
@@ -58,7 +83,11 @@ export default function NavbarCheckboxes({ xs }) {
               name="showUpcomingScrims"
             />
           }
-          label="Show upcoming scrims"
+          label={
+            <>
+              <Hidden mdDown>Show</Hidden> upcoming scrims
+            </>
+          }
           labelPlacement="bottom"
         />
       </FormGroup>

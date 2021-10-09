@@ -22,7 +22,7 @@ import HideOnScroll from '../HideOnScroll';
 import { InnerColumn } from '../PageComponents';
 import Tooltip from '../Tooltip';
 import NavbarCheckboxes from './NavbarCheckboxes';
-import NavbarInputFilters from './NavbarInputFilters';
+import NavbarDropdowns from './NavbarDropdowns';
 
 // icons
 import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
@@ -170,7 +170,7 @@ export default function Navbar({ showDropdowns, showLess, showCheckboxes }) {
                       {showCheckboxes && <NavbarCheckboxes xs={7} />}
 
                       {/* date filter and region filter */}
-                      {showDropdowns && <NavbarInputFilters />}
+                      {showDropdowns && <NavbarDropdowns />}
                     </Grid>
                   </Hidden>
                 )}

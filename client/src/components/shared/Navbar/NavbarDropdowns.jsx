@@ -1,3 +1,9 @@
+import { useSelector, useDispatch } from 'react-redux';
+import { useScrimsActions } from '../../../hooks/useScrims';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import useTheme from '@mui/styles/useTheme';
+
+// components
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -6,18 +12,20 @@ import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 
+// utils
 import moment from 'moment';
 import 'moment-timezone';
 
-import { useSelector, useDispatch } from 'react-redux';
-import { useScrimsActions } from './../../../hooks/useScrims';
-
-export default function NavbarInputFilters() {
+export default function NavbarDropdowns() {
   const [{ currentUser }, { scrimsDate, scrimsRegion }] = useSelector(
     ({ auth, scrims }) => [auth, scrims]
   );
 
   const { fetchScrims } = useScrimsActions();
+
+  const theme = useTheme();
+
+  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   const dispatch = useDispatch();
 
@@ -44,10 +52,12 @@ export default function NavbarInputFilters() {
     <Grid
       item
       container
-      md={12}
-      lg={4}
+      xs={6}
+      sm={6}
+      md={4}
+      alignItems={matchesSm ? 'flex-start' : 'center'}
       justifyContent="flex-end"
-      alignItems="center"
+      direction={matchesSm ? 'column' : 'row'}
       id="nav__selects--container">
       {/* date regions and filters */}
       <Grid item>
