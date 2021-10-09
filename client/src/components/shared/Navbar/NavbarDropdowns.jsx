@@ -11,6 +11,7 @@ import Box from '@mui/material/Box';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
+import Hidden from '@mui/material/Hidden';
 
 // utils
 import moment from 'moment';
@@ -79,11 +80,16 @@ export default function NavbarDropdowns() {
         />
 
         <FormHelperText className="text-white">
-          Filter scrims by date
+          Filter&nbsp;
+          <Hidden lgDown>scrims&nbsp;</Hidden>by date
         </FormHelperText>
       </Grid>
 
       <Box marginRight={4} />
+
+      <Hidden mdUp>
+        <Box marginTop={2} />
+      </Hidden>
 
       <Grid item id="nav__region-filter--container">
         <InputLabel className="text-white">Region</InputLabel>
@@ -100,7 +106,8 @@ export default function NavbarDropdowns() {
           ))}
         </Select>
         <FormHelperText className="text-white">
-          Filter scrims by region
+          Filter&nbsp;
+          <Hidden lgDown>scrims&nbsp;</Hidden>by region
         </FormHelperText>
       </Grid>
     </Grid>
