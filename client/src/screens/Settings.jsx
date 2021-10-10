@@ -189,9 +189,13 @@ export default function Settings() {
     const { rankNumber, rankDivision } = rankData;
     let isDivisionWithNumber = divisionsWithNumbers.includes(rankDivision);
 
+    console.log({ rankNumber });
+
     let rankResult = isDivisionWithNumber
-      ? `${rankDivision} ${rankNumber ?? '4'}` // when user saved a rank without a number but then changes back to rank with number
+      ? `${rankDivision} ${rankNumber === '' ? '4' : rankNumber}` // when user saved a rank without a number but then changes back to rank with number
       : rankDivision;
+
+    console.log({ rankResult });
 
     setUserData((prevState) => ({
       //  change rank everytime one of the values in rankData changes.
