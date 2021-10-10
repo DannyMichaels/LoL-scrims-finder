@@ -17,12 +17,3 @@ export const getUsersInRegion = async (region) => {
     throw error;
   }
 };
-
-export const updateUser = async (id, userData) => {
-  try {
-    const response = await api.put(`/users/${id}`, userData);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};

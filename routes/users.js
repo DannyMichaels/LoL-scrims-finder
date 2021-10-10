@@ -5,6 +5,7 @@ const router = Router();
 
 router.get('/users', controllers.getAllUsers); // GET
 router.get('/users/:id', controllers.getUserById); // GET (this route requires a adminKey query)
-router.put('/users/:id', controllers.updateUser); // PUT
+router.put('/users/:id/created-scrims', controllers.getUserCreatedScrims); // GET
+// router.put('/users/:id/scrims', controllers.getUserParticipatingScrims); // GET
 
 module.exports = router;

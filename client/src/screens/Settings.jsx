@@ -20,7 +20,8 @@ import {
 
 // services & utils
 import { makeStyles } from '@mui/styles';
-import { updateUser, getAllUsers } from './../services/users';
+import { getAllUsers } from './../services/users';
+import { updateUser } from './../services/auth';
 import { setAuthToken } from './../services/auth';
 
 // remove spaces from # in discord name
