@@ -52,7 +52,7 @@ const ProfileAccountDetails = ({ user, userParticipatedScrims }) => {
       const playerWon = winningTeam.includes(playerTeamNumber);
 
       if (playerWon) {
-        exp += 2;
+        exp += 3;
       } else {
         exp += 0.5;
       }
