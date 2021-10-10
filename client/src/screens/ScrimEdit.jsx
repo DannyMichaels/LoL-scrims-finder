@@ -235,7 +235,7 @@ export default function ScrimEdit() {
           scrimData?.teamWon === 'N/A' ? null : scrimData?.teamWon ?? null,
       };
 
-      const updatedScrim = await updateScrim(id, dataSending);
+      const updatedScrim = await updateScrim(id, dataSending, setCurrentAlert);
 
       if (updatedScrim) {
         fetchScrims();
