@@ -96,7 +96,10 @@ export default function UserProfile() {
         </Typography>
 
         {/* User Details */}
-        <AccountDetails user={userData} />
+        <AccountDetails
+          user={userData}
+          userParticipatedScrims={userParticipatedScrims}
+        />
 
         <SectionSeparator />
 
@@ -110,7 +113,7 @@ export default function UserProfile() {
   );
 }
 
-const AccountDetails = memo(({ user }) => {
+const AccountDetails = memo(({ user, userParticipatedScrims }) => {
   const isAdminJSX = user.isAdmin ? (
     <Tooltip placement="top" title={`${user?.name} is a verified admin`}>
       <span style={{ cursor: 'help', marginLeft: '8px' }}>
@@ -118,6 +121,47 @@ const AccountDetails = memo(({ user }) => {
       </span>
     </Tooltip>
   ) : null;
+
+  const getExp = () => {
+    if (!userParticipatedScrims.length) return;
+
+    let exp = 0;
+
+    for (let i = 0; i < userParticipatedScrims.length; i++) {
+      let scrim = userParticipatedScrims[i];
+      if (!scrim.teamWon) continue;
+
+      let scrimTeams = [...scrim.teamOne, ...scrim.teamTwo];
+      let foundPlayer = scrimTeams.find((player) => player._user === user._id);
+
+      let playerTeamName = foundPlayer?.team?.name; // teamOne, teamTwo.
+      let playerTeamNumber = playerTeamName.includes('One') ? '1' : '2';
+      let winningTeam = scrim.teamWon;
+      let playerWon = winningTeam.includes(playerTeamNumber);
+      console.log({ playerWon });
+      // if (playerWon) {
+      //   exp += 2;
+      // } else {
+      //   exp += 0.5;
+      // }
+
+      // return exp;
+    }
+  };
+
+  getExp();
+
+  const calcLevel = () => {
+    let exp = 0,
+      level = 1;
+
+    for (let i = 0; i < exp; i++) {
+      //if Number is divisible by 10, level up
+      if (i % 10 === 0) level += 1;
+    }
+
+    return level;
+  };
 
   return user?._id ? (
     <Grid
@@ -130,6 +174,7 @@ const AccountDetails = memo(({ user }) => {
         Name: {user.name} {isAdminJSX}
       </Grid>
 
+      {/* <Grid item>Level: {calcLevel()}</Grid> */}
       <Grid item container component="li" alignItems="center">
         Discord: {user.discord}
       </Grid>
