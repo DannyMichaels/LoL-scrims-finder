@@ -14,7 +14,7 @@ import Button from '@mui/material/Button';
 import Select from '@mui/material/Select';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-
+import Tooltip from './../components/shared/Tooltip';
 import { Redirect } from 'react-router-dom';
 import {
   InnerColumn,
@@ -28,7 +28,6 @@ import { getMinutes } from './../utils/getMinutes';
 import moment from 'moment';
 import 'moment-timezone';
 import devLog from './../utils/devLog';
-import CustomTooltip from './../components/shared/Tooltip';
 
 export default function ScrimCreate() {
   const { fetchScrims } = useScrimsActions();
@@ -124,7 +123,8 @@ export default function ScrimCreate() {
       } else {
         setCurrentAlert({
           type: 'Success',
-          message: 'scrim created successfully!',
+          message:
+            'scrim created successfully, redirected to the created scrim page!',
         });
       }
     } catch (error) {
@@ -181,9 +181,7 @@ export default function ScrimCreate() {
                 <Grid item>
                   <FormControlLabel
                     control={
-                      <CustomTooltip
-                        title="Is the scrim private?"
-                        placement="top">
+                      <Tooltip title="Is the scrim private?" placement="top">
                         <Checkbox
                           color="primary"
                           checked={scrimData.isPrivate}
@@ -195,7 +193,7 @@ export default function ScrimCreate() {
                           }}
                           name="isPrivate"
                         />
-                      </CustomTooltip>
+                      </Tooltip>
                     }
                     label={
                       <p
