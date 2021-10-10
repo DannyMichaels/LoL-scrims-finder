@@ -2,22 +2,10 @@ import { useCallback, useState, useEffect, useMemo } from 'react';
 
 // components
 import Grid from '@mui/material/Grid';
-import Tooltip from '../shared/Tooltip';
 import Moment from 'react-moment';
-
-// icons
-import VerifiedAdminIcon from '@mui/icons-material/VerifiedUser';
 
 const ProfileAccountDetails = ({ user, userParticipatedScrims }) => {
   const [userExp, setUserExp] = useState();
-
-  const isAdminJSX = user.isAdmin ? (
-    <Tooltip placement="top" title={`${user?.name} is a verified admin`}>
-      <span style={{ cursor: 'help', marginLeft: '8px' }}>
-        <VerifiedAdminIcon />
-      </span>
-    </Tooltip>
-  ) : null;
 
   const calcExp = useCallback(() => {
     if (!userParticipatedScrims.length) return;
@@ -86,7 +74,7 @@ const ProfileAccountDetails = ({ user, userParticipatedScrims }) => {
       spacing={1}>
       <Grid item spacing={1} container component="li" alignItems="center">
         <Grid item>
-          <strong>Name:</strong>&nbsp;{user.name}&nbsp;{isAdminJSX}
+          <strong>Name:</strong>&nbsp;{user.name}
         </Grid>
         <Grid item>
           | <strong>Level:</strong>&nbsp;{userLevel}
