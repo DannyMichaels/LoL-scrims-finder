@@ -1,6 +1,5 @@
 const User = require('../models/user');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const Scrim = require('../models/scrim');
 const KEYS = require('../config/keys');
 const mongoose = require('mongoose');
 
@@ -43,7 +42,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-    const adminKey = req?.query?.adminKey;
+    const adminKeyQuery = req?.query?.adminKey === KEYS.ADMIN_KEY ?? false;
 
     let isValid = mongoose.Types.ObjectId.isValid(id);
 
@@ -51,31 +50,34 @@ const getUserById = async (req, res) => {
       return res.status(500).json({ error: 'invalid id' });
     }
 
-    if (!adminKey) {
-      return res.status(500).json({ error: 'admin key not provided' });
-    }
-
-    if (adminKey !== KEYS.ADMIN_KEY) {
-      return res.status(500).json({ error: 'incorrect admin key' });
-    }
-
     let user = await User.findOne({ _id: id }).select([
       'discord',
       'name',
       'region',
-      'createdAt',
-      'updatedAt',
-      'email',
+      'rank',
       'adminKey',
+      adminKeyQuery && 'email', // for when admins want to see the details (not user profile page)
+      'createdAt',
+      adminKeyQuery && 'updatedAt', // only show updatedAt when req.query.admin key has been entered and is correct
     ]);
 
     if (!user) return res.status(404).json({ message: 'User not found!' });
 
-    // using populate to show more than _id when using Ref on the model.
-    return res.json({
+    let userWithNoAdminKey = {
       ...user._doc,
-      'isAdmin?': user.adminKey === KEYS.ADMIN_KEY,
-    });
+      isAdmin: user.adminKey === KEYS.ADMIN_KEY, // boolean,
+    };
+
+    let deletedAdminKey = delete userWithNoAdminKey.adminKey;
+
+    if (adminKeyQuery) {
+      // if we provided admin key in postman, show email and admin key.
+      return res.status(200).json(user);
+    }
+
+    if (deletedAdminKey) {
+      return res.status(200).json(userWithNoAdminKey);
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -84,7 +86,6 @@ const getUserById = async (req, res) => {
 const getUserCreatedScrims = async (req, res) => {
   try {
     const { id } = req.params;
-    const adminKey = req?.query?.adminKey;
 
     let isValid = mongoose.Types.ObjectId.isValid(id);
 
@@ -92,31 +93,17 @@ const getUserCreatedScrims = async (req, res) => {
       return res.status(500).json({ error: 'invalid id' });
     }
 
-    if (!adminKey) {
-      return res.status(500).json({ error: 'admin key not provided' });
-    }
+    let user = await User.findById(id);
+    console.log(user.region);
 
-    if (adminKey !== KEYS.ADMIN_KEY) {
-      return res.status(500).json({ error: 'incorrect admin key' });
-    }
-
-    let user = await User.findOne({ _id: id }).select([
-      'discord',
-      'name',
-      'region',
-      'createdAt',
-      'updatedAt',
-      'email',
-      'adminKey',
-    ]);
+    let scrims = await Scrim.find();
 
     if (!user) return res.status(404).json({ message: 'User not found!' });
 
-    // using populate to show more than _id when using Ref on the model.
-    return res.json({
-      ...user._doc,
-      'isAdmin?': user.adminKey === KEYS.ADMIN_KEY,
-    });
+    const userCreatedScrims = scrims.filter(
+      (scrim) => String(scrim.createdBy) === String(user._id)
+    );
+    return res.json(userCreatedScrims);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
