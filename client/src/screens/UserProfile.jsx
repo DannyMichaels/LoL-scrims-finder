@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, memo } from 'react';
 import useAuth from './../hooks/useAuth';
+import useToggle from './../hooks/useToggle';
 import { useParams, useHistory, Link } from 'react-router-dom';
 import { useProfileStyles } from './../styles/UserProfile.styles';
 
@@ -20,6 +21,9 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
 
+// sections
+import ProfileAccountDetails from '../components/UserProfile_components/ProfileAccountDetails';
+
 // services
 import {
   getOneUser,
@@ -29,10 +33,6 @@ import {
 
 // utils
 import { showEarliestFirst, showLatestFirst } from './../utils/getSortedScrims';
-
-// icons
-import VerifiedAdminIcon from '@mui/icons-material/VerifiedUser';
-import useToggle from './../hooks/useToggle';
 
 export default function UserProfile() {
   const { currentUser, isCurrentUserAdmin } = useAuth();
@@ -95,8 +95,8 @@ export default function UserProfile() {
           </Tooltip>
         </Typography>
 
-        {/* User Details */}
-        <AccountDetails
+        {/* User Details: name, discord, rank, exp, etc. */}
+        <ProfileAccountDetails
           user={userData}
           userParticipatedScrims={userParticipatedScrims}
         />
@@ -110,91 +110,6 @@ export default function UserProfile() {
     </>
   );
 }
-
-const AccountDetails = memo(({ user, userParticipatedScrims }) => {
-  const isAdminJSX = user.isAdmin ? (
-    <Tooltip placement="top" title={`${user?.name} is a verified admin`}>
-      <span style={{ cursor: 'help', marginLeft: '8px' }}>
-        <VerifiedAdminIcon />
-      </span>
-    </Tooltip>
-  ) : null;
-
-  const calcExp = () => {
-    if (!userParticipatedScrims.length) return;
-
-    let exp = 0;
-
-    for (let i = 0; i < userParticipatedScrims.length; i++) {
-      let scrim = userParticipatedScrims[i];
-
-      // if scrim doesn't have a winning team, skip this and go to the next scrim
-      if (!scrim.teamWon) continue;
-
-      let scrimTeams = [...scrim.teamOne, ...scrim.teamTwo];
-      let foundPlayer = scrimTeams.find((player) => player._user === user._id);
-
-      let playerTeamName = foundPlayer?.team?.name; // teamOne, teamTwo.
-      let playerTeamNumber = playerTeamName.includes('One') ? '1' : '2';
-      let winningTeam = scrim.teamWon;
-      let playerWon = winningTeam.includes(playerTeamNumber);
-
-      if (playerWon) {
-        exp += 2;
-      } else {
-        exp += 0.5;
-      }
-    }
-
-    return exp;
-  };
-
-  const calcLevel = () => {
-    let exp = calcExp(),
-      level = 1;
-
-    for (let i = 1; i < exp; i++) {
-      //if Number is divisible by 10, level up
-      if (i % 10 === 0) level += 1;
-    }
-
-    return level;
-  };
-
-  return user?._id ? (
-    <Grid
-      style={{ padding: 0, margin: 0 }}
-      container
-      direction="column"
-      component="ul"
-      spacing={1}>
-      <Grid item spacing={1} container component="li" alignItems="center">
-        <Grid item>
-          Name: {user.name} {isAdminJSX}
-        </Grid>
-        <Grid item>| Level: {calcLevel()}</Grid>
-        <Grid item>| EXP: {calcExp()}</Grid>
-      </Grid>
-
-      {/* <Grid item>Level: {calcLevel()}</Grid> */}
-      <Grid item container component="li" alignItems="center">
-        Discord: {user.discord}
-      </Grid>
-
-      <Grid item container component="li" alignItems="center">
-        Region: {user.region}
-      </Grid>
-
-      <Grid item container component="li" alignItems="center">
-        Rank: {user.rank}
-      </Grid>
-
-      <Grid item container component="li" alignItems="center">
-        Joined:&nbsp;<Moment format="MM/DD/yyyy">{user.createdAt}</Moment>
-      </Grid>
-    </Grid>
-  ) : null;
-});
 
 const MyCreatedScrims = ({ isCurrentUser, scrims }) => {
   const [filterPrivate, togglePrivate] = useToggle(false);
