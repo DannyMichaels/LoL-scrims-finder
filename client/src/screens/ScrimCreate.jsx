@@ -107,7 +107,7 @@ export default function ScrimCreate() {
         lobbyHost: scrimData.lobbyHost === 'random' ? null : currentUser,
       };
 
-      const createdScrim = await createScrim(scrimToCreate);
+      const createdScrim = await createScrim(scrimToCreate, setCurrentAlert);
 
       fetchScrims();
 
@@ -123,8 +123,7 @@ export default function ScrimCreate() {
       } else {
         setCurrentAlert({
           type: 'Success',
-          message:
-            'scrim created successfully, redirected to the created scrim page!',
+          message: 'scrim created successfully!',
         });
       }
     } catch (error) {
