@@ -23,7 +23,9 @@ export const createScrim = async (scrim, setCurrentAlert) => {
     const response = await api.post('/scrims', scrim);
     return response.data;
   } catch (error) {
-    setCurrentAlert({ type: 'Error', message: 'error creating scrim' });
+    if (setCurrentAlert) {
+      setCurrentAlert({ type: 'Error', message: 'error creating scrim' });
+    }
 
     throw error;
   }
@@ -34,10 +36,12 @@ export const updateScrim = async (id, scrim, setCurrentAlert) => {
     const response = await api.put(`/scrims/${id}`, scrim);
     return response.data;
   } catch (error) {
-    setCurrentAlert({
-      type: 'Error',
-      message: 'Error updating Scrim',
-    });
+    if (setCurrentAlert) {
+      setCurrentAlert({
+        type: 'Error',
+        message: 'Error updating Scrim',
+      });
+    }
     throw error;
   }
 };
