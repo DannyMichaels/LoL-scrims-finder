@@ -94,7 +94,6 @@ const getUserCreatedScrims = async (req, res) => {
     }
 
     let user = await User.findById(id);
-    console.log(user.region);
 
     let scrims = await Scrim.find();
 
@@ -109,8 +108,53 @@ const getUserCreatedScrims = async (req, res) => {
   }
 };
 
+// get scrims where the user was a caster, or a player
+const getUserParticipatedScrims = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let isValid = mongoose.Types.ObjectId.isValid(id);
+
+    if (!isValid) {
+      return res.status(500).json({ error: 'invalid id' });
+    }
+
+    let user = await User.findById(id);
+
+    let scrims = await Scrim.find();
+
+    if (!user) return res.status(404).json({ message: 'User not found!' });
+
+    const userParticipatedScrims = scrims.filter((scrim) => {
+      const scrimTeams = [...scrim.teamOne, ...scrim.teamTwo];
+
+      const scrimPlayers = scrimTeams.map(({ _user }) => String(_user));
+
+      const foundPlayer = scrimPlayers.find((id) => String(user._id) === id);
+      const foundCaster = scrim.casters.find(
+        (id) => String(id) === String(user._id)
+      );
+
+      if (foundPlayer) {
+        return true;
+      }
+
+      if (foundCaster) {
+        return true;
+      }
+
+      // else he didn't return false.
+      return false;
+    });
+    return res.json(userParticipatedScrims);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
   getUserCreatedScrims,
+  getUserParticipatedScrims,
 };

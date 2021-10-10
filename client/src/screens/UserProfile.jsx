@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { useSelector } from 'react-redux';
+import { useParams, useHistory } from 'react-router-dom';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';
@@ -10,9 +11,8 @@ import { InnerColumn } from '../components/shared/PageComponents';
 import Tooltip from '../components/shared/Tooltip';
 import Moment from 'react-moment';
 
-// utils
+// services
 import { getOneUser, getUserCreatedScrims } from '../services/users';
-import { useParams } from 'react-router-dom';
 
 // icons
 import VerifiedAdminIcon from '@mui/icons-material/VerifiedUser';
@@ -21,14 +21,21 @@ export default function UserProfile() {
   const { currentUser } = useSelector(({ auth }) => auth);
   const [userData, setUserData] = useState(null);
   const [userCreatedScrims, setUserCreatedScrims] = useState([]);
+  const [userParticipatedScrims, setUserParticipatedScrims] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const { id } = useParams();
+  const history = useHistory();
+
+  const isCurrentUser = useMemo(
+    () => userData?._id === currentUser?._id,
+    [currentUser?._id, userData?._id]
+  );
 
   let titleText = useMemo(() => {
     // if the user in the page is the current user, say "My Profile"
-    if (userData?._id === currentUser?._id) return 'My Profile';
+    if (isCurrentUser) return 'My Profile';
     return `${userData?.name}'s Profile`; // else say "Bob's  Profile" or whatever
-  }, [userData, currentUser]);
+  }, [isCurrentUser, userData?.name]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -50,26 +57,41 @@ export default function UserProfile() {
 
   return (
     <>
-      <Navbar showLess />
+      <Navbar showLess onClickBack={() => history.push('/')} />
       <InnerColumn>
-        <Typography variant="h1">{titleText}</Typography>
+        <Typography variant="h1">
+          <Tooltip title={`visit ${userData?.name}'s op.gg`}>
+            <a
+              className="link"
+              href={`https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`}
+              target="_blank"
+              rel="noopener noreferrer">
+              {titleText}
+            </a>
+          </Tooltip>
+        </Typography>
 
         {/* User Details */}
         <AccountDetails user={userData} />
+
+        {/* My Scrims (will only render if is current user) */}
+        <MyCreatedScrims
+          isCurrentUser={isCurrentUser}
+          scrims={userCreatedScrims}
+        />
       </InnerColumn>
     </>
   );
 }
 
-const AccountDetails = ({ user }) => {
-  const isAdminJSX =
-    user.adminKey === process.env.REACT_APP_ADMIN_KEY ? (
-      <Tooltip placement="top" title={`${user?.name} is a verified admin`}>
-        <span style={{ cursor: 'help', marginLeft: '8px' }}>
-          <VerifiedAdminIcon />
-        </span>
-      </Tooltip>
-    ) : null;
+const AccountDetails = memo(({ user }) => {
+  const isAdminJSX = user.isAdmin ? (
+    <Tooltip placement="top" title={`${user?.name} is a verified admin`}>
+      <span style={{ cursor: 'help', marginLeft: '8px' }}>
+        <VerifiedAdminIcon />
+      </span>
+    </Tooltip>
+  ) : null;
 
   return user?._id ? (
     <Grid
@@ -99,4 +121,10 @@ const AccountDetails = ({ user }) => {
       </Grid>
     </Grid>
   ) : null;
-};
+});
+
+const MyCreatedScrims = memo(({ isCurrentUser, scrims }) => {
+  if (!isCurrentUser) return null;
+
+  return <pre>{JSON.stringify(scrims, null, 2)}</pre>;
+});
