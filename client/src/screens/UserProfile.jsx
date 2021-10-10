@@ -101,8 +101,6 @@ export default function UserProfile() {
           userParticipatedScrims={userParticipatedScrims}
         />
 
-        <SectionSeparator />
-
         {/* My Scrims (will only render if is current user) */}
         <MyCreatedScrims
           isCurrentUser={isCurrentUser}
@@ -122,13 +120,15 @@ const AccountDetails = memo(({ user, userParticipatedScrims }) => {
     </Tooltip>
   ) : null;
 
-  const getExp = () => {
+  const calcExp = () => {
     if (!userParticipatedScrims.length) return;
 
     let exp = 0;
 
     for (let i = 0; i < userParticipatedScrims.length; i++) {
       let scrim = userParticipatedScrims[i];
+
+      // if scrim doesn't have a winning team, skip this and go to the next scrim
       if (!scrim.teamWon) continue;
 
       let scrimTeams = [...scrim.teamOne, ...scrim.teamTwo];
@@ -138,24 +138,22 @@ const AccountDetails = memo(({ user, userParticipatedScrims }) => {
       let playerTeamNumber = playerTeamName.includes('One') ? '1' : '2';
       let winningTeam = scrim.teamWon;
       let playerWon = winningTeam.includes(playerTeamNumber);
-      console.log({ playerWon });
-      // if (playerWon) {
-      //   exp += 2;
-      // } else {
-      //   exp += 0.5;
-      // }
 
-      // return exp;
+      if (playerWon) {
+        exp += 2;
+      } else {
+        exp += 0.5;
+      }
     }
+
+    return exp;
   };
 
-  getExp();
-
   const calcLevel = () => {
-    let exp = 0,
+    let exp = calcExp(),
       level = 1;
 
-    for (let i = 0; i < exp; i++) {
+    for (let i = 1; i < exp; i++) {
       //if Number is divisible by 10, level up
       if (i % 10 === 0) level += 1;
     }
@@ -170,8 +168,12 @@ const AccountDetails = memo(({ user, userParticipatedScrims }) => {
       direction="column"
       component="ul"
       spacing={1}>
-      <Grid item container component="li" alignItems="center">
-        Name: {user.name} {isAdminJSX}
+      <Grid item spacing={1} container component="li" alignItems="center">
+        <Grid item>
+          Name: {user.name} {isAdminJSX}
+        </Grid>
+        <Grid item>| Level: {calcLevel()}</Grid>
+        <Grid item>| EXP: {calcExp()}</Grid>
       </Grid>
 
       {/* <Grid item>Level: {calcLevel()}</Grid> */}
@@ -216,12 +218,15 @@ const MyCreatedScrims = ({ isCurrentUser, scrims }) => {
 
   return (
     <>
+      <SectionSeparator />
+
       <Grid
         container
         alignItems="center"
         flexWrap="nowrap"
         justifyContent="space-between"
-        direction="row">
+        direction="row"
+        marginTop={2}>
         <Grid item>
           <Typography variant="h1">My Created Scrims</Typography>
         </Grid>
