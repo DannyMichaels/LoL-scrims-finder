@@ -25,8 +25,9 @@ export default function UserProfile() {
   const { id } = useParams();
 
   let titleText = useMemo(() => {
+    // if the user in the page is the current user, say "My Profile"
     if (userData?._id === currentUser?._id) return 'My Profile';
-    return `${userData?.name}'s Profile`;
+    return `${userData?.name}'s Profile`; // else say "Bob's  Profile" or whatever
   }, [userData, currentUser]);
 
   useEffect(() => {
