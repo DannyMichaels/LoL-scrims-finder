@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';
@@ -14,13 +15,19 @@ import { getOneUser, getUserCreatedScrims } from '../services/users';
 import { useParams } from 'react-router-dom';
 
 // icons
-import VerifiedAdmin from '@mui/icons-material/VerifiedUser';
+import VerifiedAdminIcon from '@mui/icons-material/VerifiedUser';
 
 export default function UserProfile() {
+  const { currentUser } = useSelector(({ auth }) => auth);
   const [userData, setUserData] = useState(null);
   const [userCreatedScrims, setUserCreatedScrims] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const { id } = useParams();
+
+  let titleText = useMemo(() => {
+    if (userData?._id === currentUser?._id) return 'My Profile';
+    return `${userData?.name}'s Profile`;
+  }, [userData, currentUser]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -44,7 +51,7 @@ export default function UserProfile() {
     <>
       <Navbar showLess />
       <InnerColumn>
-        <Typography variant="h1">My Profile</Typography>
+        <Typography variant="h1">{titleText}</Typography>
 
         {/* User Details */}
         <AccountDetails user={userData} />
@@ -58,7 +65,7 @@ const AccountDetails = ({ user }) => {
     user.adminKey === process.env.REACT_APP_ADMIN_KEY ? (
       <Tooltip placement="top" title={`${user?.name} is a verified admin`}>
         <span style={{ cursor: 'help', marginLeft: '8px' }}>
-          <VerifiedAdmin />
+          <VerifiedAdminIcon />
         </span>
       </Tooltip>
     ) : null;
