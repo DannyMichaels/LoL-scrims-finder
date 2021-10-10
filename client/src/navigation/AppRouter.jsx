@@ -9,6 +9,7 @@ import ScrimDetail from '../screens/ScrimDetail';
 import NotFound from '../screens/NotFound';
 import ScrimEdit from '../screens/ScrimEdit';
 import Settings from '../screens/Settings';
+import MyProfile from './../screens/MyProfile';
 
 const AppRouter = () => (
   <Switch>
@@ -16,6 +17,7 @@ const AppRouter = () => (
     <PrivateRoute exact path="/scrims/:id/edit" component={ScrimEdit} />
     <PrivateRoute exact path="/scrims/:id" component={ScrimDetail} />
     <PrivateRoute exact path="/settings" component={Settings} />
+    <PrivateRoute exact path="/my-profile" component={MyProfile} />
     <Route exact path="/signup" component={SignUp} />
     <PrivateRoute exact path={['/', '/scrims']} component={Scrims} />
     <Route component={NotFound} />
