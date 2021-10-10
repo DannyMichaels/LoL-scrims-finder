@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, memo } from 'react';
 import useAuth from './../hooks/useAuth';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, Link } from 'react-router-dom';
+import { useProfileStyles } from './../styles/UserProfile.styles';
 
 // components
 import Navbar from '../components/shared/Navbar/Navbar';
@@ -11,6 +12,8 @@ import { InnerColumn } from '../components/shared/PageComponents';
 import Tooltip from '../components/shared/Tooltip';
 import Moment from 'react-moment';
 import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 // services
 import {
@@ -21,6 +24,7 @@ import {
 
 // icons
 import VerifiedAdminIcon from '@mui/icons-material/VerifiedUser';
+import useToggle from './../hooks/useToggle';
 
 export default function UserProfile() {
   const { currentUser, isCurrentUserAdmin } = useAuth();
@@ -138,31 +142,61 @@ const AccountDetails = memo(({ user }) => {
 });
 
 const MyCreatedScrims = memo(({ isCurrentUser, scrims }) => {
+  const [filterPrivate, togglePrivate] = useToggle(false);
+  const classes = useProfileStyles();
+
   if (!isCurrentUser) return null;
+  if (!scrims.length) return null;
 
   return (
     <>
-      <Typography variant="h1">My Created Scrims</Typography>
       <Grid
-        style={{ padding: 0, margin: 0 }}
         container
-        direction="column"
-        component="ul">
-        {scrims.map((scrim) => (
-          <Grid
-            key={scrim._id}
-            item
-            container
-            component="li"
-            alignItems="center"
-            marginBottom={1}>
-            * {scrim.title} |&nbsp;
-            <Moment format="MM/DD/yyyy hh:mm A">{scrim.gameStartTime}</Moment>
-            &nbsp;
-            {scrim?.isPrivate ? '(Private)' : ''}
-          </Grid>
-        ))}
+        alignItems="center"
+        flexWrap="nowrap"
+        justifyContent="space-between"
+        direction="row">
+        <Grid item>
+          <Typography variant="h1">My Created Scrims</Typography>
+        </Grid>
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Checkbox
+                color="primary"
+                checked={filterPrivate}
+                onChange={togglePrivate}
+                name="togglePrivate"
+              />
+            }
+            label="Only show private scrims"
+            labelPlacement="bottom"
+          />
+        </Grid>
       </Grid>
+      <ul className={classes.myCreatedScrimsList}>
+        {scrims
+          // if filterPrivate is false, just return scrim as is, else filter by scrims that are private
+          .filter((scrim) => (!filterPrivate ? scrim : scrim.isPrivate))
+          .map((scrim) => (
+            <li key={scrim._id}>
+              <Tooltip title="Open in new tab">
+                <Link
+                  className="link"
+                  to={`/scrims/${scrim._id}`}
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  {scrim.title} |&nbsp;
+                  <Moment format="MM/DD/yyyy hh:mm A">
+                    {scrim.gameStartTime}
+                  </Moment>
+                  &nbsp;| {scrim.region}&nbsp;
+                  {scrim?.isPrivate ? '(Private)' : ''}
+                </Link>
+              </Tooltip>
+            </li>
+          ))}
+      </ul>
     </>
   );
 });
