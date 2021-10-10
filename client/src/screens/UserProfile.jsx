@@ -48,6 +48,7 @@ export default function UserProfile() {
       const fetchedUserData = await getOneUser(id);
       setUserData(fetchedUserData);
 
+      // don't fetch userCreatedScrims if user isn't an admin and isn't himself
       if (isCurrentUserAdmin && isCurrentUser) {
         const userCreatedScrims = await getUserCreatedScrims(id);
         setUserCreatedScrims(userCreatedScrims);
