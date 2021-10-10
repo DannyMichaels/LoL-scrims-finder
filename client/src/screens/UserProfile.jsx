@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, memo } from 'react';
-import { useSelector } from 'react-redux';
+import useAuth from './../hooks/useAuth';
 import { useParams, useHistory } from 'react-router-dom';
 
 // components
@@ -10,19 +10,25 @@ import Loading from '../components/shared/Loading';
 import { InnerColumn } from '../components/shared/PageComponents';
 import Tooltip from '../components/shared/Tooltip';
 import Moment from 'react-moment';
+import Divider from '@mui/material/Divider';
 
 // services
-import { getOneUser, getUserCreatedScrims } from '../services/users';
+import {
+  getOneUser,
+  getUserCreatedScrims,
+  getUserParticipatedScrims,
+} from '../services/users';
 
 // icons
 import VerifiedAdminIcon from '@mui/icons-material/VerifiedUser';
 
 export default function UserProfile() {
-  const { currentUser } = useSelector(({ auth }) => auth);
+  const { currentUser, isCurrentUserAdmin } = useAuth();
   const [userData, setUserData] = useState(null);
   const [userCreatedScrims, setUserCreatedScrims] = useState([]);
   const [userParticipatedScrims, setUserParticipatedScrims] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
   const { id } = useParams();
   const history = useHistory();
 
@@ -31,7 +37,7 @@ export default function UserProfile() {
     [currentUser?._id, userData?._id]
   );
 
-  let titleText = useMemo(() => {
+  const titleText = useMemo(() => {
     // if the user in the page is the current user, say "My Profile"
     if (isCurrentUser) return 'My Profile';
     return `${userData?.name}'s Profile`; // else say "Bob's  Profile" or whatever
@@ -42,14 +48,19 @@ export default function UserProfile() {
       const fetchedUserData = await getOneUser(id);
       setUserData(fetchedUserData);
 
-      const userCreatedScrims = await getUserCreatedScrims(id);
-      setUserCreatedScrims(userCreatedScrims);
+      if (isCurrentUserAdmin && isCurrentUser) {
+        const userCreatedScrims = await getUserCreatedScrims(id);
+        setUserCreatedScrims(userCreatedScrims);
+      }
+
+      const userScrims = await getUserParticipatedScrims(id);
+      setUserParticipatedScrims(userScrims);
 
       setIsLoaded(true);
     };
 
     fetchUserData();
-  }, [id]);
+  }, [id, isCurrentUser, isCurrentUserAdmin]);
 
   if (!isLoaded) {
     return <Loading text="Loading..." />;
@@ -73,6 +84,8 @@ export default function UserProfile() {
 
         {/* User Details */}
         <AccountDetails user={userData} />
+
+        <SectionSeparator />
 
         {/* My Scrims (will only render if is current user) */}
         <MyCreatedScrims
@@ -126,5 +139,36 @@ const AccountDetails = memo(({ user }) => {
 const MyCreatedScrims = memo(({ isCurrentUser, scrims }) => {
   if (!isCurrentUser) return null;
 
-  return <pre>{JSON.stringify(scrims, null, 2)}</pre>;
+  return (
+    <>
+      <Typography variant="h1">My Created Scrims</Typography>
+      <Grid
+        style={{ padding: 0, margin: 0 }}
+        container
+        direction="column"
+        component="ul">
+        {scrims.map((scrim) => (
+          <Grid
+            key={scrim._id}
+            item
+            container
+            component="li"
+            alignItems="center"
+            marginBottom={1}>
+            * {scrim.title} |&nbsp;
+            <Moment format="MM/DD/yyyy hh:mm A">{scrim.gameStartTime}</Moment>
+            &nbsp;
+            {scrim?.isPrivate ? '(Private)' : ''}
+          </Grid>
+        ))}
+      </Grid>
+    </>
+  );
 });
+
+const SectionSeparator = () => (
+  <>
+    <div style={{ display: 'flex', flexGrow: 1, padding: '10px' }} />
+    <Divider />
+  </>
+);

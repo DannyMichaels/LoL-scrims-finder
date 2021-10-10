@@ -27,6 +27,16 @@ export const getUserCreatedScrims = async (id) => {
   }
 };
 
+// get scrims where the user  was a caster or a player
+export const getUserParticipatedScrims = async (id) => {
+  try {
+    const response = await api.get(`users/${id}/scrims`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getUsersInRegion = async (region) => {
   // this one is unused
   try {
