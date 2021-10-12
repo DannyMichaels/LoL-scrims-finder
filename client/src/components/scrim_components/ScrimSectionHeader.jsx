@@ -34,12 +34,12 @@ export default function ScrimSectionHeader({
   leaveCast,
   handleDeleteScrim,
   buttonsDisabled,
-  expanded,
+  isBoxExpanded,
   isInDetail,
 }) {
   const { casters } = scrim;
   const { setCurrentAlert } = useAlerts();
-  const classes = useScrimSectionStyles({ expanded });
+  const classes = useScrimSectionStyles({ isBoxExpanded });
   const history = useHistory();
   const theme = useTheme();
 
@@ -167,7 +167,7 @@ export default function ScrimSectionHeader({
           </Typography>
         </Grid>
 
-        {!expanded && showPlayers && (
+        {!isBoxExpanded && showPlayers && (
           <Grid item xs={4}>
             <Typography
               style={{ marginRight: '10px' }}
@@ -193,12 +193,12 @@ export default function ScrimSectionHeader({
               buttonsDisabled,
               joinCast,
               leaveCast,
-              expanded,
+              isBoxExpanded,
             }}
           />
 
-          {/* dont show players in header if expanded or smaller screen */}
-          {!expanded && showPlayers && (
+          {/* dont show players in header if isBoxExpanded or smaller screen */}
+          {!isBoxExpanded && showPlayers && (
             <Grid
               item
               container

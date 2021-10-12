@@ -129,7 +129,6 @@ export const useFilteredScrims = () => {
 // hook to fetch scrims
 export const useFetchScrims = () => {
   const dispatch = useDispatch();
-
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -137,6 +136,10 @@ export const useFetchScrims = () => {
       devLog('fetching scrims');
       const scrimsData = await getAllScrims();
       dispatch({ type: 'scrims/fetchScrims', payload: scrimsData });
+
+      setTimeout(() => {
+        dispatch({ type: 'scrims/setLoading', payload: false });
+      }, 500);
     };
 
     fetchScrims();
@@ -147,59 +150,55 @@ export const useFetchScrims = () => {
   return null;
 };
 
-const FETCH_INTERVAL = 10000;
-
-// load scrims every 10 seconds
-export const useFetchScrimsInterval = () => {
-  const { pathname } = useLocation();
-  const dispatch = useDispatch();
-
-  const loadScrims = async () => {
-    if (pathname !== '/sign-up') {
-      devLog('fetching scrims (interval)');
-      const scrimsData = await getAllScrims();
-      // calling it fetchScrimsInterval so it's easier to distinguish in redux devtools
-      dispatch({ type: 'scrims/fetchScrimsInterval', payload: scrimsData });
-    }
-
-    // eslint-disable-next-line
-  };
-
-  useInterval(loadScrims, FETCH_INTERVAL);
-
-  return null;
-};
-
-// load one scrim every 10 seconds
 const ONE_SCRIM_FETCH_INTERVAL = 5000;
-
-export const useFetchScrimInterval = (isInDetail, expanded, scrim) => {
+// load one isBoxExpanded /detail page scrim every 5 seconds, also listens to reload click to re-fetch
+export const useFetchScrimInterval = (isInDetail, isBoxExpanded, scrim) => {
   const [scrimData, setScrimData] = useState(scrim);
+  const { toggleFetch, scrimsLoading } = useScrims();
 
   const scrimRef = useRef();
 
-  const isExpandedRef = useRef();
+  const isisBoxExpandedRef = useRef();
   const isInDetailRef = useRef();
 
   useEffect(() => {
-    isExpandedRef.current = expanded;
+    isisBoxExpandedRef.current = isBoxExpanded;
     isInDetailRef.current = isInDetail;
     scrimRef.current = scrim;
   });
 
   const fetchScrimData = async () => {
-    // if user is in detail just continue (dont worry about expanded)
-    // if user is in home and scrim isn't expanded don't continue.
-    if (!isExpandedRef.current && !isInDetailRef.current) return;
+    // if user is in detail just continue (dont worry about isBoxExpanded)
+    // if user is in home and scrim isn't isBoxExpanded don't continue.
+    if (!isisBoxExpandedRef.current && !isInDetailRef.current) return;
 
-    devLog(`fetching one scrim on interval (${scrim._id})`);
+    devLog(`fetching one scrim on interval (${scrimRef.current._id})`);
 
-    const scrimsResponse = await getScrimById(scrimRef.current._id);
+    const oneScrim = await getScrimById(scrimRef.current._id);
 
-    if (scrimsResponse) {
-      setScrimData(scrimsResponse);
+    if (oneScrim.createdBy) {
+      setScrimData(oneScrim);
     }
   };
+
+  // if user clicks reload, re-fetch the scrim data
+  // this only re-fetches the scrims that are visible in the page
+  useEffect(() => {
+    const fetchOnReloadClick = async () => {
+      if (scrimsLoading) return; // do this so it doesn't run that on mount
+
+      devLog(`fetching one scrim on toggleFetch (${scrimRef.current._id})`);
+
+      const oneScrim = await getScrimById(scrimRef.current._id);
+
+      if (oneScrim.createdBy) {
+        setScrimData(oneScrim);
+      }
+    };
+    fetchOnReloadClick();
+
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toggleFetch]);
 
   useInterval(fetchScrimData, ONE_SCRIM_FETCH_INTERVAL);
 

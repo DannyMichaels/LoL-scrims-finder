@@ -4,7 +4,8 @@ const initialState = {
   scrims: [],
   filteredScrims: [], // filtered scrims by date and region
   scrimsLoaded: false,
-  fetch: false,
+  scrimsLoading: true,
+  toggleFetch: false,
 
   scrimsDate: moment(), // the date value to filter the scrims by
 
@@ -26,6 +27,13 @@ export default function scrimsReducer(state = initialState, action) {
         ...state,
         scrims: payload,
         scrimsLoaded: true,
+      };
+    }
+
+    case 'scrims/setLoading': {
+      return {
+        ...state,
+        scrimsLoading: payload,
       };
     }
 
@@ -90,7 +98,7 @@ export default function scrimsReducer(state = initialState, action) {
     case 'scrims/toggleFetch': {
       return {
         ...state,
-        fetch: !state.fetch,
+        toggleFetch: !state.toggleFetch,
       };
     }
 

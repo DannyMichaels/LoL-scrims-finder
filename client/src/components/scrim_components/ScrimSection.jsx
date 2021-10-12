@@ -43,9 +43,8 @@ const MAX_CASTER_AMOUNT = 2;
 export default function ScrimSection({ scrimData, isInDetail }) {
   const { currentUser } = useAuth();
   const { setCurrentAlert } = useAlerts();
-
   // the expand controls at bottom (dont show if we have the isInDetail prop, aka only one scrim page)
-  const [expanded, setExpanded] = useState(() => {
+  const [isBoxExpanded, setIsBoxExpanded] = useState(() => {
     return isInDetail ? true : false;
   });
 
@@ -55,12 +54,12 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   const [imageUploaded, setImageUploaded] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false); // for when players spam joining or leaving.
 
-  // useFetchScrimInterval: fetch one scrim on 5 sec interval, will run when expanded or when in detail page.
+  // useFetchScrimInterval: fetch one scrim on 5 sec interval, will run when isBoxExpanded or when in detail page.
   // the setScrim is only going to update the scrim in this component, not in the redux store.
   // this is so we don't have to loop through every scrim ever to rerender the component when players make changes
   const [scrim, setScrim] = useFetchScrimInterval(
     isInDetail,
-    expanded,
+    isBoxExpanded,
     scrimData
   );
 
@@ -71,7 +70,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   // if the scrim has a winning team, it means it has ended.
   const gameEnded = useMemo(() => scrim.teamWon, [scrim.teamWon]);
 
-  const classes = useScrimSectionStyles({ scrim, expanded });
+  const classes = useScrimSectionStyles({ scrim, isBoxExpanded });
 
   const history = useHistory();
 
@@ -80,15 +79,15 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   // when the user first expands this scrim and this isn't on detail page, refetch data.
   useEffect(() => {
     const fetchOneScrim = async () => {
-      if (expanded && !isInDetail) {
-        devLog('scrim expanded, fetching data');
+      if (isBoxExpanded && !isInDetail) {
+        devLog('scrim isBoxExpanded, fetching data');
         setScrim(await getScrimById(scrimData._id));
       }
     };
     fetchOneScrim();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, isInDetail, scrimData._id]);
+  }, [isBoxExpanded, isInDetail, scrimData._id]);
 
   useEffect(() => {
     let gameHasStarted = compareDates(scrim) > 0;
@@ -235,7 +234,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
           gameEnded={gameEnded}
           casterEntered={casterEntered}
           buttonsDisabled={buttonsDisabled}
-          expanded={expanded}
+          isBoxExpanded={isBoxExpanded}
           isInDetail={isInDetail}
         />
 
@@ -289,8 +288,8 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       {!isInDetail && (
         <ScrimSectionExpander
           scrimBoxRef={scrimBoxRef}
-          expanded={expanded}
-          setExpanded={setExpanded}
+          isBoxExpanded={isBoxExpanded}
+          setIsBoxExpanded={setIsBoxExpanded}
         />
       )}
     </PageSection>

@@ -8,24 +8,26 @@ import Tooltip from '../shared/Tooltip';
 import { COLORS } from './../../appTheme';
 
 export default function ScrimSectionExpander({
-  expanded,
-  setExpanded,
+  isBoxExpanded,
+  setIsBoxExpanded,
   scrimBoxRef,
 }) {
   const [isHover, setIsHover] = useState(false);
 
   return (
     <StyledDivider
-      className={`scrim__expand--container ${expanded ? 'collapsed' : ''}`}>
+      className={`scrim__expand--container ${
+        isBoxExpanded ? 'collapsed' : ''
+      }`}>
       {/*  I need to do it like this (ternary) to reset the tooltip */}
-      {expanded ? (
-        <Tooltip title={'Show less'} open={expanded && isHover}>
+      {isBoxExpanded ? (
+        <Tooltip title={'Show less'} open={isBoxExpanded && isHover}>
           <button
             onMouseOver={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
             className="scrim__expand--expandButton"
             onClick={() => {
-              setExpanded((prevState) => !prevState);
+              setIsBoxExpanded((prevState) => !prevState);
               setIsHover(false);
               window.scrollTo({
                 behavior: 'smooth',
@@ -36,13 +38,13 @@ export default function ScrimSectionExpander({
           </button>
         </Tooltip>
       ) : (
-        <Tooltip title={'Show More'} open={!expanded && isHover}>
+        <Tooltip title={'Show More'} open={!isBoxExpanded && isHover}>
           <button
             onMouseOver={() => setIsHover(true)}
             onMouseLeave={() => setIsHover(false)}
             className="scrim__expand--expandButton"
             onClick={() => {
-              setExpanded((prevState) => !prevState);
+              setIsBoxExpanded((prevState) => !prevState);
               setIsHover(false);
               window.scrollTo({
                 behavior: 'smooth',
