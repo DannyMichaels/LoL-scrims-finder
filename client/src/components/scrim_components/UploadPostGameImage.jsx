@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { useScrimsActions } from './../../hooks/useScrims';
 import useAuth from './../../hooks/useAuth';
 import useAlerts from '../../hooks/useAlerts';
 
