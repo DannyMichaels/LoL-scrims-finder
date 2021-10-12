@@ -849,7 +849,13 @@ const addImageToScrim = async (req, res) => {
 
       return res.status(200).json(scrim);
     }
-  );
+  )
+    .populate('createdBy', populateUser)
+    .populate('casters', populateUser)
+    .populate('lobbyHost', populateUser)
+    .populate(populateTeam('teamOne'))
+    .populate(populateTeam('teamTwo'))
+    .exec();
 };
 
 const removeImageFromScrim = async (req, res) => {

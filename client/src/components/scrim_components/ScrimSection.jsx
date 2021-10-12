@@ -256,6 +256,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
           <ScrimSectionMiddleAreaBox
             imageUploaded={imageUploaded === scrim._id}
             scrim={scrim}
+            setScrim={setScrim}
             gameStarted={gameStarted === scrim._id}
             setGameStarted={setGameStarted}
             gameEnded={gameEnded}

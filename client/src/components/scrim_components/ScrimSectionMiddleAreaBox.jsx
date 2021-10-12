@@ -175,6 +175,7 @@ export default function ScrimSectionMiddleAreaBox({
                   <UploadPostGameImage
                     isUploaded={imageUploaded}
                     scrim={scrim}
+                    setScrim={setScrim}
                   />
                 </>
               )}
