@@ -413,7 +413,13 @@ const insertPlayerInScrim = async (req, res) => {
         scrim.save();
         return res.status(200).json(scrim);
       }
-    );
+    )
+      .populate('createdBy', populateUser)
+      .populate('casters', populateUser)
+      .populate('lobbyHost', populateUser)
+      .populate(populateTeam('teamOne'))
+      .populate(populateTeam('teamTwo'))
+      .exec();
   });
 
   // end of session
@@ -479,7 +485,13 @@ const removePlayerFromScrim = async (req, res) => {
 
       return res.status(200).json(scrim);
     }
-  );
+  )
+    .populate('createdBy', populateUser)
+    .populate('casters', populateUser)
+    .populate('lobbyHost', populateUser)
+    .populate(populateTeam('teamOne'))
+    .populate(populateTeam('teamTwo'))
+    .exec();
 };
 
 // move roles/teams
@@ -738,7 +750,13 @@ const insertCasterInScrim = async (req, res) => {
 
           return res.status(200).json(scrim);
         }
-      );
+      )
+        .populate('createdBy', populateUser)
+        .populate('casters', populateUser)
+        .populate('lobbyHost', populateUser)
+        .populate(populateTeam('teamOne'))
+        .populate(populateTeam('teamTwo'))
+        .exec();
     } else {
       return res.status(500).json({
         error: 'Caster spots full!',
@@ -791,7 +809,13 @@ const removeCasterFromScrim = async (req, res) => {
 
         return res.status(200).json(scrim);
       }
-    );
+    )
+      .populate('createdBy', populateUser)
+      .populate('casters', populateUser)
+      .populate('lobbyHost', populateUser)
+      .populate(populateTeam('teamOne'))
+      .populate(populateTeam('teamTwo'))
+      .exec();
   });
   session.endSession();
 };
@@ -869,7 +893,13 @@ const removeImageFromScrim = async (req, res) => {
 
         return res.status(200).json(scrim);
       }
-    );
+    )
+      .populate('createdBy', populateUser)
+      .populate('casters', populateUser)
+      .populate('lobbyHost', populateUser)
+      .populate(populateTeam('teamOne'))
+      .populate(populateTeam('teamTwo'))
+      .exec();
   } catch (err) {
     return res.status(500).json({ error: err });
   }

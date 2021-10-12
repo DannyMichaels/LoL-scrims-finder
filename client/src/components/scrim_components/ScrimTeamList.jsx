@@ -1,6 +1,5 @@
 import { Fragment, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useScrimsActions } from './../../hooks/useScrims';
 import useAuth from './../../hooks/useAuth';
 import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
 import useAlerts from './../../hooks/useAlerts';
@@ -56,8 +55,8 @@ export default function ScrimTeamList({
   gameStarted,
   buttonsDisabled,
   setButtonsDisabled,
+  setScrim,
 }) {
-  const { fetchScrims } = useScrimsActions();
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
 
@@ -99,14 +98,15 @@ export default function ScrimTeamList({
       setButtonsDisabled,
     });
 
-    if (updatedScrim) {
+    // using .createdBy because on error it wont return populated scrim, so we don't set the scrim
+    if (updatedScrim?.createdBy) {
       console.log(
         `%c added ${currentUser?.name} to scrim: ${scrim._id} in team: ${teamJoiningName}`,
         'color: #99ff99'
       );
+      setScrim(updatedScrim);
     }
 
-    await fetchScrims();
     setButtonsDisabled(false);
   };
 
@@ -125,14 +125,15 @@ export default function ScrimTeamList({
       setButtonsDisabled,
     });
 
-    if (updatedScrim) {
+    if (updatedScrim?.createdBy) {
       console.log(
         `%cswapped ${currentUser?.name} in scrim: ${scrim._id} to: ${teamName} as ${role}`,
         'color: #99ff99'
       );
+
+      setScrim(updatedScrim);
     }
 
-    await fetchScrims();
     setButtonsDisabled(false);
   };
 
@@ -146,14 +147,15 @@ export default function ScrimTeamList({
       setButtonsDisabled,
     });
 
-    if (updatedScrim) {
+    if (updatedScrim?.createdBy) {
       console.log(
         `%cremoved ${currentUser?.name} from scrim: ${scrim._id}`,
         'color: #99ff99'
       );
+
+      setScrim(updatedScrim);
     }
 
-    await fetchScrims();
     setButtonsDisabled(false);
   };
 
@@ -169,14 +171,15 @@ export default function ScrimTeamList({
       setButtonsDisabled,
     });
 
-    if (updatedScrim) {
+    if (updatedScrim?.createdBy) {
       console.log(
         `%ckicked ${playerToKick?._user?.name} from scrim: ${scrim._id}`,
         'color: #99ff99'
       );
+
+      setScrim(updatedScrim);
     }
 
-    await fetchScrims();
     setButtonsDisabled(false);
   };
 
