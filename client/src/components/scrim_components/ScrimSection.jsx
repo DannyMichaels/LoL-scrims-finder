@@ -61,7 +61,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     isInDetail,
     isBoxExpanded,
     scrimData
-  );
+  ); // in ScrimDetail we don't have expander, so it will just fetch on interval
 
   const scrimBoxRef = useRef(null); // element container
 
@@ -80,10 +80,11 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   useEffect(() => {
     const fetchOneScrim = async () => {
       if (isBoxExpanded && !isInDetail) {
-        devLog('scrim isBoxExpanded, fetching data');
+        devLog(`scrim box expanded ${isBoxExpanded}, fetching data`);
         setScrim(await getScrimById(scrimData._id));
       }
     };
+
     fetchOneScrim();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
