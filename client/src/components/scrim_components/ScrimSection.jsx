@@ -154,6 +154,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       userId: currentUser?._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
+      setScrim,
     });
 
     // using .createdBy because on error it wont return populated scrim, so we don't set the scrim

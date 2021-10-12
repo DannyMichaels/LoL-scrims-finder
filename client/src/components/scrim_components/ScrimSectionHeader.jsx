@@ -185,7 +185,7 @@ export default function ScrimSectionHeader({
         <Grid container direction="row" justifyContent="space-between">
           {/*  casters text and buttons*/}
           <CastersSection
-            showCasters={showPlayers}
+            showCasters={isInDetail ? true : showPlayers || isBoxExpanded}
             casters={casters}
             gameEnded={gameEnded}
             data={{

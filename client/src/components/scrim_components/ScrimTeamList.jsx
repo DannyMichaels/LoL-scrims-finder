@@ -96,6 +96,7 @@ export default function ScrimTeamList({
       },
       setAlert: setCurrentAlert,
       setButtonsDisabled,
+      setScrim,
     });
 
     // using .createdBy because on error it wont return populated scrim, so we don't set the scrim
@@ -123,6 +124,7 @@ export default function ScrimTeamList({
       },
       setAlert: setCurrentAlert,
       setButtonsDisabled,
+      setScrim,
     });
 
     if (updatedScrim?.createdBy) {

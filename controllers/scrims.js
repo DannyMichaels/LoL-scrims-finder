@@ -386,11 +386,8 @@ const insertPlayerInScrim = async (req, res) => {
     );
 
     if (spotTaken) {
-      return res.status(500).json({
-        error: `spot taken! spots available for ${teamJoiningTitle}: ${
-          spotsAvailable ? spotsAvailable : 'no spots available!'
-        }`,
-      });
+      onSpotTaken(scrim._doc, res, spotsAvailable, teamJoiningTitle);
+      return;
     }
 
     await Scrim.findByIdAndUpdate(
@@ -644,9 +641,8 @@ const movePlayerInScrim = async (req, res) => {
         : 'Team 2 (Red Side)';
 
     if (spotTaken) {
-      return res.status(500).json({
-        error: `spot taken! spots available for ${teamJoiningTitle}: ${spotsAvailable}`,
-      });
+      onSpotTaken(scrim._doc, res, spotsAvailable, teamJoiningTitle);
+      return;
     }
 
     await Scrim.findByIdAndUpdate(
@@ -760,6 +756,7 @@ const insertCasterInScrim = async (req, res) => {
     } else {
       return res.status(500).json({
         error: 'Caster spots full!',
+        scrim: await populateOneScrim(scrimId),
       });
     }
   });
@@ -910,6 +907,27 @@ const removeImageFromScrim = async (req, res) => {
     return res.status(500).json({ error: err });
   }
 };
+
+async function populateOneScrim(scrimId) {
+  const scrimData = await Scrim.findById(scrimId)
+    .populate('createdBy', populateUser)
+    .populate('casters', populateUser)
+    .populate('lobbyHost', populateUser)
+    .populate(populateTeam('teamOne'))
+    .populate(populateTeam('teamTwo'))
+    .exec();
+
+  return scrimData;
+}
+
+async function onSpotTaken(scrim, res, spotsAvailable, teamJoiningTitle) {
+  const scrimData = await populateOneScrim(scrim._id);
+
+  return res.status(500).json({
+    error: `spot taken! spots available for ${teamJoiningTitle}: ${spotsAvailable}`,
+    scrim: scrimData,
+  });
+}
 
 module.exports = {
   getAllScrims,
