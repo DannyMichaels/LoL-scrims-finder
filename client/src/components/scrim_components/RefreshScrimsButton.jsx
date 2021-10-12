@@ -5,14 +5,13 @@ import Tooltip from '../shared/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
 import useTimeout from './../../hooks/useTimeout';
-import useScrims from '../../hooks/useScrims';
-
-// services
-import { getAllScrims } from './../../services/scrims';
+import useScrims, { useScrimsActions } from '../../hooks/useScrims';
 
 // button to re-fetch scrims that are visible in the page (see useScrims @ useScrimInterval)
 export default function RefreshScrimsButton() {
   const { filteredScrims } = useScrims();
+  const { fetchScrims } = useScrimsActions();
+
   const [disabled, setDisabled] = useState(false);
   const [refreshCounter, setRefreshCounter] = useState(1);
   const [disableMS, setDisableMS] = useState(3000);
@@ -27,8 +26,7 @@ export default function RefreshScrimsButton() {
       dispatch({ type: 'scrims/toggleFetch' });
     } else {
       // else if there aren't any visible scrims on the page, fetch all existing scrims on the back-end.
-      const scrimsData = await getAllScrims();
-      dispatch({ type: 'scrims/fetchScrims', payload: scrimsData });
+      fetchScrims();
     }
 
     // if refresh counter num is even, disable the button
@@ -39,7 +37,7 @@ export default function RefreshScrimsButton() {
     }
 
     setDisabled(true);
-  }, [dispatch, refreshCounter, filteredScrims.length]);
+  }, [dispatch, refreshCounter, filteredScrims.length, fetchScrims]);
 
   useTimeout(
     () => {
