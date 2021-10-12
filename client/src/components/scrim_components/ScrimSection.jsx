@@ -166,7 +166,6 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       setScrim(updatedScrim);
     }
 
-    // await fetchOneScrim(setScrim, scrim._id);
     setButtonsDisabled(false);
   };
 
@@ -188,8 +187,6 @@ export default function ScrimSection({ scrimData, isInDetail }) {
 
       setScrim(updatedScrim);
     }
-
-    // await fetchOneScrim(setScrim, scrim._id);
 
     setButtonsDisabled(false);
   };
