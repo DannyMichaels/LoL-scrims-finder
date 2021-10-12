@@ -201,17 +201,13 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       let deletedScrim = await deleteScrim(scrim._id);
 
       if (deletedScrim) {
-        await dispatch({ type: 'scrims/deleteScrim', payload: scrim });
+        dispatch({ type: 'scrims/deleteScrim', payload: scrim });
 
         if (isInDetail) {
-          // await fetchOneScrim(setScrim, scrim._id);
-
-          setScrim(deletedScrim);
-
           history.push('/');
         }
 
-        await setCurrentAlert({
+        setCurrentAlert({
           type: 'Success',
           message: 'Scrim removed successfully',
         });

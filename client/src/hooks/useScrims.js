@@ -150,8 +150,8 @@ export const useFetchScrims = () => {
   return null;
 };
 
-const ONE_SCRIM_FETCH_INTERVAL = 5000;
-// load one isBoxExpanded /detail page scrim every 5 seconds, also listens to reload click to re-fetch
+const ONE_SCRIM_FETCH_INTERVAL = 10000;
+// load one isBoxExpanded /detail page scrim every 10 seconds, also listens to reload click to re-fetch
 export const useFetchScrimInterval = (isInDetail, isBoxExpanded, scrim) => {
   const [scrimData, setScrimData] = useState(scrim);
   const { toggleFetch, scrimsLoading } = useScrims();
@@ -176,7 +176,7 @@ export const useFetchScrimInterval = (isInDetail, isBoxExpanded, scrim) => {
 
     const oneScrim = await getScrimById(scrimRef.current._id);
 
-    if (oneScrim.createdBy) {
+    if (oneScrim?.createdBy) {
       setScrimData(oneScrim);
     }
   };
@@ -191,7 +191,7 @@ export const useFetchScrimInterval = (isInDetail, isBoxExpanded, scrim) => {
 
       const oneScrim = await getScrimById(scrimRef.current._id);
 
-      if (oneScrim.createdBy) {
+      if (oneScrim?.createdBy) {
         setScrimData(oneScrim);
       }
     };

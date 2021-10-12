@@ -41,7 +41,7 @@ const changeFileName = async (file, scrimId) => {
 };
 
 // can also delete image here... maybe needs renaming
-export default function UploadPostGameImage({ scrim, isUploaded }) {
+export default function UploadPostGameImage({ scrim, isUploaded, setScrim }) {
   const { currentUser } = useAuth();
   const fileInputRef = useRef();
   const { fetchScrims } = useScrimsActions();
