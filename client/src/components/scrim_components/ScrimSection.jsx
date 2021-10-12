@@ -16,6 +16,7 @@ import ScrimSectionExpander from './ScrimSectionExpander';
 // utils / services
 import { deleteScrim, removeCasterFromScrim } from '../../services/scrims';
 import { insertCasterInScrim } from '../../services/scrims';
+import { useFetchScrimInterval } from './../../hooks/useScrims';
 
 const compareDates = (scrim) => {
   let currentTime = new Date().getTime();
@@ -34,7 +35,7 @@ const compareDates = (scrim) => {
 
 const MAX_CASTER_AMOUNT = 2;
 
-export default function ScrimSection({ scrim, isInDetail }) {
+export default function ScrimSection({ scrimData, isInDetail }) {
   const { fetchScrims } = useScrimsActions();
   const { currentUser } = useAuth();
   const { setCurrentAlert } = useAlerts();
@@ -49,6 +50,9 @@ export default function ScrimSection({ scrim, isInDetail }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [imageUploaded, setImageUploaded] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false); // for when players spam joining or leaving.
+
+  // useFetchScrimInterval: fetch one scrim on 5 sec interval, will run when expanded or when in detail page.
+  const [scrim] = useFetchScrimInterval(isInDetail, expanded, scrimData);
 
   const scrimBoxRef = useRef(null); // element container
 

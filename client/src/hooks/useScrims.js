@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import useInterval from '../hooks/useInterval';
-import { getAllScrims } from './../services/scrims';
+import { getAllScrims, getScrimById } from './../services/scrims';
 import devLog from '../utils/devLog';
 import { useDispatch, useSelector } from 'react-redux';
 import { showEarliestFirst, showLatestFirst } from '../utils/getSortedScrims';
@@ -168,4 +168,40 @@ export const useFetchScrimsInterval = () => {
   useInterval(loadScrims, FETCH_INTERVAL);
 
   return null;
+};
+
+// load one scrim every 10 seconds
+const ONE_SCRIM_FETCH_INTERVAL = 5000;
+
+export const useFetchScrimInterval = (isInDetail, expanded, scrim) => {
+  const [scrimData, setScrimData] = useState(scrim);
+
+  const scrimRef = useRef();
+
+  const isExpandedRef = useRef();
+  const isInDetailRef = useRef();
+
+  useEffect(() => {
+    isExpandedRef.current = expanded;
+    isInDetailRef.current = isInDetail;
+    scrimRef.current = scrim;
+  });
+
+  const fetchScrimData = async () => {
+    // if user is in detail just continue (dont worry about expanded)
+    // if user is in home and scrim isn't expanded don't continue.
+    if (!isExpandedRef.current && !isInDetailRef.current) return;
+
+    devLog(`fetching one scrim on interval (${scrim._id})`);
+
+    const scrimsResponse = await getScrimById(scrimRef.current._id);
+
+    if (scrimsResponse) {
+      setScrimData(scrimsResponse);
+    }
+  };
+
+  useInterval(fetchScrimData, ONE_SCRIM_FETCH_INTERVAL);
+
+  return [scrimData, setScrimData];
 };
