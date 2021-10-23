@@ -6,6 +6,39 @@ const jwt = require('jsonwebtoken');
 // models
 const User = require('../models/user.model');
 
+const validateRank = async (rank, res) => {
+  const divisionsWithNumbers = [
+    'Iron',
+    'Bronze',
+    'Silver',
+    'Gold',
+    'Platinum',
+    'Diamond',
+  ];
+
+  let rankDivision = rank.replace(/[0-9]/g, '').trim();
+
+  let isDivisionWithNumber = divisionsWithNumbers.includes(rankDivision);
+
+  const rankInvalid = !allowedRanks.includes(rankDivision);
+
+  if (rankInvalid) {
+    return res.status(500).json({
+      status: false,
+      error: 'Invalid rank provided.',
+    });
+  }
+
+  if (isDivisionWithNumber) {
+    if (!/\d/.test(rank)) {
+      return res.status(500).json({
+        status: false,
+        error: 'Rank number not provided',
+      });
+    }
+  }
+};
+
 /**
  * @method removeSpacesBeforeHashTag
  * takes a discord name and trims the spaces.
@@ -127,13 +160,7 @@ const registerUser = async (req, res) => {
 
     const regionInvalid = !region.includes(['NA', 'OCE', 'EUW', 'EUNE', 'LAN']);
 
-    const rankInvalid = !allowedRanks.includes(rank);
-
-    if (rankInvalid) {
-      return res.status(500).json({
-        error: 'Invalid rank provided.',
-      });
-    }
+    validateRank(rank);
 
     if (regionInvalid) {
       return res.status(500).json({
@@ -271,14 +298,7 @@ const updateUser = async (req, res) => {
 
   // check for valid rank
   if (req.body.rank) {
-    const rankInvalid = !allowedRanks.includes(req.body.rank); // TODO: this doesnt work when rank num provided, fix pls.
-
-    if (rankInvalid) {
-      return res.status(500).json({
-        status: false,
-        error: 'Invalid rank provided.',
-      });
-    }
+    validateRank(req.body.rank);
   }
 
   // check for valid region
