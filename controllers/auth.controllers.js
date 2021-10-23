@@ -110,7 +110,7 @@ const loginUser = async (req, res) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { uid, name, discord, rank, adminKey, email, region } = req.body;
+    const { uid, name, discord, rank, adminKey = '', email, region } = req.body;
 
     const noSpacesDiscord = removeSpacesBeforeHashTag(discord);
 
