@@ -271,7 +271,7 @@ const updateUser = async (req, res) => {
 
   // check for valid rank
   if (req.body.rank) {
-    const rankInvalid = !allowedRanks.includes(req.body.rank);
+    const rankInvalid = !allowedRanks.includes(req.body.rank); // TODO: this doesnt work when rank num provided, fix pls.
 
     if (rankInvalid) {
       return res.status(500).json({
