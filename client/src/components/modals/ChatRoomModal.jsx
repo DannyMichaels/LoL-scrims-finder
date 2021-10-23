@@ -236,15 +236,13 @@ export default function ChatRoomModal() {
       customStyles={{}}
       contentClassName={classes.modalContent}
       open={isOpen}
-      onClose={onClose}
-    >
+      onClose={onClose}>
       {!isLoaded || !conversation?._id ? (
         <div
           style={{
             padding: '50px',
             margin: '100px 0',
-          }}
-        >
+          }}>
           <LinearProgress />
         </div>
       ) : (
@@ -253,8 +251,7 @@ export default function ChatRoomModal() {
             minWidth: '400px',
             display: 'flex',
             flexDirection: 'column',
-          }}
-        >
+          }}>
           <div className={classes.chatRoomMessagesContainer} ref={scrollRef}>
             {messages.map((message) => (
               // one message

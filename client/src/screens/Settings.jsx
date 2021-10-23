@@ -214,8 +214,7 @@ export default function Settings() {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 width: 'auto',
-              }}
-            >
+              }}>
               <Grid item>
                 <Typography variant="h1">Settings</Typography>
               </Grid>
@@ -226,8 +225,7 @@ export default function Settings() {
                 direction="row"
                 justifyContent="center"
                 alignItems="center"
-                spacing={4}
-              >
+                spacing={4}>
                 {/* SUMMONER NAME */}
                 <Grid item>
                   <TextField
@@ -264,8 +262,7 @@ export default function Settings() {
                 direction="row"
                 alignItems="center"
                 justifyContent="center"
-                spacing={4}
-              >
+                spacing={4}>
                 <Grid item>
                   {/* REGION */}
                   <FormControl className={classes.formControl} variant="filled">
@@ -276,8 +273,7 @@ export default function Settings() {
                       name="region"
                       value={userData.region}
                       onChange={handleChange}
-                      required
-                    >
+                      required>
                       <MenuItem selected disabled>
                         select region
                       </MenuItem>
@@ -313,8 +309,7 @@ export default function Settings() {
                 container
                 alignItems="center"
                 spacing={4}
-                justifyContent="center"
-              >
+                justifyContent="center">
                 <Grid item>
                   <FormHelperText>Rank Division</FormHelperText>
                   <Select
@@ -327,8 +322,7 @@ export default function Settings() {
                         ...prevState,
                         [e.target.name]: e.target.value,
                       }))
-                    }
-                  >
+                    }>
                     {[
                       'Unranked',
                       'Iron',
@@ -363,8 +357,7 @@ export default function Settings() {
                           ...prevState,
                           [e.target.name]: e.target.value,
                         }))
-                      }
-                    >
+                      }>
                       <MenuItem selected disabled>
                         select rank number
                       </MenuItem>
