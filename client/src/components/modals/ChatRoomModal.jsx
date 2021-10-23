@@ -161,6 +161,8 @@ export default function ChatRoomModal() {
     };
 
     onNewMessageArrival();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [arrivalMessage, conversationMemberIds, currentUser?._id]);
 
   const handleSubmitMessage = useCallback(
