@@ -6,38 +6,14 @@ const jwt = require('jsonwebtoken');
 // models
 const User = require('../models/user.model');
 
-const validateRank = async (rank, res) => {
-  const divisionsWithNumbers = [
-    'Iron',
-    'Bronze',
-    'Silver',
-    'Gold',
-    'Platinum',
-    'Diamond',
-  ];
-
-  let rankDivision = rank.replace(/[0-9]/g, '').trim();
-
-  let isDivisionWithNumber = divisionsWithNumbers.includes(rankDivision);
-
-  const rankInvalid = !allowedRanks.includes(rankDivision);
-
-  if (rankInvalid) {
-    return res.status(500).json({
-      status: false,
-      error: 'Invalid rank provided.',
-    });
-  }
-
-  if (isDivisionWithNumber) {
-    if (!/\d/.test(rank)) {
-      return res.status(500).json({
-        status: false,
-        error: 'Rank number not provided',
-      });
-    }
-  }
-};
+const divisionsWithNumbers = [
+  'Iron',
+  'Bronze',
+  'Silver',
+  'Gold',
+  'Platinum',
+  'Diamond',
+];
 
 /**
  * @method removeSpacesBeforeHashTag
@@ -59,6 +35,7 @@ const removeSpacesBeforeHashTag = (str) => {
 
 const allowedRanks = [
   'Uranked',
+  'Iron',
   'Bronze',
   'Silver',
   'Gold',
@@ -158,9 +135,29 @@ const registerUser = async (req, res) => {
       discord: { $regex: `^${noSpacesDiscord}$`, $options: 'i' },
     });
 
-    const regionInvalid = !region.includes(['NA', 'OCE', 'EUW', 'EUNE', 'LAN']);
+    const regionInvalid = !['NA', 'OCE', 'EUW', 'EUNE', 'LAN'].includes(region);
 
-    validateRank(rank);
+    let rankDivision = rank.replace(/[0-9]/g, '').trim();
+
+    let isDivisionWithNumber = divisionsWithNumbers.includes(rankDivision);
+
+    const rankInvalid = !allowedRanks.includes(rankDivision);
+
+    if (rankInvalid) {
+      return res.status(500).json({
+        status: false,
+        error: 'Invalid rank provided.',
+      });
+    }
+
+    if (isDivisionWithNumber) {
+      if (!/\d/.test(rank)) {
+        return res.status(500).json({
+          status: false,
+          error: 'Rank number not provided',
+        });
+      }
+    }
 
     if (regionInvalid) {
       return res.status(500).json({
@@ -298,7 +295,27 @@ const updateUser = async (req, res) => {
 
   // check for valid rank
   if (req.body.rank) {
-    validateRank(req.body.rank);
+    let rankDivision = req.body.rank.replace(/[0-9]/g, '').trim();
+
+    let isDivisionWithNumber = divisionsWithNumbers.includes(rankDivision);
+
+    const rankInvalid = !allowedRanks.includes(rankDivision);
+
+    if (rankInvalid) {
+      return res.status(500).json({
+        status: false,
+        error: 'Invalid rank provided.',
+      });
+    }
+
+    if (isDivisionWithNumber) {
+      if (!/\d/.test(req.body.rank)) {
+        return res.status(500).json({
+          status: false,
+          error: 'Rank number not provided',
+        });
+      }
+    }
   }
 
   // check for valid region
