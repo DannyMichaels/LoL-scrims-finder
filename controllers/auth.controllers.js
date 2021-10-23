@@ -321,7 +321,7 @@ const updateUser = async (req, res) => {
   // check for valid region
   if (req.body.region) {
     const regionInvalid = !['NA', 'OCE', 'EUW', 'EUNE', 'LAN'].includes(
-      req.body.region,
+      req.body.region
     );
 
     if (regionInvalid) {
@@ -387,7 +387,7 @@ const updateUser = async (req, res) => {
               token: accessToken,
               user,
             });
-          },
+          }
         );
       });
     });

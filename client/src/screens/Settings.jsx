@@ -77,7 +77,7 @@ export default function Settings() {
 
   const usersInRegion = useMemo(
     () => allUsers.filter((user) => user?.region === userData?.region),
-    [allUsers, userData?.region],
+    [allUsers, userData?.region]
   );
 
   const foundUserSummonerName = useMemo(
@@ -91,9 +91,9 @@ export default function Settings() {
           }
 
           return name === userData.name;
-        },
+        }
       ),
-    [userData.name, usersInRegion, currentUser?._id],
+    [userData.name, usersInRegion, currentUser?._id]
   );
 
   const foundUserDiscord = useMemo(
@@ -107,7 +107,7 @@ export default function Settings() {
 
         return removeSpaces(discord) === removeSpaces(userData.discord);
       }),
-    [userData.discord, allUsers, currentUser?._id],
+    [userData.discord, allUsers, currentUser?._id]
   );
 
   // chrone is throwing a violation error for this: [Violation] 'submit' handler took 701ms
@@ -158,11 +158,11 @@ export default function Settings() {
       }
     } catch (error) {
       console.error('ERROR:', error);
-      let errMsg = error?.messasge;
-      // setCurrentAlert({
-      //   type: 'Error',
-      //   message: errMsg ?? error,
-      // });
+      const errMsg = error?.messasge;
+      setCurrentAlert({
+        type: 'Error',
+        message: errMsg ?? JSON.stringify(error),
+      });
     }
   };
 
@@ -287,7 +287,7 @@ export default function Settings() {
                           <MenuItem value={region} key={key}>
                             {region}
                           </MenuItem>
-                        ),
+                        )
                       )}
                     </Select>
                   </FormControl>
@@ -355,7 +355,7 @@ export default function Settings() {
                       variant="standard"
                       name="rankNumber"
                       required={divisionsWithNumbers.includes(
-                        rankData.rankDivision,
+                        rankData.rankDivision
                       )}
                       value={rankData.rankNumber || '4'}
                       onChange={(e) =>

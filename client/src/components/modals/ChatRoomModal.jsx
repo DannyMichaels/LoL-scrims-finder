@@ -113,7 +113,7 @@ export default function ChatRoomModal() {
           return (
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
           );
-        }),
+        })
       );
 
       setIsLoaded(true);
@@ -145,7 +145,7 @@ export default function ChatRoomModal() {
           // put in the DB that the message has been seen.
           await postMessageSeenByUser(
             arrivalMessage.messageId,
-            arrivalMessage._receiver,
+            arrivalMessage._receiver
           );
 
           dispatch({
@@ -169,7 +169,7 @@ export default function ChatRoomModal() {
     async (msgText) => {
       try {
         const receiver = conversation?.members?.find(
-          (user) => user._id !== currentUser?._id,
+          (user) => user._id !== currentUser?._id
         );
 
         const newlyCreatedMessage = await postNewMessage({
@@ -208,7 +208,7 @@ export default function ChatRoomModal() {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser?._id, conversation?._id],
+    [currentUser?._id, conversation?._id]
   );
 
   useEffect(() => {
