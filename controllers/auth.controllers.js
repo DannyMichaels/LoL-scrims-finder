@@ -24,6 +24,18 @@ const removeSpacesBeforeHashTag = (str) => {
     });
 };
 
+const allowedRanks = [
+  'Uranked',
+  'Bronze',
+  'Silver',
+  'Gold',
+  'Platinum',
+  'Diamond',
+  'Master',
+  'Grandmaster',
+  'Challenger',
+];
+
 // get google uid and email by using google auth firebase, then give rest of user data hosted in database.
 // same as verify user but with errors.
 const loginUser = async (req, res) => {
@@ -112,6 +124,22 @@ const registerUser = async (req, res) => {
     const discordTaken = await User.findOne({
       discord: { $regex: `^${noSpacesDiscord}$`, $options: 'i' },
     });
+
+    const regionInvalid = !region.includes(['NA', 'OCE', 'EUW', 'EUNE', 'LAN']);
+
+    const rankInvalid = !allowedRanks.includes(rank);
+
+    if (rankInvalid) {
+      return res.status(500).json({
+        error: 'Invalid rank provided.',
+      });
+    }
+
+    if (regionInvalid) {
+      return res.status(500).json({
+        error: 'Invalid region provided.',
+      });
+    }
 
     if (discordTaken) {
       return res.status(500).json({
@@ -227,21 +255,56 @@ const verifyUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
+  const { uid = null } = req.body;
 
   const foundUser = await User.findOne({ _id: id });
 
-  const isMatch = bcrypt.compare(req.body.uid, foundUser.uid); // compare req.body.uid to user uid in db.
+  if (!foundUser) {
+    return res.status(500).json({ status: false, message: 'user not found' });
+  }
+
+  const isMatch = bcrypt.compare(uid, foundUser.uid); // compare req.body.uid to user uid in db.
+
+  if (!isMatch) {
+    return res.status(500).json({ status: false, message: 'unauthorized' });
+  }
+
+  // check for valid rank
+  if (req.body.rank) {
+    const rankInvalid = !allowedRanks.includes(req.body.rank);
+
+    if (rankInvalid) {
+      return res.status(500).json({
+        status: false,
+        error: 'Invalid rank provided.',
+      });
+    }
+  }
+
+  // check for valid region
+  if (req.body.region) {
+    const regionInvalid = !['NA', 'OCE', 'EUW', 'EUNE', 'LAN'].includes(
+      req.body.region,
+    );
+
+    if (regionInvalid) {
+      return res.status(500).json({
+        error: 'Invalid region provided.',
+        status: false,
+      });
+    }
+  }
 
   if (isMatch) {
     const payload = {
       uid: foundUser.uid,
       email: foundUser.email,
       _id: foundUser._id,
-      rank: req.body.rank,
-      region: req.body.region,
-      discord: req.body.discord,
-      adminKey: req.body.adminKey,
-      name: req.body.name,
+      rank: req.body.rank ?? foundUser.rank,
+      region: req.body.region ?? foundUser.region,
+      discord: req.body.discord ?? foundUser.discord,
+      adminKey: req.body.adminKey ?? foundUser.adminKey,
+      name: req.body.name ?? foundUser.name,
 
       profileBackgroundImg:
         req.body.profileBackgroundImg ??
@@ -287,9 +350,13 @@ const updateUser = async (req, res) => {
               token: accessToken,
               user,
             });
-          }
+          },
         );
       });
+    });
+  } else {
+    return res.status(500).json({
+      success: false,
     });
   }
 };

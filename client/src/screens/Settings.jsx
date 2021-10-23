@@ -77,7 +77,7 @@ export default function Settings() {
 
   const usersInRegion = useMemo(
     () => allUsers.filter((user) => user?.region === userData?.region),
-    [allUsers, userData?.region]
+    [allUsers, userData?.region],
   );
 
   const foundUserSummonerName = useMemo(
@@ -91,9 +91,9 @@ export default function Settings() {
           }
 
           return name === userData.name;
-        }
+        },
       ),
-    [userData.name, usersInRegion, currentUser?._id]
+    [userData.name, usersInRegion, currentUser?._id],
   );
 
   const foundUserDiscord = useMemo(
@@ -107,7 +107,7 @@ export default function Settings() {
 
         return removeSpaces(discord) === removeSpaces(userData.discord);
       }),
-    [userData.discord, allUsers, currentUser?._id]
+    [userData.discord, allUsers, currentUser?._id],
   );
 
   // chrone is throwing a violation error for this: [Violation] 'submit' handler took 701ms
@@ -158,11 +158,11 @@ export default function Settings() {
       }
     } catch (error) {
       console.error('ERROR:', error);
-      let errMsg = error.messasge;
-      setCurrentAlert({
-        type: 'Error',
-        message: errMsg ?? error,
-      });
+      let errMsg = error?.messasge;
+      // setCurrentAlert({
+      //   type: 'Error',
+      //   message: errMsg ?? error,
+      // });
     }
   };
 
@@ -214,7 +214,8 @@ export default function Settings() {
                 marginLeft: 'auto',
                 marginRight: 'auto',
                 width: 'auto',
-              }}>
+              }}
+            >
               <Grid item>
                 <Typography variant="h1">Settings</Typography>
               </Grid>
@@ -225,7 +226,8 @@ export default function Settings() {
                 direction="row"
                 justifyContent="center"
                 alignItems="center"
-                spacing={4}>
+                spacing={4}
+              >
                 {/* SUMMONER NAME */}
                 <Grid item>
                   <TextField
@@ -262,7 +264,8 @@ export default function Settings() {
                 direction="row"
                 alignItems="center"
                 justifyContent="center"
-                spacing={4}>
+                spacing={4}
+              >
                 <Grid item>
                   {/* REGION */}
                   <FormControl className={classes.formControl} variant="filled">
@@ -273,7 +276,8 @@ export default function Settings() {
                       name="region"
                       value={userData.region}
                       onChange={handleChange}
-                      required>
+                      required
+                    >
                       <MenuItem selected disabled>
                         select region
                       </MenuItem>
@@ -283,7 +287,7 @@ export default function Settings() {
                           <MenuItem value={region} key={key}>
                             {region}
                           </MenuItem>
-                        )
+                        ),
                       )}
                     </Select>
                   </FormControl>
@@ -309,7 +313,8 @@ export default function Settings() {
                 container
                 alignItems="center"
                 spacing={4}
-                justifyContent="center">
+                justifyContent="center"
+              >
                 <Grid item>
                   <FormHelperText>Rank Division</FormHelperText>
                   <Select
@@ -322,7 +327,8 @@ export default function Settings() {
                         ...prevState,
                         [e.target.name]: e.target.value,
                       }))
-                    }>
+                    }
+                  >
                     {[
                       'Unranked',
                       'Iron',
@@ -349,7 +355,7 @@ export default function Settings() {
                       variant="standard"
                       name="rankNumber"
                       required={divisionsWithNumbers.includes(
-                        rankData.rankDivision
+                        rankData.rankDivision,
                       )}
                       value={rankData.rankNumber || '4'}
                       onChange={(e) =>
@@ -357,7 +363,8 @@ export default function Settings() {
                           ...prevState,
                           [e.target.name]: e.target.value,
                         }))
-                      }>
+                      }
+                    >
                       <MenuItem selected disabled>
                         select rank number
                       </MenuItem>
