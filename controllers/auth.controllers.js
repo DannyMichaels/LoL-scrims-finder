@@ -423,59 +423,65 @@ const updateUser = async (req, res) => {
 
     const isAdmin = req.body.adminKey === KEYS.ADMIN_KEY;
 
-    const payload = {
-      uid: foundUser.uid,
-      email: foundUser.email,
-      _id: foundUser._id,
-      rank: req.body.rank ?? foundUser.rank,
-      region: req.body.region ?? foundUser.region,
-      discord: req.body.discord ?? foundUser.discord,
-      adminKey: req.body.adminKey ?? foundUser.adminKey,
-      name: req.body.name?.trim() ?? foundUser.name,
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(req.body.uid, salt, async (err, hashUid) => {
+        if (err) throw err;
 
-      isAdmin,
+        const payload = {
+          uid: hashUid,
+          email: foundUser.email,
+          _id: foundUser._id,
+          rank: req.body.rank ?? foundUser.rank,
+          region: req.body.region ?? foundUser.region,
+          discord: req.body.discord ?? foundUser.discord,
+          adminKey: req.body.adminKey ?? foundUser.adminKey,
+          name: req.body.name?.trim() ?? foundUser.name,
 
-      profileBackgroundImg:
-        req.body.profileBackgroundImg ??
-        foundUser?.profileBackgroundImg ??
-        'Summoners Rift',
+          isAdmin,
 
-      profileBackgroundBlur:
-        req.body.profileBackgroundBlur ??
-        foundUser?.profileBackgroundBlur ??
-        '20',
+          profileBackgroundImg:
+            req.body.profileBackgroundImg ??
+            foundUser?.profileBackgroundImg ??
+            'Summoners Rift',
 
-      notifications: foundUser.notifications,
-      friendRequests: foundUser.friendRequests,
-      friends: foundUser.friends,
+          profileBackgroundBlur:
+            req.body.profileBackgroundBlur ??
+            foundUser?.profileBackgroundBlur ??
+            '20',
 
-      canSendEmailsToUser: req.body.canSendEmailsToUser ?? false,
-    };
+          notifications: foundUser.notifications,
+          friendRequests: foundUser.friendRequests,
+          friends: foundUser.friends,
 
-    const accessToken = jwt.sign(payload, KEYS.SECRET_OR_KEY, {
-      expiresIn: 31556926, // 1 year in seconds
-    });
+          canSendEmailsToUser: req.body.canSendEmailsToUser ?? false,
+        };
 
-    await User.findByIdAndUpdate(
-      user._id,
-      payload,
-      { new: true },
-      (error, updatedUser) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        if (!updatedUser) {
-          return res.status(404).json(updatedUser);
-        }
-
-        return res.status(201).json({
-          success: true,
-          token: `Bearer ${accessToken}`,
-          user: updatedUser,
+        const accessToken = jwt.sign(payload, KEYS.SECRET_OR_KEY, {
+          expiresIn: 31556926, // 1 year in seconds
+          // expiresIn: new Date(new Date()).setDate(new Date().getDate() + 30), // 30 days from now, does this work?
         });
-      }
-    );
+        await User.findByIdAndUpdate(
+          user._id,
+          payload,
+          { new: true },
+          (error, updatedUser) => {
+            if (error) {
+              return res.status(500).json({ error: error.message });
+            }
+
+            if (!updatedUser) {
+              return res.status(404).json(updatedUser);
+            }
+
+            return res.status(201).json({
+              success: true,
+              token: `Bearer ${accessToken}`,
+              user: updatedUser,
+            });
+          }
+        );
+      });
+    });
   } catch (error) {
     return res.status(500).json(error);
   }

@@ -25,6 +25,7 @@ import {
 import { makeStyles } from '@mui/styles';
 import { updateUser } from '../services/auth.services';
 import { setAuthToken } from '../services/auth.services';
+import { auth } from '../firebase';
 
 // remove spaces from # in discord name
 const removeSpaces = (str) => {
@@ -60,6 +61,7 @@ export default function Settings() {
     ...currentUser,
   });
 
+  const [uid, setUid] = useState('');
   const { setCurrentAlert } = useAlerts();
 
   const [rankData, setRankData] = useState({
@@ -77,6 +79,10 @@ export default function Settings() {
   ];
 
   const classes = useStyles();
+
+  useEffect(() => {
+    setUid(auth.currentUser?.uid);
+  }, []);
 
   const usersInRegion = useMemo(
     () => allUsers.filter((user) => user?.region === userData?.region),
@@ -137,6 +143,7 @@ export default function Settings() {
       const data = await updateUser({
         ...userData,
         name: userData.name.trim(),
+        uid,
       });
 
       if (data?.token) {
@@ -212,7 +219,7 @@ export default function Settings() {
                 width: 'auto',
               }}>
               <Grid item>
-                <Typography variant="h1">Settings</Typography>
+                <Typography variant="h1">Settings (UID FIX)</Typography>
               </Grid>
 
               <Grid
