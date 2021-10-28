@@ -49,11 +49,25 @@ export function useAuthActions() {
       };
 
       // token = `Bearer ${bcryptHash}`
-      const decodedUser = await loginUser(googleParams); // get the jwt token from backend with params
+      try {
+        const decodedUser = await loginUser(googleParams); // get the jwt token from backend with params
 
-      if (decodedUser) {
-        setCurrentUser(decodedUser);
-        history.push('/');
+        if (decodedUser) {
+          setCurrentUser(decodedUser);
+          history.push('/');
+        }
+      } catch (error) {
+        const errorMsg =
+          error?.response?.data?.error ??
+          'error logging in, please try again later.';
+
+        dispatch({
+          type: 'alerts/setCurrentAlert',
+          payload: {
+            type: 'Error',
+            message: errorMsg,
+          },
+        });
       }
     }
   };
@@ -78,10 +92,7 @@ export function useAuthVerify() {
 
         setAuthToken(token);
 
-        const data = await verifyUser({
-          email: decodedUser?.email,
-          uid: decodedUser?.uid,
-        });
+        const data = await verifyUser();
 
         // if there is no token PrivateRoute.jsx should send us to /sign-up automatically.
         if (data?.token) {

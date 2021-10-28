@@ -2,18 +2,21 @@
 import { useEffect } from 'react';
 import useSocket from './useSocket';
 import useAuth from './useAuth';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 // utils
 import devLog from './../utils/devLog';
 
 // services
-import { getUserNotifications, getUserById } from '../services/users.services';
+import { getUserById } from '../services/users.services';
+import { getUserNotifications } from '../services/notification.services';
 
 export default function useNotifications() {
   const { socket } = useSocket();
   const { currentUser } = useAuth();
   const dispatch = useDispatch();
+
+  const { notificationsOpen } = useSelector(({ general }) => general);
 
   useEffect(() => {
     if (!socket) return;
@@ -55,9 +58,9 @@ export default function useNotifications() {
   }, [socket, currentUser?._id, dispatch]);
 
   useEffect(() => {
-    const fetchNotificationsOnMount = async () => {
+    const fetchNotifications = async () => {
       if (!currentUser?._id) return;
-      devLog('fetching notifications  on mount for currentUser');
+      devLog('fetching notifications for currentUser');
 
       const { notifications } = await getUserNotifications(currentUser?._id);
 
@@ -65,10 +68,10 @@ export default function useNotifications() {
       dispatch({ type: 'auth/updateCurrentUser', payload: { notifications } });
     };
 
-    fetchNotificationsOnMount();
+    fetchNotifications();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser?._id]);
+  }, [currentUser?._id, notificationsOpen]); // refetch when opening modal
 
   return null;
 }

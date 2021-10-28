@@ -20,16 +20,14 @@ import api from './apiConfig';
  */
 export const postNewMessage = async ({
   conversationId,
-  senderId,
   text,
   receiverId = null,
 }) => {
   try {
     const response = await api.post(`/messages`, {
       conversationId,
-      senderId,
       text,
-      receiverId,
+      receiverId, // if no receiverId, it's probably a scrim
     });
     return response.data;
   } catch (error) {
@@ -48,24 +46,30 @@ export const getConversationMessages = async (conversationId) => {
 
 /**
  * @method postMessageSeenByUser
+ * @desc tell the back-end and database that the currentUser has seen this message.
  * @param {String} messageId
  * @param {String} seenByUserId
+ * @access private
  * @returns {Promise<{status: boolean, updatedMessage: object}>}
  */
-export const postMessageSeenByUser = async (messageId, seenByUserId) => {
+export const postMessageSeenByUser = async (messageId) => {
   try {
-    const response = await api.post(`/messages/post-seen/${messageId}`, {
-      seenByUserId,
-    });
+    const response = await api.post(`/messages/post-seen/${messageId}`);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
-export const getUserUnseenMessages = async (userId) => {
+/**
+ * @method getUserUnseenMessages
+ * @desc get the messages that the current user didn't see (sent by his friends)
+ * @access  private
+ * @returns
+ */
+export const getUserUnseenMessages = async () => {
   try {
-    const response = await api.get(`/messages/unseen-messages/${userId}`);
+    const response = await api.get('/messages/verifiedUser/unseen-messages');
     return response.data;
   } catch (error) {
     throw error;

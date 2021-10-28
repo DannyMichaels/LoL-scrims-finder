@@ -14,10 +14,11 @@ const handleValidId = async (id, res) => {
 
 // @route   POST /api/messages
 // @desc    post a new message
-// @access  Public
+// @access  Private
 const postMessage = async (req, res) => {
   try {
-    const { text, conversationId, senderId, receiverId } = req.body;
+    const { text, conversationId, receiverId } = req.body;
+    const senderId = req.user._id ?? '';
 
     await handleValidId(conversationId, res);
     await handleValidId(senderId, res);
@@ -60,6 +61,7 @@ const postMessage = async (req, res) => {
 
 // @route   GET /api/messages/:conversationId
 // @desc    get the messages of the conversation by conversation._id
+// TODO: there should be a check for if it's a scrim conversation make it public, else make it private if it's private DM
 // @access  Public
 const getConversationMessages = async (req, res) => {
   try {
@@ -80,15 +82,16 @@ const getConversationMessages = async (req, res) => {
 };
 
 // @route   POST /api/messages/post-seen/:messageId
-// @desc    post that the message has been seen by the user
-// @access  Public
+// @desc    post that the message has been seen by the currentUser
+// @access  Private
 const postMessageSeenByUser = async (req, res) => {
   try {
     const { messageId } = req.params;
+    const seenByUserId = req.user._id ?? false;
 
     await handleValidId(messageId, res);
 
-    if (!req.body.seenByUserId) {
+    if (!seenByUserId) {
       return res.status(500).json({
         error: 'seen by user id not provided! (req.body.seenByUserId)',
       });
@@ -96,7 +99,7 @@ const postMessageSeenByUser = async (req, res) => {
 
     let message = await Message.findById(messageId);
 
-    message._seenBy = [...message._seenBy, req.body.seenByUserId];
+    message._seenBy = [...message._seenBy, seenByUserId];
 
     const savedMessage = await message.save();
 
@@ -108,17 +111,22 @@ const postMessageSeenByUser = async (req, res) => {
 
 // @route   GET /api/messages/unseen-messages/:userId
 // @desc    get the messages that the user didn't see by user._id
-// @access  Public
+// @access  Private
 const getUserUnseenMessages = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user._id;
+    const currentUser = await User.findById(userId).select(['friends']);
 
     await handleValidId(userId, res);
 
     const messages = await Message.find({ _receiver: userId });
 
+    const friendIds = currentUser.friends.map(({ _id }) => _id);
+
     const unseenMessages = messages.filter((message) => {
-      return !message?._seenBy?.includes(userId);
+      if (!message?._seenBy.some((id) => friendIds.includes(id))) return false; // if not friend, return false. (if unfriended)
+
+      return !message?._seenBy?.includes(userId); // return if is friend and user didn't see it.
     });
 
     return res.status(200).json(unseenMessages);

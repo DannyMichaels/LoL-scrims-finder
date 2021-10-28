@@ -35,7 +35,7 @@ export default function CreateNewConversationButton({
       if (!newMessageText) {
         setCurrentAlert({
           type: 'Error',
-          messag: 'cannot start conversation, no message provided!',
+          message: 'cannot start conversation, no message provided!',
         });
         return;
       }
@@ -50,7 +50,6 @@ export default function CreateNewConversationButton({
       // add the initial messsage;
 
       const newlyCreatedMessage = await postNewMessage({
-        senderId: currentUser?._id,
         conversationId: newConversation._id,
         text: newMessageText,
         receiverId: receiverUser._id,

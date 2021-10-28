@@ -17,12 +17,13 @@ import { Link } from 'react-router-dom';
 import { getRankImage } from './../../utils/getRankImage';
 
 // services
+import { pushUserNotification } from '../../services/notification.services';
+
 import {
-  addUserFriend,
+  rejectFriendRequest,
+  acceptFriendRequest,
   getUserFriendRequests,
-  pushUserNotification,
-  removeFriendRequest,
-} from '../../services/users.services';
+} from '../../services/friends.services';
 
 // icons
 import CheckIcon from '@mui/icons-material/CheckCircle';
@@ -49,7 +50,7 @@ export default function FriendRequestsModal() {
 
     // this is for when user recieves notification from socket and opens this page, he didn't refresh, so we need to refetch.
     const fetchUserFriendRequests = async () => {
-      let friendRequests = await getUserFriendRequests(currentUser?._id);
+      const friendRequests = await getUserFriendRequests();
       setFriendRequests(friendRequests);
     };
     fetchUserFriendRequests();
@@ -58,12 +59,12 @@ export default function FriendRequestsModal() {
   const onAcceptClick = useCallback(
     async (requestUser, requestId) => {
       try {
-        const { updatedUserFriends } = await addUserFriend(
+        const { updatedUserFriends } = await acceptFriendRequest(
           currentUser?._id,
           requestUser._id
         );
 
-        const { friendRequests } = await removeFriendRequest(
+        const { friendRequests } = await rejectFriendRequest(
           currentUser?._id,
           requestId
         );
@@ -78,14 +79,14 @@ export default function FriendRequestsModal() {
         // send event to friend user.
         socket?.emit('sendNotification', receiverNotification);
 
-        // send notification to user who requested the friend request (current User)
+        // send notification to new friend
         await pushUserNotification(requestUser._id, {
           message: `You and ${currentUser?.name} are now friends!`,
           _relatedUser: currentUser,
           createdDate: Date.now(),
         });
 
-        // send notification to user that they're friends
+        // send notification to currentUser
         const { notifications } = await pushUserNotification(currentUser._id, {
           message: `You and ${requestUser?.name} are now friends!`,
           _relatedUser: requestUser,
@@ -111,7 +112,7 @@ export default function FriendRequestsModal() {
         );
       } catch (error) {
         if (error?.response?.data?.error === 'Friend already added!') {
-          const { friendRequests } = await removeFriendRequest(
+          const { friendRequests } = await rejectFriendRequest(
             currentUser?._id,
             requestId
           );
@@ -141,7 +142,7 @@ export default function FriendRequestsModal() {
   const onRejectClick = useCallback(
     async (requestUser, requestId) => {
       try {
-        const { friendRequests } = await removeFriendRequest(
+        const { friendRequests } = await rejectFriendRequest(
           currentUser?._id,
           requestId
         );

@@ -15,7 +15,8 @@ import Box from '@mui/material/Box';
 import {
   deleteAllUserNotifications,
   deleteOneUserNotification,
-} from '../../services/users.services';
+} from '../../services/notification.services';
+import { getUserById } from './../../services/users.services';
 import { makeStyles } from '@mui/styles';
 
 // icons
@@ -42,13 +43,13 @@ function NotificationsModal({ currentUser, notificationsOpen }) {
         title: 'Mark all as read',
         onClick: async () => {
           //  delete all notifications
-          const newNotificationsState = await deleteAllUserNotifications(
+          const { notifications } = await deleteAllUserNotifications(
             currentUser?._id
           );
 
           dispatch({
             type: 'auth/updateCurrentUser',
-            payload: { notifications: newNotificationsState },
+            payload: { notifications },
           });
         },
       }}>
@@ -68,9 +69,11 @@ function NotificationsModal({ currentUser, notificationsOpen }) {
               .map((notification, idx, arr) => (
                 <>
                   <OneNotification
+                    key={notification._id}
                     currentUserId={currentUser._id}
                     closeModal={closeNotifications}
                     notification={notification}
+                    notifications={notifications}
                   />
                   {idx !== arr.length - 1 ? (
                     <Box my={2}>
@@ -93,17 +96,14 @@ function NotificationsModal({ currentUser, notificationsOpen }) {
   );
 }
 
-const OneNotification = memo(({ notification, closeModal, currentUserId }) => {
+const OneNotification = memo(({ notification, closeModal }) => {
   const classes = useStyles();
   const history = useHistory();
   const dispatch = useDispatch();
   const [isHover, setIsHover] = useState(false);
 
   const onDeleteNotification = useCallback(async () => {
-    const resp = await deleteOneUserNotification(
-      currentUserId,
-      notification._id
-    );
+    const resp = await deleteOneUserNotification(notification._id);
 
     const newNotificationsState = resp.notifications;
 
@@ -111,7 +111,7 @@ const OneNotification = memo(({ notification, closeModal, currentUserId }) => {
       type: 'auth/updateCurrentUser',
       payload: { notifications: newNotificationsState },
     });
-  }, [notification, currentUserId, dispatch]);
+  }, [notification, dispatch]);
 
   const relatedItem = useMemo(() => {
     if (notification?._relatedUser) {
@@ -129,7 +129,10 @@ const OneNotification = memo(({ notification, closeModal, currentUserId }) => {
             ? 'Open conversation'
             : notification.isFriendRequest
             ? 'Go to friend requests'
-            : 'Go to scrim page'
+            : notification.isScrimAlert
+            ? 'Go to scrim page'
+            : notification.message.includes('are now friends') &&
+              'Visit friend page'
         }
         open={isHover && relatedItem !== null}>
         <div
@@ -141,7 +144,7 @@ const OneNotification = memo(({ notification, closeModal, currentUserId }) => {
             cursor: relatedItem ? 'pointer' : 'inherit',
             alignItems: 'flex-start',
           }}
-          onClick={() => {
+          onClick={async () => {
             if (!relatedItem) return;
             closeModal();
 
@@ -157,6 +160,9 @@ const OneNotification = memo(({ notification, closeModal, currentUserId }) => {
                   isOpen: true,
                 },
               });
+            } else if (notification.message.includes('are now friends')) {
+              const user = await getUserById(notification._relatedUser);
+              history.push(`/users/${user.name}?region=${user.region}`);
             }
           }}>
           <span style={{ fontSize: '0.8rem', color: '#ccc' }}>

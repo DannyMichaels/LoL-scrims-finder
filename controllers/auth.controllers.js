@@ -61,14 +61,14 @@ const loginUser = async (req, res) => {
   const { email, uid } = req.body;
 
   if (!email) {
-    res.status(500).json({
+    res.status(401).json({
       error: 'Unauthorized',
     });
     return;
   }
 
   if (!uid) {
-    res.status(500).json({
+    res.status(401).json({
       error: 'Unauthorized',
     });
     return;
@@ -86,8 +86,7 @@ const loginUser = async (req, res) => {
 
   // Check uid
   try {
-    // making this a promise broke in prod (I accidentally double hashed the uids...)
-    const isMatch = bcrypt.compare(uid, foundUser.uid); // compare unhashed req.body.uid to hashed user uid in db.
+    const isMatch = await bcrypt.compare(uid, foundUser.uid); // compare unhashed req.body.uid to hashed user uid in db.
 
     if (isMatch) {
       const payload = {
@@ -111,12 +110,12 @@ const loginUser = async (req, res) => {
         expiresIn: 31556926, // 1 year in seconds
       });
 
-      return res.json({ success: true, token: 'Bearer ' + accessToken });
+      return res.json({ success: true, token: `Bearer ${accessToken}` });
     } else {
-      return res.status(500).json('unauthorized');
+      return res.status(401).json({ error: 'Unauthorized', status: false });
     }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -288,13 +287,8 @@ const verifyUser = async (req, res) => {
     // will find the one user with the exact uid and email combination
     const foundUser = await User.findOne({
       email: { $eq: user.email },
+      uid: { $eq: user.uid },
     });
-
-    const isMatch = req.body.uid === user.uid && req.body.email === user.email;
-
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Unauthorized', status: false });
-    }
 
     if (foundUser) {
       const payload = {
