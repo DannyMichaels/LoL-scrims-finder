@@ -53,7 +53,7 @@ const getAllScrims = async (req, res) => {
             console.log(err);
             return res.status(400).end();
           }
-          return res.json(scrimData);
+          return res.json([]);
         });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -74,7 +74,7 @@ const getAllScrims = async (req, res) => {
             console.log(err);
             return res.status(400).end();
           }
-          return res.json(scrimData);
+          return res.json([]);
         });
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -123,7 +123,7 @@ const getScrimById = async (req, res) => {
           console.log(err);
           return res.status(400).end();
         }
-        return res.json(scrimData);
+        return res.json(null);
       });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -135,47 +135,48 @@ const getScrimById = async (req, res) => {
 // @access  Private (only people with the admin key can see this page in the app and create one)
 const createScrim = async (req, res) => {
   try {
-    let createdByUser = await User.findOne({
-      _id: { $eq: req.body.createdBy._id },
-    });
+    return null;
+    // let createdByUser = await User.findOne({
+    //   _id: { $eq: req.body.createdBy._id },
+    // });
 
-    // if adminkey isn't provided or is incorrect, throw an error
-    // it would probably be better to use discord and just give people admin roles instead of entering a key.
-    if (!req.body.adminKey || req.body.adminKey !== KEYS.ADMIN_KEY) {
-      return res
-        .status(401)
-        .json({ error: 'Cannot create scrim: unauthorized' });
-    }
+    // // if adminkey isn't provided or is incorrect, throw an error
+    // // it would probably be better to use discord and just give people admin roles instead of entering a key.
+    // if (!req.body.adminKey || req.body.adminKey !== KEYS.ADMIN_KEY) {
+    //   return res
+    //     .status(401)
+    //     .json({ error: 'Cannot create scrim: unauthorized' });
+    // }
 
-    let requestBody = {
-      ...req.body,
-      lobbyName: getLobbyName(
-        req.body.title ?? `${createdByUser?.name}'s Scrim`,
-        req.body?.region ?? 'NA'
-      ),
-      lobbyPassword: generatePassword(),
-      createdBy: createdByUser,
-    };
+    // let requestBody = {
+    //   ...req.body,
+    //   lobbyName: getLobbyName(
+    //     req.body.title ?? `${createdByUser?.name}'s Scrim`,
+    //     req.body?.region ?? 'NA'
+    //   ),
+    //   lobbyPassword: generatePassword(),
+    //   createdBy: createdByUser,
+    // };
 
-    const scrim = new Scrim(requestBody);
+    // const scrim = new Scrim(requestBody);
 
-    // add scrim to new conversation
-    const scrimConversation = new Conversation({
-      members: [],
-      _scrim: scrim._id,
-    });
+    // // add scrim to new conversation
+    // const scrimConversation = new Conversation({
+    //   members: [],
+    //   _scrim: scrim._id,
+    // });
 
-    // add that new conversation as _conversation inside scrim
-    scrim._conversation = scrimConversation._id;
+    // // add that new conversation as _conversation inside scrim
+    // scrim._conversation = scrimConversation._id;
 
-    await scrim.save(); // save scrim
+    // await scrim.save(); // save scrim
 
-    let savedConversation = await scrimConversation.save(); // save conv
+    // let savedConversation = await scrimConversation.save(); // save conv
 
-    console.log('Scrim created: ', scrim);
-    console.log('conversation created for scirm: ', savedConversation);
+    // console.log('Scrim created: ', scrim);
+    // console.log('conversation created for scirm: ', savedConversation);
 
-    return res.status(201).json(scrim);
+    // return res.status(201).json(scrim);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
@@ -186,67 +187,14 @@ const createScrim = async (req, res) => {
 // @desc    update an existing scrim (is ScrimEdit in the react app)
 // @access  Private (only people with the admin key can update a scrim)
 const updateScrim = async (req, res) => {
-  const { id } = req.params;
-
-  let isValid = mongoose.Types.ObjectId.isValid(id);
-
-  if (!isValid) {
-    return res.status(500).json({ error: 'invalid id' });
-  }
-
-  // if adminkey isn't provided or is incorrect, throw an error
-  // it would probably be better to use discord and just give people admin roles instead of entering a key.
-  if (!req.body.adminKey || req.body.adminKey !== KEYS.ADMIN_KEY) {
-    return res.status(401).json({ error: 'Cannot update scrim: unauthorized' });
-  }
-
-  await Scrim.findByIdAndUpdate(id, req.body, { new: true }, (error, scrim) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-    if (!scrim) {
-      return res.status(500).send('Scrim not found');
-    }
-
-    return res.status(200).json(scrim);
-  })
-    .populate('createdBy', populateUser)
-    .populate('casters', populateUser)
-    .populate('lobbyHost', populateUser)
-    .populate(populateTeam('teamOne'))
-    .populate(populateTeam('teamTwo'))
-    .exec();
+  return null;
 };
 
 // @route   DELETE /api/scrims/:id
 // @desc    delete an existing scrim
 // @access  Private (only people with the admin key can delete a scrim)
 const deleteScrim = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    let isValid = mongoose.Types.ObjectId.isValid(id);
-
-    if (!isValid) {
-      return res.status(500).json({ error: 'invalid id' });
-    }
-
-    // if adminkey isn't provided or is incorrect, throw an error
-    // it would probably be better to use discord and just give people admin roles instead of entering a key.
-    if (!req.body.adminKey || req.body.adminKey !== KEYS.ADMIN_KEY) {
-      return res
-        .status(401)
-        .json({ error: 'Cannot delete scrim: unauthorized' });
-    }
-
-    const deleted = await Scrim.findByIdAndDelete(id);
-
-    if (deleted) {
-      return res.status(200).send(`Scrim with id: ${escape(id)} deleted`);
-    }
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
+  return null;
 };
 
 // @route   PATCH /api/scrims/:scrimId/insert-player/:userId
