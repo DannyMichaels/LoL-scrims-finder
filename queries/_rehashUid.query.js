@@ -2,8 +2,10 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 // utils
-const { MONGODB_URI } = require('../utils/constants');
+// const { MONGODB_URI } = require('../utils/constants');
 const mongooseConnect = require('../db/connection');
+require('dotenv').config();
+const MONGODB_URI = process.env.MONGODB_URI;
 
 let connection;
 
