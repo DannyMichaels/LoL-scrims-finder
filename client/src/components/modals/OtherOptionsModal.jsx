@@ -93,7 +93,7 @@ export default function MoreOptionsModal() {
           Icon={SchoolIcon}
           onClick={() => {
             onClose();
-            history.push('/tutorial');
+            history.push('/guide');
           }}
         />
       </Grid>
