@@ -6,7 +6,7 @@ const SIMPLIFIED_URL =
 export default function Guide() {
   return (
     <>
-      <Navbar showLess />
+      <Navbar showLess noGuide />
       <iframe
         style={{
           width: '100%',
