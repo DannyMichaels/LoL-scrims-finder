@@ -49,6 +49,7 @@ export default function Navbar({
   showLess,
   showCheckboxes,
   noLogin = false,
+  noSpacer = false,
 }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -255,7 +256,7 @@ export default function Navbar({
       />
 
       <div className={classes.offset} />
-      <div className={classes.toolbarDistance} />
+      {!noSpacer && <div className={classes.toolbarDistance} />}
     </>
   );
 }
