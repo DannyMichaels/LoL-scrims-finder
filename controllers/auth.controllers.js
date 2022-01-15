@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const escape = require('escape-html');
 const { REGIONS } = require('../utils/constants');
 const KEYS = require('../config/keys');
+const { unbanUser, banDateExpired } = require('../utils/adminUtils');
 
 // models
 const User = require('../models/user.model');
@@ -92,6 +93,19 @@ const loginUser = async (req, res) => {
 
     if (!isMatch) {
       return res.status(401).json({ error: 'Unauthorized', status: false });
+    }
+
+    if (foundUser.currentBan.isActive) {
+      // unban user if date passed
+      if (banDateExpired(foundUser.currentBan.dateTo)) {
+        await unbanUser(foundUser);
+      } else {
+        return res.status(401).json({
+          error: `You are banned until ${new Date(
+            foundUser.currentBan.dateTo
+          ).toLocaleDateString()}`,
+        });
+      }
     }
 
     const payload = {
