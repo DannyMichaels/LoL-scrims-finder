@@ -43,7 +43,7 @@ const banUser = async (req, res) => {
 
     if (userToBan.adminKey === KEYS.ADMIN_KEY) {
       return res.status(500).json({
-        error: 'You cannot ban this user',
+        error: 'You cannot ban an admin',
       });
     }
 

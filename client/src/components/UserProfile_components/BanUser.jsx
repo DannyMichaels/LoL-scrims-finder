@@ -40,14 +40,6 @@ export default function BanUser({ user, setUser }) {
       try {
         setButtonsDisabled(true);
 
-        if (user.isAdmin) {
-          setCurrentAlert({
-            type: 'Error',
-            message: 'You cannot ban an admin',
-          });
-          return;
-        }
-
         const {
           success = false,
           dateFrom,

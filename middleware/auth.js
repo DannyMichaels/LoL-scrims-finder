@@ -32,7 +32,9 @@ module.exports = async function (req, res, next) {
             return res.status(401).json({
               error: `You are banned until ${new Date(
                 foundUser.currentBan.dateTo
-              ).toLocaleDateString()}`,
+              ).toLocaleDateString()} ${
+                foundBan.reason ? `\nReason: ${foundBan.reason}` : ''
+              }`,
             });
           }
         }

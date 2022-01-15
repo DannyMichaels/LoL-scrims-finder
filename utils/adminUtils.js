@@ -2,8 +2,9 @@ const Ban = require('../models/ban.model');
 
 const banDateExpired = (dateTo) => {
   return (
-    new Date(dateTo).toLocaleDateString('en-US').split(' ')[0] <=
-    new Date().toLocaleDateString('en-US')
+    new Date(
+      new Date(dateTo).toLocaleDateString('en-US').split(' ')[0]
+    ).getTime() <= new Date(new Date().toLocaleDateString('en-US')).getTime()
   );
 };
 
