@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const KEYS = require('../config/keys');
 const User = require('../models/user.model');
+const Ban = require('../models/ban.model');
 const { unbanUser, banDateExpired } = require('../utils/adminUtils');
 
 module.exports = async function (req, res, next) {
@@ -29,10 +30,12 @@ module.exports = async function (req, res, next) {
           if (banDateExpired(foundUser.currentBan.dateTo)) {
             await unbanUser(foundUser);
           } else {
+            const foundBan = await Ban.findById(foundUser.currentBan?._ban);
+
             return res.status(401).json({
               error: `You are banned until ${new Date(
                 foundUser.currentBan.dateTo
-              ).toLocaleDateString()} ${
+              ).toLocaleDateString()}. ${
                 foundBan.reason ? `\nReason: ${foundBan.reason}` : ''
               }`,
             });
