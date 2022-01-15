@@ -31,6 +31,11 @@ const Ban = new Schema(
       default: false,
       required: true,
     },
+    reason: {
+      type: String,
+      default: '',
+      required: false,
+    },
   },
   { timestamps: true }
 );

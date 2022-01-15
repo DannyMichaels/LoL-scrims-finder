@@ -5,9 +5,9 @@ const escape = require('escape-html');
 const { REGIONS } = require('../utils/constants');
 const KEYS = require('../config/keys');
 const { unbanUser, banDateExpired } = require('../utils/adminUtils');
-
 // models
 const User = require('../models/user.model');
+const Ban = require('../models/ban.model');
 
 const divisionsWithNumbers = [
   'Iron',
@@ -100,10 +100,14 @@ const loginUser = async (req, res) => {
       if (banDateExpired(foundUser.currentBan.dateTo)) {
         await unbanUser(foundUser);
       } else {
+        const foundBan = await Ban.findById(foundUser.currentBan?._ban);
+
         return res.status(401).json({
           error: `You are banned until ${new Date(
             foundUser.currentBan.dateTo
-          ).toLocaleDateString()}`,
+          ).toLocaleDateString()}. ${
+            foundBan.reason ? `\nReason: ${foundBan.reason}` : ''
+          }`,
         });
       }
     }

@@ -7,7 +7,7 @@ const banUser = async (req, res) => {
   try {
     const { user = {} } = req;
 
-    const { banUserId = '', dateFrom, dateTo } = req.body;
+    const { banUserId = '', dateFrom, dateTo, reason = '' } = req.body;
 
     if (!banUserId) {
       return res.status(500).json({
@@ -53,6 +53,7 @@ const banUser = async (req, res) => {
       dateTo: new Date(dateTo),
       _bannedBy: user._id,
       isActive: true,
+      reason,
     });
 
     const savedBan = await newBan.save();
@@ -78,6 +79,8 @@ const banUser = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      dateFrom,
+      dateTo,
       bannedUserId: updatedUser._id,
       _bannedBy: user._id,
       _ban: savedBan._id,
