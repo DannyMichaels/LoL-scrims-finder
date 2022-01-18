@@ -195,6 +195,10 @@ const updateScrim = async (req, res) => {
 
   let isValid = mongoose.Types.ObjectId.isValid(id);
 
+  if (!isValid) {
+    return res.status(500).json({ error: 'invalid id' });
+  }
+
   const oneScrim = await Scrim.findById(id).select([
     '-teamOne',
     '-teamTwo',
@@ -202,10 +206,6 @@ const updateScrim = async (req, res) => {
     '-lobbyHost',
     '-editHistory',
   ]);
-
-  if (!isValid) {
-    return res.status(500).json({ error: 'invalid id' });
-  }
 
   if (!oneScrim) {
     return res.status(500).json({ error: 'scrim not found' });
