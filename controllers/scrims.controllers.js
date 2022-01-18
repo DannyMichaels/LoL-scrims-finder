@@ -204,7 +204,6 @@ const updateScrim = async (req, res) => {
     '-teamTwo',
     '-casters',
     '-lobbyHost',
-    '-editHistory',
   ]);
 
   if (!oneScrim) {
@@ -215,9 +214,9 @@ const updateScrim = async (req, res) => {
 
   if (oneScrim._doc.editHistory?.length) {
     editHistory = [
-      ...oneScrim.editHistory,
       {
-        previousData: JSON.stringify(oneScrim),
+        ...oneScrim._doc.editHistory,
+        previousTitle: oneScrim._doc.title,
         payload: JSON.stringify(req.body),
         _user: req.user,
       },
@@ -227,7 +226,7 @@ const updateScrim = async (req, res) => {
       {
         payload: JSON.stringify(req.body),
         _user: req.user,
-        previousData: JSON.stringify(oneScrim),
+        previousTitle: oneScrim._doc.title,
       },
     ];
   }

@@ -31,7 +31,7 @@ const PlayerSchema = new Schema({
 const EditHistory = new Schema(
   {
     payload: { type: String },
-    previousData: { type: String },
+    previousTitle: { type: String },
     _user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
