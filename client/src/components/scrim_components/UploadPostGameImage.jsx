@@ -15,6 +15,7 @@ import {
   addImageToScrim,
   removeImageFromScrim,
 } from '../../services/scrims.services';
+
 import * as FileManipulator from '../../models/FileManipulator';
 import * as ImageManipulator from '../../models/ImageManipulator';
 
@@ -93,17 +94,10 @@ export default function UploadPostGameImage({
     }
 
     try {
-      // const reader = new FileReader();
-
       setButtonDisabled(true);
 
       const base64 = await ImageManipulator.resize(file);
-
-      // send base64 string from client to back-end.
-      // reader.addEventListener('loadend', async () => {
-      //   const base64 = reader.result;
-      //   const resizedImage = await FileManipulator.resizeImage({maxWidth: 1, maxHeight: 1});
-
+   
       const requestBody = {
         timestampNow: Date.now(),
         base64,
