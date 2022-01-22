@@ -67,7 +67,7 @@ export default function UploadPostGameImage({
       setButtonDisabled(false);
 
       const errorMsg = error?.response?.data?.error ?? 'error removing image';
-      setCurrentAlert({ type: 'Error', message: errorMsg });
+      setCurrentAlert({ type: 'Error', message: JSON.stringify(errorMsg) });
     }
   };
 
@@ -147,7 +147,7 @@ export default function UploadPostGameImage({
 
       setCurrentAlert({
         type: 'Error',
-        message: err.toString(),
+        message: JSON.stringify(err),
       });
     }
   };
