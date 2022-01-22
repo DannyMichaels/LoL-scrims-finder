@@ -80,6 +80,15 @@ export default function UploadPostGameImage({
 
     if (!isImage) return;
 
+    const isValidSize = await FileManipulator.checkFileSize({
+      file,
+      fileInputRef,
+      setCurrentAlert,
+      maxFileSizeMib: 0.953674,
+    });
+
+    if (!isValidSize) return;
+
     let yes = window.confirm('Are you sure you want to upload this image?');
 
     if (!yes) {
