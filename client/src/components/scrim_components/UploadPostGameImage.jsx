@@ -18,6 +18,9 @@ import {
 import * as FileManipulator from '../../models/FileManipulator';
 import * as ImageManipulator from '../../models/ImageManipulator';
 
+import * as FileManipulator from '../../models/FileManipulator';
+import * as ImageManipulator from '../../models/ImageManipulator';
+
 // icons
 import UploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
@@ -75,6 +78,7 @@ export default function UploadPostGameImage({
 
     if (!isImage) return;
 
+
     const isValidSize = await FileManipulator.checkFileSize({
       file,
       fileInputRef,
@@ -90,6 +94,7 @@ export default function UploadPostGameImage({
       }
       return;
     }
+
 
     let yes = window.confirm('Are you sure you want to upload this image?');
 
