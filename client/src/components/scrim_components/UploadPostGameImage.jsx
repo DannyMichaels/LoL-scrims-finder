@@ -16,6 +16,7 @@ import {
   removeImageFromScrim,
 } from '../../services/scrims.services';
 import uploadToBucket from '../../utils/uploadToBucket';
+import FileManipulator from '../../models/FileManipulator';
 
 // icons
 import UploadIcon from '@mui/icons-material/CloudUpload';
@@ -24,22 +25,9 @@ import DeleteIcon from '@mui/icons-material/DeleteForever';
 // constants
 const MAX_FILE_SIZE_MIB = 0.953674; // 1 megabyte (in Memibyte format)
 
-/**
- * @method changeFileName
- * takes a file and changes its name
- * @param {File} file the file that is going to have it's name changes
- * @param {String} scrimId {scrim._id}
- */
 const changeFileName = async (file, scrimId) => {
-  // does this have to be async?
-  let fileExtension = file.name.substring(file.name.lastIndexOf('.')); // .jpg, .png, etc...
-  let newFileName = `${scrimId}-${Date.now()}${fileExtension}`; // make a new name: scrim._id, current time, and extension
-
-  // change name of file to something more traceable (I don't want users random names).
-  return Object.defineProperty(file, 'name', {
-    writable: true,
-    value: newFileName, // file extension isn't necessary with this approach.
-  });
+  let newFileName = `${scrimId}-${Date.now()}`; // make a new name: scrim._id, current time, and extension
+  return await FileManipulator.renameFile(file, newFileName);
 };
 
 // can also delete image here... maybe needs renaming
