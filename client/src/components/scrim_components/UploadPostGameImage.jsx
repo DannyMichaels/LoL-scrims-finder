@@ -11,11 +11,11 @@ import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
 
 // utils
-import S3FileUpload from 'react-s3';
 import {
   addImageToScrim,
   removeImageFromScrim,
 } from '../../services/scrims.services';
+import uploadToBucket from '../../utils/uploadToBucket';
 
 // icons
 import UploadIcon from '@mui/icons-material/CloudUpload';
@@ -53,14 +53,6 @@ export default function UploadPostGameImage({
   const fileInputRef = useRef();
   const { setCurrentAlert } = useAlerts();
   const [buttonDisabled, setButtonDisabled] = useState(false); // disable when uploading / deleting img
-
-  const config = {
-    bucketName: 'lol-scrimsfinder-bucket',
-    dirName: `postGameLobbyImages/${scrim._id}` /* optional */,
-    region: 'us-east-1',
-    accessKeyId: process.env.REACT_APP_S3_ACCESS_KEY_ID,
-    secretAccessKey: process.env.REACT_APP_S3_SECRET_ACCESS_KEY,
-  };
 
   const handleDeleteImage = async () => {
     try {
@@ -131,7 +123,12 @@ export default function UploadPostGameImage({
       await changeFileName(file, scrim._id); // change the file name to something more traceable.
 
       // upload the image to S3
-      const bucketData = await S3FileUpload.uploadFile(file, config);
+      // const bucketData = await S3FileUpload.uploadFile(file, config);
+      const bucketData = await uploadToBucket({
+        fileName: file.name,
+        dirName: `postGameLobbyImages/${scrim._id}`,
+        file: file,
+      });
 
       // after it has been successfully uploaded to S3, put the new image data in the back-end
       let newImage = {
@@ -162,7 +159,7 @@ export default function UploadPostGameImage({
 
       setCurrentAlert({
         type: 'Error',
-        message: err,
+        message: err.toString(),
       });
     }
   };
