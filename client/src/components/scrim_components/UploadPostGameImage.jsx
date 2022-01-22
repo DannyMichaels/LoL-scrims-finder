@@ -16,14 +16,11 @@ import {
   removeImageFromScrim,
 } from '../../services/scrims.services';
 import uploadToBucket from '../../utils/uploadToBucket';
-import FileManipulator from '../../models/FileManipulator';
+import * as FileManipulator from '../../models/FileManipulator';
 
 // icons
 import UploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/DeleteForever';
-
-// constants
-const MAX_FILE_SIZE_MIB = 0.953674; // 1 megabyte (in Memibyte format)
 
 const changeFileName = async (file, scrimId) => {
   let newFileName = `${scrimId}-${Date.now()}`; // make a new name: scrim._id, current time, and extension
@@ -75,26 +72,13 @@ export default function UploadPostGameImage({
     if (e.target.files.length === 0) return;
     let file = e.target.files[0];
 
-    const fileSize = file.size / 1024 / 1024; // in MiB
+    const isImage = await FileManipulator.checkIsImage({
+      file,
+      fileInputRef,
+      setCurrentAlert,
+    });
 
-    if (!/^image\//.test(file.type)) {
-      // if file type isn't an image, return
-      fileInputRef.current.value = '';
-      setCurrentAlert({
-        type: 'Error',
-        message: `File ${file.name} is not an image! \nonly images are allowed.`,
-      });
-      return;
-    }
-
-    if (fileSize > MAX_FILE_SIZE_MIB) {
-      fileInputRef.current.value = '';
-      setCurrentAlert({
-        type: 'Error',
-        message: `File ${file.name} is too big! \nmax allowed size: 1 MB.`,
-      });
-      return;
-    }
+    if (!isImage) return;
 
     let yes = window.confirm('Are you sure you want to upload this image?');
 
