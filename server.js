@@ -24,7 +24,7 @@ function createServer() {
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   };
 
-  app.use(cors());
+  app.use(cors(corsOptions));
   app.use(helmet()); // security with express-helmet
 
   app.use(bodyParser.json({ limit: '2mb' }));
