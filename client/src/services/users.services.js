@@ -1,4 +1,5 @@
 import api from './apiConfig';
+import axios from 'axios';
 
 export const getAllUsers = async () => {
   try {
@@ -65,14 +66,14 @@ export const getUserById = async (userId) => {
   }
 };
 
-export const getProfileImage = async (summonerName, region = 'na') => {
+export const getOPGGData = async (summonerName, region = 'na') => {
   try {
-    const response = await api.get(
+    const response = await axios.get(
       `https://lol-api-summoner.op.gg/api/${region}/complete/summoners?keyword=${summonerName}`
     );
 
     // returns an array, but because we pass the exact region and name, we return the first result.
-    return response.data[0];
+    return response.data.data[0];
   } catch (error) {
     throw error;
   }

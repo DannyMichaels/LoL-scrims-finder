@@ -25,6 +25,7 @@ import MyCreatedScrims from './../components/UserProfile_components/MyCreatedScr
 import UserParticipatedScrims from './../components/UserProfile_components/UserParticipatedScrims';
 import SendFriendRequest from './../components/UserProfile_components/SendFriendRequest';
 import BanUser from '../components/UserProfile_components/BanUser';
+import ProfileImage from '../components/UserProfile_components/ProfileImage';
 
 // services
 import {
@@ -165,7 +166,13 @@ export default function UserProfile() {
           container
           direction="row"
           alignItems="center"
-          justifyContent="space-between">
+          justifyContent="space-between"
+          sx={{ position: 'relative' }}>
+          <ProfileImage
+            summonerName={userData?.name}
+            region={userData?.region}
+          />
+
           <Typography variant="h1" className="inline-flex">
             <Tooltip
               title={`${userData?.name} is ${isOnline ? 'online' : 'offline'}`}>
