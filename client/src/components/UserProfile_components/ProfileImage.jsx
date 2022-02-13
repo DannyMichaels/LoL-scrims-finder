@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getOPGGData } from '../../services/users.services';
 import styled from '@emotion/styled';
 import CircularProgress from '@mui/material/CircularProgress';
+import FallbackImage from '../../assets/images/user/fallback-user.png';
 
 export default function ProfileImage({ summonerName, region }) {
   const [isLoaded, setLoaded] = useState(false);
@@ -13,7 +14,7 @@ export default function ProfileImage({ summonerName, region }) {
     const fetchImage = async () => {
       const opggData = await getOPGGData(summonerName, region);
 
-      setImage(opggData?.profile_image_url || '');
+      setImage(opggData?.profile_image_url || FallbackImage);
       setBorder(opggData?.solo_tier_info?.border_image_url || '');
       setLevel(opggData?.level || 0);
 
