@@ -168,52 +168,55 @@ export default function UserProfile() {
           alignItems="center"
           justifyContent="space-between"
           sx={{ position: 'relative' }}>
-          <ProfileImage
-            summonerName={userData?.name}
-            region={userData?.region}
-          />
-
-          <Typography variant="h1" className="inline-flex">
-            <Tooltip
-              title={`${userData?.name} is ${isOnline ? 'online' : 'offline'}`}>
-              <div className={classes.onlineCircle} />
-            </Tooltip>
-
-            <Tooltip title={`visit ${userData?.name}'s op.gg`}>
-              <a
-                className="link"
-                href={`https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`}
-                target="_blank"
-                rel="noopener noreferrer">
-                {userData?.isDonator ? (
-                  <Sparkles>{userData?.name}</Sparkles>
-                ) : (
-                  userData?.name
-                )}
-              </a>
-            </Tooltip>
-            {userData?.isDonator && (
+          <Grid item style={{ display: 'flex', alignItems: 'center' }}>
+            <ProfileImage
+              summonerName={userData?.name}
+              region={userData?.region}
+            />
+            <Typography variant="h1" className="inline-flex">
               <Tooltip
-                placement="top"
-                title={`${userData?.name} helped keep this app alive!`}>
-                <span style={{ cursor: 'help', marginLeft: '8px' }}>
-                  <HonorIcon />
-                </span>
+                title={`${userData?.name} is ${
+                  isOnline ? 'online' : 'offline'
+                }`}>
+                <div className={classes.onlineCircle} />
               </Tooltip>
-            )}
 
-            {userData?.isAdmin && (
-              <Tooltip
-                placement="top"
-                title={`${userData?.name} is a verified admin`}>
-                <span style={{ cursor: 'help', marginLeft: '8px' }}>
-                  <VerifiedAdminIcon />
-                </span>
+              <Tooltip title={`visit ${userData?.name}'s op.gg`}>
+                <a
+                  className="link"
+                  href={`https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`}
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  {userData?.isDonator ? (
+                    <Sparkles>{userData?.name}</Sparkles>
+                  ) : (
+                    userData?.name
+                  )}
+                </a>
               </Tooltip>
-            )}
-          </Typography>
+              {userData?.isDonator && (
+                <Tooltip
+                  placement="top"
+                  title={`${userData?.name} helped keep this app alive!`}>
+                  <span style={{ cursor: 'help', marginLeft: '8px' }}>
+                    <HonorIcon />
+                  </span>
+                </Tooltip>
+              )}
 
-          <Grid item alignItems="center" direction="column">
+              {userData?.isAdmin && (
+                <Tooltip
+                  placement="top"
+                  title={`${userData?.name} is a verified admin`}>
+                  <span style={{ cursor: 'help', marginLeft: '8px' }}>
+                    <VerifiedAdminIcon />
+                  </span>
+                </Tooltip>
+              )}
+            </Typography>
+          </Grid>
+
+          <Grid item>
             {isCurrentUser ? (
               <ChangeBackground
                 userBg={userBg}
