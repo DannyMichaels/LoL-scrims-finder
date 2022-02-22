@@ -53,6 +53,7 @@ export default function useCountdown(dateToCountdownFrom, onComplete) {
       if (difference < 0) {
         // stop timer
         clearInterval(intervalRef.current);
+        setIsTimerStarted(false);
         onComplete();
       } else {
         setTimerDays(days);
@@ -68,7 +69,7 @@ export default function useCountdown(dateToCountdownFrom, onComplete) {
     return () => {
       clearInterval(intervalRef.current);
     };
-  });
+  }, [startTimer]);
 
   return { timerDays, timerHours, timerMinutes, timerSeconds, isTimerStarted };
 }

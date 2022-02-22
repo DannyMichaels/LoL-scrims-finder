@@ -44,7 +44,7 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
     return 'GAME IN PROGRESS';
   }, [scrim.teamWon, teamsFilled]);
 
-  if (!isTimerStarted) {
+  if (!gameStarted && !isTimerStarted) {
     return (
       <Fragment>
         <Grid container direction="column">
