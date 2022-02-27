@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
 import useAlerts from '../hooks/useAlerts';
 import useAuth, { useAuthActions } from '../hooks/useAuth';
+import useCSRF from './../hooks/useCSRF';
 
 // components
 import { Redirect } from 'react-router-dom';
@@ -25,6 +26,7 @@ import { KEYCODES } from '../utils/keycodes';
 
 // services
 import { registerUser } from '../services/auth.services';
+import { Helmet } from 'react-helmet';
 
 function getSteps() {
   return [
@@ -38,6 +40,7 @@ function getSteps() {
 export default function SignUp() {
   const { currentUser } = useAuth();
   const { setCurrentUser } = useAuthActions();
+  const { csrf } = useCSRF();
 
   const [userData, setUserData] = useState({
     name: '',

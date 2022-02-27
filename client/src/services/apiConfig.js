@@ -12,6 +12,7 @@ const apiUrl =
 
 const api = axios.create({
   baseURL: apiUrl,
+  withCredentials: true,
   headers: {
     'x-api-key': process.env.REACT_APP_API_KEY,
   },

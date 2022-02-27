@@ -30,6 +30,7 @@ import devLog from '../../utils/devLog';
 import { updateScrim, getScrimById } from '../../services/scrims.services';
 import { sample } from '../../utils/sample';
 import withAdminRoute from './../../utils/withAdminRoute';
+import useCSRF from './../../hooks/useCSRF';
 
 const RANDOM_HOST_CODE = '_$random'; // because input doesn't want value to be null, if lobbyhost is equal to this, send it as null in the back end
 
@@ -62,6 +63,8 @@ function ScrimEdit() {
 
   const [isUpdating, setIsUpdating] = useState(false);
   const [isUpdated, setUpdated] = useState(false);
+
+  const { csrf } = useCSRF();
 
   useEffect(() => {
     const prefillFormData = async () => {
