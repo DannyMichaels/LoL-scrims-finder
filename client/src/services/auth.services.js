@@ -1,7 +1,6 @@
 import api from './apiConfig';
 import devLog from '../utils/devLog';
 import jwt_decode from 'jwt-decode';
-import Cookies from 'universal-cookie';
 
 export const setAuthToken = (token) => {
   if (token) {
