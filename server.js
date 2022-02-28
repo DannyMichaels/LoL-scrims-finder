@@ -29,9 +29,6 @@ function createServer() {
 
   app.use(cors(corsOptions));
 
-  // parse cookies
-  // we need this because "cookie" is true in csrfProtection
-
   app.use(helmet()); // security with express-helmet
 
   app.use(express.json());
@@ -40,6 +37,8 @@ function createServer() {
     express.urlencoded({ extended: true, limit: '2mb' })
   ); /* bodyParser.urlencoded() is deprecated */
 
+  // parse cookies
+  // we need this because "cookie" is true in csrfProtection
   app.use(cookieParser());
   app.use(
     csrf({
