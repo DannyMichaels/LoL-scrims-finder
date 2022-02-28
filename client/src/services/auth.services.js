@@ -14,9 +14,6 @@ export const setAuthToken = (token) => {
 
 export const loginUser = async (googleParams) => {
   try {
-    // const cookie = String(await Cookies.get('csrf-token'));
-
-    // console.log('cookie', cookie);
     const response = await api.post('/auth/login', {
       email: googleParams.email,
       uid: googleParams.uid,
