@@ -18,18 +18,10 @@ export const loginUser = async (googleParams) => {
     // const cookie = String(await Cookies.get('csrf-token'));
 
     // console.log('cookie', cookie);
-    const response = await api.post(
-      '/auth/login',
-      {
-        email: googleParams.email,
-        uid: googleParams.uid,
-      },
-      {
-        headers: {
-          'csrf-token': Cookies.get('csrf-token'),
-        },
-      }
-    );
+    const response = await api.post('/auth/login', {
+      email: googleParams.email,
+      uid: googleParams.uid,
+    });
 
     if (response.data?.token) {
       const { token } = response.data;
@@ -110,12 +102,9 @@ export const removeToken = () => {
 
 export const getCSRFToken = async () => {
   const response = await api.get('/getCSRFToken');
-  api.defaults.headers.post['xsrf-token'] = response.data.csrfToken;
-  api.defaults.headers.put['xsrf-token'] = response.data.csrfToken;
-  api.defaults.headers.patch['xsrf-token'] = response.data.csrfToken;
   return response.data.csrfToken;
 };
 
 export const setCSRFToken = (csrfToken) => {
-  api.defaults.headers.common['xsrf-token'] = csrfToken;
+  api.defaults.headers.common['CSRF-Token'] = csrfToken;
 };

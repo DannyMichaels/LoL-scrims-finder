@@ -10,6 +10,7 @@ import useMessenger from './hooks/useMessenger';
 import useNotifications from './hooks/useNotifications';
 import useServerStatus from './hooks/useServerStatus';
 import { useCreateSocket } from './hooks/useSocket';
+import useCSRF from './hooks/useCSRF';
 
 // styles
 import { useAppStyles } from './styles/App.styles';
@@ -32,6 +33,7 @@ function App() {
 
   const appWrapperRef = useAppBackground(); // change the background image and blur whenever appBackground or appBgBlur change in the redux store
 
+  useCSRF();
   useServerStatus(); // check if server is online, if it's not redirects to error page.
   useCreateSocket(); // create socket for messenger
   useAuthVerify(); // verify user is authenticated.

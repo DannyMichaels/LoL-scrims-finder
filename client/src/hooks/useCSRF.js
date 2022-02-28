@@ -1,27 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { setCSRFToken, getCSRFToken } from '../services/auth.services';
 import { useCookies } from 'react-cookie';
+import { useHistory, useLocation } from 'react-router-dom';
 
 export default function useCSRF() {
-  const [cookies, setCookie, removeCookie] = useCookies(['_csrf-token-scrims']);
+  const history = useHistory();
+  const location = useLocation();
 
-  const [csrf, setCSRF] = useState('');
+  const [cookies /*, setCookie, removeCookie*/] = useCookies([
+    '_csrf',
+    'XSRF-TOKEN',
+  ]);
 
   useEffect(() => {
-    const fetchCSRF = async () => {
-      // const csrf = await getCSRFToken();
-      // setCookie('csrf-token', csrf);
-      // setCSRF(csrf);
+    const setCookies = async () => {
+      setCSRFToken(cookies['XSRF-TOKEN'] || (await getCSRFToken())); // fallback if cookie not coming in time
     };
-    fetchCSRF();
-  }, []);
+    setCookies();
+  }, [cookies, history, location]);
 
-  useEffect(() => {
-    console.log('token', cookies['csrf-token']);
-
-    setCSRFToken(cookies['csrf-token']);
-    setCSRF(cookies['csrf-token']);
-  }, [cookies, csrf]);
-
-  return { csrf, setCSRF };
+  return null;
 }

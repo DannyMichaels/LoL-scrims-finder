@@ -45,38 +45,36 @@ export function useAuthActions() {
     devLog('logging in...');
 
     // verifying user with google, then getting rest of data.
-    // const result = await auth.signInWithPopup(provider);
+    const result = await auth.signInWithPopup(provider);
 
-    // if (result.user) {
-    //   let googleParams = {
-    //     uid: result.user.uid, // google id
-    //     email: result.user.email,
-    //   };
+    if (result.user) {
+      try {
+        let googleParams = {
+          uid: result.user.uid, // google id
+          email: result.user.email,
+        };
 
-    const googleParams = {};
+        // token = `Bearer ${bcryptHash}`
+        const decodedUser = await loginUser(googleParams); // get the jwt token from backend with params
 
-    // token = `Bearer ${bcryptHash}`
-    try {
-      const decodedUser = await loginUser(googleParams); // get the jwt token from backend with params
+        if (decodedUser) {
+          setCurrentUser(decodedUser);
+          history.push('/');
+        }
+      } catch (error) {
+        const errorMsg =
+          error?.response?.data?.error ??
+          'error logging in, please try again later.';
 
-      if (decodedUser) {
-        setCurrentUser(decodedUser);
-        history.push('/');
+        dispatch({
+          type: 'alerts/setCurrentAlert',
+          payload: {
+            type: 'Error',
+            message: errorMsg,
+          },
+        });
       }
-    } catch (error) {
-      const errorMsg =
-        error?.response?.data?.error ??
-        'error logging in, please try again later.';
-
-      dispatch({
-        type: 'alerts/setCurrentAlert',
-        payload: {
-          type: 'Error',
-          message: errorMsg,
-        },
-      });
     }
-    // }
   };
 
   return { handleLogin, handleLogout, setCurrentUser };

@@ -1,14 +1,12 @@
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const passport = require('passport');
 const mongoSanitize = require('express-mongo-sanitize');
 const apiKey = require('./middleware/apiKey');
 const helmet = require('helmet');
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
-const csrfProtection = require('./middleware/csrf');
 
 // routes
 const scrimRoutes = require('./routes/scrims.routes');
@@ -37,8 +35,18 @@ function createServer() {
 
   app.use(helmet()); // security with express-helmet
 
-  app.use(bodyParser.json({ limit: '2mb' }));
-  app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }));
+  app.use(express.json());
+  // parse requests of content-type - application/x-www-form-urlencoded
+  app.use(
+    express.urlencoded({ extended: true, limit: '2mb' })
+  ); /* bodyParser.urlencoded() is deprecated */
+
+  app.use(cookieParser());
+  app.use(
+    csrf({
+      cookie: true,
+    })
+  );
 
   // to prohibited characters with _ (mongoSanitize)
   app.use(
@@ -55,24 +63,6 @@ function createServer() {
   // Passport config
   require('./config/passport')(passport);
 
-  app.use(cookieParser());
-  app.use(
-    csrf({
-      cookie: {
-        key: '_csrf-token-scrims',
-        path: '/context-route',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 3600, // 1-hour
-      },
-    })
-  );
-
-  // app.use('/', (req, res, next) => {
-  //   res.cookie('csrf-token', req.csrfToken());
-  //   next();
-  // });
-
   // this route doesn't need an api key because app.use(apikey) is called later
   app.get('/', (_req, res) => {
     res.send(
@@ -82,6 +72,15 @@ function createServer() {
 
   // require an api key for these routes
   app.use(apiKey);
+
+  app.use('/api', async function (req, res, next) {
+    try {
+      res.cookie('XSRF-TOKEN', req.csrfToken());
+      next();
+    } catch (error) {
+      throw res.status(500).json({ error: error.message });
+    }
+  });
 
   app.get('/api/getCSRFToken', (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
