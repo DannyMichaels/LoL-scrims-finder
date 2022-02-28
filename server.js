@@ -22,8 +22,7 @@ function createServer() {
   const app = express();
 
   const corsOptions = {
-    // origin: 'https://lol-scrims-finder.netlify.app',
-    origin: 'http://localhost:3001',
+    origin: 'https://lol-scrims-finder.netlify.app',
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
     credentials: true,
   };
