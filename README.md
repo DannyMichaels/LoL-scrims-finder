@@ -91,6 +91,16 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 
 - Added live socket new message notifications.
 
+### 01/22/2022
+- Moved image hosting away from AWS S3 to Digital Ocean.
+- post game lobby images now get resized on the client, and uploaded to S3 from the server.
+
+### 2/25/222 
+- Used my new [words API](https://gitcat-words-api.herokuapp.com/) for generating random lobby names during lobby creation (people always close theirs...).
+
+### 2/27/2022
+- Added Protection against CSRF attacks.
+
 ---
 
 <br />
