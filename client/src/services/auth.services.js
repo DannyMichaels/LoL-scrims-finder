@@ -14,6 +14,9 @@ export const setAuthToken = (token) => {
 
 export const loginUser = async (googleParams) => {
   try {
+    // const cookie = String(await Cookies.get('csrf-token'));
+
+    // console.log('cookie', cookie);
     const response = await api.post('/auth/login', {
       email: googleParams.email,
       uid: googleParams.uid,
@@ -94,4 +97,13 @@ export const updateUser = async (userData) => {
 export const removeToken = () => {
   devLog('removing token...');
   api.defaults.headers.common['Authorization'] = null;
+};
+
+export const getCSRFToken = async () => {
+  const response = await api.get('/getCSRFToken');
+  return response.data.csrfToken;
+};
+
+export const setCSRFToken = (csrfToken) => {
+  api.defaults.headers.common['CSRF-Token'] = csrfToken;
 };

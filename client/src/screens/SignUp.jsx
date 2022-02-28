@@ -38,7 +38,6 @@ function getSteps() {
 export default function SignUp() {
   const { currentUser } = useAuth();
   const { setCurrentUser } = useAuthActions();
-
   const [userData, setUserData] = useState({
     name: '',
     rank: '',

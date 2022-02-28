@@ -48,13 +48,13 @@ export function useAuthActions() {
     const result = await auth.signInWithPopup(provider);
 
     if (result.user) {
-      let googleParams = {
-        uid: result.user.uid, // google id
-        email: result.user.email,
-      };
-
-      // token = `Bearer ${bcryptHash}`
       try {
+        let googleParams = {
+          uid: result.user.uid, // google id
+          email: result.user.email,
+        };
+
+        // token = `Bearer ${bcryptHash}`
         const decodedUser = await loginUser(googleParams); // get the jwt token from backend with params
 
         if (decodedUser) {

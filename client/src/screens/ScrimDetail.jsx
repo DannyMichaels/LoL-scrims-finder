@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import useScrims from './../hooks/useScrims';
 import { useParams, useHistory } from 'react-router-dom';
 import ScrimSection from '../components/scrim_components/ScrimSection';
 import Navbar from '../components/shared/Navbar/Navbar';
@@ -12,7 +11,6 @@ import useAlerts from './../hooks/useAlerts';
 export default function ScrimDetail() {
   const { id } = useParams();
   const [scrim, setScrim] = useState(null);
-  const { scrims } = useScrims();
   const history = useHistory();
   const { setCurrentAlert } = useAlerts();
 
@@ -40,10 +38,9 @@ export default function ScrimDetail() {
       }
     };
     fetchScrimData();
-    // run this on mount and everytime scrims change.
 
     // eslint-disable-next-line
-  }, [id, scrims, history]);
+  }, [id, history]);
 
   if (!scrim) return <Loading text="Loading Scrim Data..." />;
 

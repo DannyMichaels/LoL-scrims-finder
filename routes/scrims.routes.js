@@ -2,12 +2,13 @@ const { Router } = require('express');
 const controllers = require('../controllers/scrims.controllers');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+// const csrfProtection = require('../middleware/csrf');
 
 const router = Router();
 
 router.get('/scrims', controllers.getAllScrims); // GET
 router.get('/scrims/today', controllers.getTodaysScrims); // GET
-router.post('/scrims', controllers.createScrim); // POST
+router.post('/scrims', admin, controllers.createScrim); // POST
 router.get('/scrims/:id', controllers.getScrimById); // GET
 router.put('/scrims/:id', admin, controllers.updateScrim); // PUT
 

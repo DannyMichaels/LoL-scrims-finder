@@ -1,11 +1,14 @@
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const passport = require('passport');
 const mongoSanitize = require('express-mongo-sanitize');
 const apiKey = require('./middleware/apiKey');
+const helmet = require('helmet');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
 
+// routes
 const scrimRoutes = require('./routes/scrims.routes');
 const userRoutes = require('./routes/users.routes');
 const authRoutes = require('./routes/auth.routes');
@@ -14,7 +17,6 @@ const messageRoutes = require('./routes/messages.routes');
 const friendRoutes = require('./routes/friends.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const adminRoutes = require('./routes/admin.routes');
-const helmet = require('helmet');
 
 function createServer() {
   const app = express();
@@ -22,13 +24,28 @@ function createServer() {
   const corsOptions = {
     origin: 'https://lol-scrims-finder.netlify.app',
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    credentials: true,
   };
 
   app.use(cors(corsOptions));
+
+  // parse cookies
+  // we need this because "cookie" is true in csrfProtection
+
   app.use(helmet()); // security with express-helmet
 
-  app.use(bodyParser.json({ limit: '2mb' }));
-  app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }));
+  app.use(express.json());
+  // parse requests of content-type - application/x-www-form-urlencoded
+  app.use(
+    express.urlencoded({ extended: true, limit: '2mb' })
+  ); /* bodyParser.urlencoded() is deprecated */
+
+  app.use(cookieParser());
+  app.use(
+    csrf({
+      cookie: true,
+    })
+  );
 
   // to prohibited characters with _ (mongoSanitize)
   app.use(
@@ -42,6 +59,9 @@ function createServer() {
 
   app.use(logger('dev'));
 
+  // Passport config
+  require('./config/passport')(passport);
+
   // this route doesn't need an api key because app.use(apikey) is called later
   app.get('/', (_req, res) => {
     res.send(
@@ -51,9 +71,21 @@ function createServer() {
 
   // require an api key for these routes
   app.use(apiKey);
-  app.use('/api', scrimRoutes);
 
-  app.get('/api/server-status', async (_req, res) => {
+  app.use('/api', async function (req, res, next) {
+    try {
+      res.cookie('XSRF-TOKEN', req.csrfToken());
+      next();
+    } catch (error) {
+      throw res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/getCSRFToken', (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+  });
+
+  app.get('/api/server-status', async (req, res) => {
     try {
       res.status(200).send({ isServerUp: true, success: true });
       return;
@@ -62,9 +94,7 @@ function createServer() {
     }
   });
 
-  // Passport config
-  require('./config/passport')(passport);
-
+  app.use('/api', scrimRoutes);
   app.use('/api', userRoutes);
   app.use('/api', authRoutes);
   app.use('/api', conversationRoutes);
@@ -72,9 +102,6 @@ function createServer() {
   app.use('/api', friendRoutes);
   app.use('/api', notificationRoutes);
   app.use('/api', adminRoutes);
-
-  // another way to require api key for a specific route only.
-  // router.get('/scrims', apiKey, controllers.getAllScrims);
 
   return app;
 }
