@@ -15,6 +15,7 @@ import EditUserModal from './../modals/EditUserModal';
 
 export default function ProfileAccountDetails({
   user,
+  setUser,
   userParticipatedScrims,
 }) {
   const {
@@ -133,6 +134,7 @@ export default function ProfileAccountDetails({
         openModal={openModal}
         onClose={handleModalClose}
         user={user}
+        setUser={setUser}
       />
     </>
   );
