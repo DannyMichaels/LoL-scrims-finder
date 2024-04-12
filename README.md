@@ -14,7 +14,6 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - Countdown Timer with lobby name and password. ✔️
 - Complete join, leave and swap functionality for players ✔️
 - Sessions with transactions in the back-end (solve the classic "move-ticket buy at same time") issue for same players clicking on spots at same time. ✔️
-- Desktop media queries. ✔️
 
 # POST-MVP
 
@@ -23,7 +22,6 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - Use the Riot Live Client API for summoner data.
 - Discord validation
 - Be able to host tournaments with classic tourney-style functionality and interface.
-- Mobile media queries
 
 <br />
 
