@@ -97,9 +97,13 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 
 - userAgent data now gets saved in the DB when logging in, that is for security purposes.
 
-# 4/30/2023
+### 4/30/2023
 - socket is now hosted with the server, instead of a different hierarchy
 - conversations on the messenger dropdown are now sorted by unseen messages, then by online status
+
+### 5/16/2023
+- rewrite some queries
+- change scrollbar in user profile page
 ---
 
 <br />
