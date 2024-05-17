@@ -126,15 +126,14 @@ const getUserCreatedScrims = async (req, res) => {
       return res.status(500).json({ error: 'invalid id' });
     }
 
-    let user = await User.findById(id);
+    const user = await User.findById(id);
 
-    let scrims = await Scrim.find();
+    const userCreatedScrims = await Scrim.find({
+      createdBy: user._id,
+    });
 
     if (!user) return res.status(404).json({ message: 'User not found!' });
 
-    const userCreatedScrims = scrims.filter(
-      (scrim) => String(scrim.createdBy) === String(user._id)
-    );
     return res.json(userCreatedScrims);
   } catch (error) {
     return res.status(500).json({ error: error.message });
