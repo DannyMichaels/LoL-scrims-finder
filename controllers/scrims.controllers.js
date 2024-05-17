@@ -26,6 +26,7 @@ const KEYS = require('../config/keys');
 const escape = require('escape-html');
 const createS3 = require('../utils/createS3');
 const uploadToBucket = require('../utils/uploadToBucket');
+const Cache = require('../utils/cache.js');
 
 // for post-game lobby image upload
 let s3Bucket = createS3();
@@ -33,6 +34,9 @@ let s3Bucket = createS3();
 // @route   GET /api/scrims
 // @desc    Get all scrims / games.
 // @access  Public
+const allScrimsCache = new Cache({
+  timeToLive: 60 * 60 * 1000, // 1 hour
+});
 const getAllScrims = async (req, res) => {
   const region = req.query?.region;
   // /api/scrims?region=NA
@@ -61,21 +65,23 @@ const getAllScrims = async (req, res) => {
   } else {
     // if no region, just get all scrims.
     // this is what we use in the app to get all scrims.
+    const cachedScrims = allScrimsCache.get('allScrims');
     try {
-      return await Scrim.find()
+      if (cachedScrims) {
+        return res.status(200).json(cachedScrims);
+      }
+
+      const result = await Scrim.find()
         .select('-editHistory')
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
         .populate('lobbyHost', populateUser)
         .populate(populateTeam('teamOne'))
         .populate(populateTeam('teamTwo'))
-        .exec((err, scrimData) => {
-          if (err) {
-            console.log(err);
-            return res.status(400).end();
-          }
-          return res.json(scrimData);
-        });
+        .exec();
+
+      allScrimsCache.set('allScrims', result);
+      return res.status(200).json(result);
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
@@ -163,6 +169,7 @@ const createScrim = async (req, res) => {
     scrim._conversation = scrimConversation._id;
 
     await scrim.save(); // save scrim
+    allScrimsCache.clear(); // clear
 
     const savedConversation = await scrimConversation.save(); // save conv
 
@@ -225,6 +232,8 @@ const updateScrim = async (req, res) => {
     editHistory,
   };
 
+  allScrimsCache.clear(); // clear
+
   await Scrim.findByIdAndUpdate(id, payload, { new: true }, (error, scrim) => {
     if (error) {
       return res.status(500).json({ error: error.message });
@@ -259,6 +268,7 @@ const deleteScrim = async (req, res) => {
     const deleted = await Scrim.findByIdAndDelete(id);
 
     if (deleted) {
+      allScrimsCache.clear(); // clear
       return res.status(200).send(`Scrim with id: ${escape(id)} deleted`);
     }
   } catch (error) {
