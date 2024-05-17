@@ -18,6 +18,7 @@
     "aws-sdk": "^2.1062.0",
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
+    "cross-env": "^7.0.3",
     "firebase": "^8.4.1",
     "firebase-tools": "^9.10.0",
     "html-entities": "^2.3.2",
@@ -45,6 +46,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
