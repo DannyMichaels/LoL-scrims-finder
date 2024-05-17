@@ -155,37 +155,19 @@ const getUserParticipatedScrims = async (req, res) => {
     }
 
     let user = await User.findById(id);
-
-    let scrims = await Scrim.find();
-
     if (!user) return res.status(404).json({ message: 'User not found!' });
 
-    const userParticipatedScrims = scrims.filter((scrim) => {
-      if (!scrim.teamWon) return false; // if no team won, that means the game didn't end yet.
+    const userParticipatedScrims = await Scrim.find({
+      $and: [{ teamWon: { $exists: true } }, { teamWon: { $ne: null } }],
+      // find the player in the teamOne or teamTwo
 
-      const scrimTeams = [...scrim.teamOne, ...scrim.teamTwo];
-
-      const scrimPlayers = scrimTeams.map(({ _user }) => String(_user));
-
-      const foundPlayer = scrimPlayers.find(
-        (userId) => String(user._id) === String(userId)
-      );
-
-      const foundCaster = scrim.casters.find(
-        (casterId) => String(casterId) === String(user._id)
-      );
-
-      if (foundPlayer) {
-        return true;
-      }
-
-      if (foundCaster) {
-        return true;
-      }
-
-      // else if he wasn't a caster or a player return false.
-      return false;
+      $or: [
+        { teamOne: { $elemMatch: { _user: user._id } } },
+        { teamTwo: { $elemMatch: { _user: user._id } } },
+        { casters: { $elemMatch: { _user: user._id } } },
+      ],
     });
+
     return res.json(userParticipatedScrims);
   } catch (error) {
     return res.status(500).json({ error: error.message });
