@@ -33,13 +33,15 @@ const Footer = ({ location }) => (
     <StyledFooter className="page-section site-footer">
       <InnerColumn>
         <Grid container justifyContent="space-between">
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href={`https://discordapp.com/users/${gitcatDiscordId}`}
-            className="link">
-            &copy; {currentYear} GitCat
-          </a>
+          <Sparkles>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={`https://discordapp.com/users/${gitcatDiscordId}`}
+              className="link">
+              &copy; {currentYear} GitCat
+            </a>
+          </Sparkles>
           {/* <a
             target="_blank"
             rel="noreferrer"
@@ -48,7 +50,7 @@ const Footer = ({ location }) => (
             Source
           </a> */}
 
-          <Sparkles>
+          {/* <Sparkles>
             <a
               target="_blank"
               rel="noreferrer"
@@ -56,7 +58,7 @@ const Footer = ({ location }) => (
               href="https://www.danielmichaelmusic.com">
               Support my music
             </a>
-          </Sparkles>
+          </Sparkles> */}
         </Grid>
       </InnerColumn>
     </StyledFooter>
