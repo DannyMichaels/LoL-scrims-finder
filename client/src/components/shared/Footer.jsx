@@ -34,13 +34,7 @@ const Footer = ({ location }) => (
       <InnerColumn>
         <Grid container justifyContent="space-between">
           <Sparkles>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href={`https://discordapp.com/users/${gitcatDiscordId}`}
-              className="link">
-              &copy; {currentYear} GitCat
-            </a>
+              &copy; {currentYear} Daniel Michael
           </Sparkles>
           {/* <a
             target="_blank"
