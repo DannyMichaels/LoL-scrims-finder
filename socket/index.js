@@ -75,6 +75,8 @@ const createSocket = (server) => {
       return;
     });
   });
+  
+  return io;
 };
 
 module.exports = createSocket;

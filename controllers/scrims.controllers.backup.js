@@ -34,215 +34,72 @@ const Cache = require('../utils/cache.js');
 // for post-game lobby image upload
 let s3Bucket = createS3();
 
-/**
- * Build MongoDB query from request parameters
- */
-const buildScrimQuery = (req) => {
-  const query = {};
-  
-  // Date filtering
-  if (req.query.date) {
-    const startDate = new Date(req.query.date);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(req.query.date);
-    endDate.setHours(23, 59, 59, 999);
-    
-    query.gameStartTime = {
-      $gte: startDate,
-      $lte: endDate
-    };
-  }
-  
-  // Date range filtering
-  if (req.query.startDate && req.query.endDate) {
-    query.gameStartTime = {
-      $gte: new Date(req.query.startDate),
-      $lte: new Date(req.query.endDate)
-    };
-  }
-  
-  // Region filtering
-  if (req.query.region) {
-    query.region = req.query.region;
-  }
-  
-  // Privacy filtering (default to public scrims only)
-  if (req.query.includePrivate !== 'true') {
-    query.isPrivate = { $ne: true };
-  }
-  
-  // Status filtering (current, upcoming, previous)
-  const now = new Date();
-  if (req.query.status) {
-    switch (req.query.status) {
-      case 'upcoming':
-        query.gameStartTime = { $gt: now };
-        query.teamWon = null;
-        break;
-      case 'current':
-        query.gameStartTime = { $lte: now };
-        query.teamWon = null;
-        break;
-      case 'previous':
-        query.gameStartTime = { $lte: now };
-        query.teamWon = { $ne: null };
-        break;
-    }
-  }
-  
-  // Team won filtering
-  if (req.query.teamWon) {
-    query.teamWon = req.query.teamWon;
-  }
-  
-  // Creator filtering
-  if (req.query.createdBy) {
-    query.createdBy = req.query.createdBy;
-  }
-  
-  // Lobby host filtering
-  if (req.query.lobbyHost) {
-    query.lobbyHost = req.query.lobbyHost;
-  }
-  
-  // Tournament status filtering
-  if (req.query.hasTournament === 'true') {
-    query['riotTournament.setupCompleted'] = true;
-  }
-  
-  // Full teams only
-  if (req.query.fullTeamsOnly === 'true') {
-    query.$and = [
-      { $expr: { $eq: [{ $size: '$teamOne' }, 5] } },
-      { $expr: { $eq: [{ $size: '$teamTwo' }, 5] } }
-    ];
-  }
-  
-  return query;
-};
-
-/**
- * Build sort options from request parameters
- */
-const buildSortOptions = (req) => {
-  const sortBy = req.query.sortBy || 'gameStartTime';
-  const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
-  
-  const sortOptions = {};
-  sortOptions[sortBy] = sortOrder;
-  
-  // Secondary sort by creation date for stable ordering
-  if (sortBy !== 'createdAt') {
-    sortOptions.createdAt = -1;
-  }
-  
-  return sortOptions;
-};
-
 // @route   GET /api/scrims
-// @desc    Get scrims with advanced filtering and pagination
+// @desc    Get all scrims / games.
 // @access  Public
+const allScrimsCache = new Cache({
+  timeToLive: 60 * 60 * 1000, // 1 hour
+});
 const getAllScrims = async (req, res) => {
-  try {
-    // Build query from request parameters
-    const query = buildScrimQuery(req);
-    
-    // Build sort options
-    const sortOptions = buildSortOptions(req);
-    
-    // Pagination
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
-    const skip = (page - 1) * limit;
-    
-    // Execute query with pagination
-    const [scrims, totalCount] = await Promise.all([
-      Scrim.find(query)
+  const region = req.query?.region;
+  // /api/scrims?region=NA
+  // right now the region query isn't being used in the app.
+  if (region) {
+    try {
+      // might have to use populate on this, not necessary now.
+      return await Scrim.find({ region: region })
         .select('-editHistory')
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
         .populate('lobbyHost', populateUser)
         .populate(populateTeam('teamOne'))
         .populate(populateTeam('teamTwo'))
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(limit)
-        .lean()
-        .exec(),
-      Scrim.countDocuments(query)
-    ]);
-    
-    // Calculate pagination metadata
-    const totalPages = Math.ceil(totalCount / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
-    
-    // For backward compatibility, if no specific query params, return simple array
-    if (!req.query.page && !req.query.status && !req.query.date && !req.query.sortBy) {
-      return res.status(200).json(scrims);
+        .exec((err, scrimData) => {
+          if (err) {
+            console.log(err);
+            return res.status(400).end();
+          }
+          return res.json(scrimData);
+        });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+      return;
     }
-    
-    return res.status(200).json({
-      success: true,
-      data: scrims,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalCount,
-        limit,
-        hasNextPage,
-        hasPrevPage
+  } else {
+    // if no region, just get all scrims.
+    // this is what we use in the app to get all scrims.
+    const cachedScrims = allScrimsCache.get('allScrims');
+    try {
+      if (cachedScrims) {
+        return res.status(200).json(cachedScrims);
       }
-    });
-  } catch (error) {
-    console.error('Error fetching scrims:', error);
-    return res.status(500).json({ 
-      success: false,
-      error: error.message 
-    });
+
+      const result = await Scrim.find()
+        .select('-editHistory')
+        .populate('createdBy', populateUser)
+        .populate('casters', populateUser)
+        .populate('lobbyHost', populateUser)
+        .populate(populateTeam('teamOne'))
+        .populate(populateTeam('teamTwo'))
+        .exec();
+
+      allScrimsCache.set('allScrims', result);
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
   }
 };
 // @route   GET /api/scrims/today
-// @desc    Get today's scrims with proper date filtering
+// @desc    Get all scrims where the gameStartTime is today, can be scuffed with live server due to different timezone on server host.
+// this is not used in the app, but may be useful.
 // @access  Public
-const getTodaysScrims = async (req, res) => {
+const getTodaysScrims = async (_req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const query = {
-      gameStartTime: {
-        $gte: today,
-        $lt: tomorrow
-      }
-    };
-    
-    // Add region filter if provided
-    if (req.query.region) {
-      query.region = req.query.region;
-    }
-    
-    // Add privacy filter
-    if (req.query.includePrivate !== 'true') {
-      query.isPrivate = { $ne: true };
-    }
-    
-    const scrims = await Scrim.find(query)
-      .select('-editHistory')
-      .populate('createdBy', populateUser)
-      .populate('casters', populateUser)
-      .populate('lobbyHost', populateUser)
-      .populate(populateTeam('teamOne'))
-      .populate(populateTeam('teamTwo'))
-      .sort({ gameStartTime: 1 })
-      .lean()
-      .exec();
-    
-    return res.status(200).json(scrims);
+    const scrims = await Scrim.find().select('-editHistory');
+    const todaysScrims = scrims.filter(checkIfScrimIsToday);
+    return res.json(todaysScrims);
   } catch (error) {
-    console.error('Error fetching today\'s scrims:', error);
     return res.status(500).json({ error: error.message });
   }
 };

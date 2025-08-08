@@ -78,63 +78,135 @@ export default function ScrimSectionMiddleAreaBox({
             <>
               {!gameEnded && (
                 <>
-                  {/* show lobby name and pswd only to players in lobby or admins */}
+                  {/* show lobby info only to players in lobby or admins */}
                   {playerEntered || casterEntered || isCurrentUserAdmin ? (
                     <>
-                      <Grid item container direction="row" alignItems="center">
-                        <Typography variant="h2">
-                          Lobby host / captain: {scrim.lobbyHost?.name}
-                        </Typography>
-                        <Box marginRight={2} />
-                        <Tooltip
-                          title="It's expected of the lobby captain to create the custom lobby and select who won after the game, 
-                        AND to upload the post-game image to verify the winner">
-                          <InfoIcon
-                            style={{ cursor: 'help' }}
-                            fontSize="large"
-                          />
-                        </Tooltip>
-                      </Grid>
-                      <Typography variant="h3">
-                        {/* the lobby name to make the custom game in LoL 
-                        (used to be randomly generated but now is just scrim.title + "Custom Game" + region)
-                        */}
-                        please make the lobby name: <br />
-                        &nbsp;
-                        <Tooltip title="Copy lobby name to clipboard">
-                          <span
-                            className="link"
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => {
-                              copyTextToClipboard(scrim.lobbyName);
-                              setCurrentAlert({
-                                type: 'Success',
-                                message: 'lobby name copied to clipboard',
-                              });
-                            }}>
-                            "{scrim.lobbyName}"
-                          </span>
-                        </Tooltip>
-                      </Typography>
-                      <Typography variant="h3">
-                        {/* the lobby password to make the custom game in LoL 
-                        (randomly generated) */}
-                        with the password: &nbsp;
-                        <Tooltip title="Copy password to clipboard">
-                          <span
-                            className="link"
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => {
-                              copyTextToClipboard(scrim.lobbyPassword);
-                              setCurrentAlert({
-                                type: 'Success',
-                                message: 'password copied to clipboard',
-                              });
-                            }}>
-                            {scrim.lobbyPassword}
-                          </span>
-                        </Tooltip>
-                      </Typography>
+                      {/* Check if we have a Riot tournament code */}
+                      {scrim.riotTournament?.tournamentCode ? (
+                        <>
+                          <Grid item container direction="column" spacing={2}>
+                            <Grid item>
+                              <Typography variant="h2" style={{ color: '#4CAF50' }}>
+                                🎮 Tournament Lobby Ready!
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item container direction="row" alignItems="center">
+                              <Typography variant="h3">
+                                Tournament Code:
+                              </Typography>
+                              <Box marginLeft={2}>
+                                <Tooltip title="Click to copy tournament code">
+                                  <Button
+                                    variant="contained"
+                                    style={{ 
+                                      backgroundColor: '#4CAF50',
+                                      color: 'white',
+                                      fontWeight: 'bold',
+                                      fontSize: '1.1em',
+                                      padding: '10px 20px'
+                                    }}
+                                    onClick={() => {
+                                      copyTextToClipboard(scrim.riotTournament.tournamentCode);
+                                      setCurrentAlert({
+                                        type: 'Success',
+                                        message: 'Tournament code copied! Paste it in the League client to join.',
+                                      });
+                                    }}>
+                                    {scrim.riotTournament.tournamentCode}
+                                  </Button>
+                                </Tooltip>
+                              </Box>
+                            </Grid>
+                            
+                            <Grid item>
+                              <Typography variant="body1" style={{ fontStyle: 'italic' }}>
+                                📋 <strong>How to join:</strong>
+                              </Typography>
+                              <Typography variant="body2" style={{ marginLeft: '20px' }}>
+                                1. Open League of Legends client<br/>
+                                2. Click "Play" → "Create Custom" → "Tournament Code"<br/>
+                                3. Paste the code above and click "Join"<br/>
+                                4. The lobby is automatically configured with:<br/>
+                                {'\u00A0\u00A0\u00A0\u00A0'}• Tournament Draft mode (competitive pick/ban)<br/>
+                                {'\u00A0\u00A0\u00A0\u00A0'}• Private access (only those with the code can join)<br/>
+                                {'\u00A0\u00A0\u00A0\u00A0'}• Automatic game recording for results
+                              </Typography>
+                            </Grid>
+                            
+                            <Grid item container direction="row" alignItems="center">
+                              <Typography variant="body2">
+                                <strong>Lobby Captain:</strong> {scrim.lobbyHost?.name || 'Auto-assigned'}
+                              </Typography>
+                              <Box marginLeft={1}>
+                                <Tooltip title="The lobby captain is responsible for reporting the winner after the game">
+                                  <InfoIcon style={{ cursor: 'help', fontSize: '18px' }} />
+                                </Tooltip>
+                              </Box>
+                            </Grid>
+                          </Grid>
+                        </>
+                      ) : (
+                        <>
+                          {/* Fallback to manual lobby creation if tournament code fails */}
+                          <Grid item container direction="row" alignItems="center">
+                            <Typography variant="h2">
+                              Lobby host / captain: {scrim.lobbyHost?.name}
+                            </Typography>
+                            <Box marginRight={2} />
+                            <Tooltip
+                              title="The lobby captain must create the custom lobby manually and select who won after the game">
+                              <InfoIcon
+                                style={{ cursor: 'help' }}
+                                fontSize="large"
+                              />
+                            </Tooltip>
+                          </Grid>
+                          
+                          <Typography variant="h3" style={{ color: '#ff9800' }}>
+                            ⚠️ Manual Lobby Creation Required
+                          </Typography>
+                          <Typography variant="body2" style={{ marginBottom: '10px', fontStyle: 'italic' }}>
+                            Tournament code generation failed. Please create the lobby manually:
+                          </Typography>
+                          
+                          <Typography variant="h3">
+                            Lobby name: <br />
+                            {' '}
+                            <Tooltip title="Copy lobby name to clipboard">
+                              <span
+                                className="link"
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                  copyTextToClipboard(scrim.lobbyName);
+                                  setCurrentAlert({
+                                    type: 'Success',
+                                    message: 'Lobby name copied to clipboard',
+                                  });
+                                }}>
+                                "{scrim.lobbyName}"
+                              </span>
+                            </Tooltip>
+                          </Typography>
+                          <Typography variant="h3">
+                            Password: {' '}
+                            <Tooltip title="Copy password to clipboard">
+                              <span
+                                className="link"
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                  copyTextToClipboard(scrim.lobbyPassword);
+                                  setCurrentAlert({
+                                    type: 'Success',
+                                    message: 'Password copied to clipboard',
+                                  });
+                                }}>
+                                {scrim.lobbyPassword}
+                              </span>
+                            </Tooltip>
+                          </Typography>
+                        </>
+                      )}
                     </>
                   ) : (
                     <></>
@@ -258,7 +330,7 @@ export default function ScrimSectionMiddleAreaBox({
           ) : (
             <>
               <Typography variant="h2">
-                Not enough players:&nbsp;
+                Not enough players:{' '}
                 {`${teamOne.length + teamTwo.length}/10`}
               </Typography>
               <Typography variant="h5" component="p" className="text-white">
@@ -266,9 +338,9 @@ export default function ScrimSectionMiddleAreaBox({
                 {/* if teamOne still needs players show this else don't show */}
                 {teamOneDifference > 0 ? (
                   <>
-                    &nbsp;{teamOneDifference}&nbsp;
+                    {' '}{teamOneDifference}{' '}
                     {/* spell check singular and plural with pluralize */}
-                    {pluralize('players', teamOneDifference)} in Team 1&nbsp;
+                    {pluralize('players', teamOneDifference)} in Team 1{' '}
                     <br />
                   </>
                 ) : null}
@@ -276,9 +348,9 @@ export default function ScrimSectionMiddleAreaBox({
                 {teamTwoDifference > 0 ? (
                   <>
                     {/* if team one needs players, show 'and', else don't show 'and' */}
-                    {teamOneDifference > 0 ? 'and' : ''}&nbsp;
+                    {teamOneDifference > 0 ? 'and' : ''}{' '}
                     {teamTwoDifference}
-                    &nbsp;{pluralize('players', teamTwoDifference)} in Team 2
+                    {' '}{pluralize('players', teamTwoDifference)} in Team 2
                     <br />
                   </>
                 ) : null}

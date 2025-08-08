@@ -93,8 +93,46 @@ const Scrim = new Schema(
 
     // track edits for the scrim
     editHistory: { type: [EditHistory], default: [] },
+
+    // Riot Tournament API data
+    riotTournament: {
+      providerId: { type: Number, default: null },
+      tournamentId: { type: Number, default: null },
+      tournamentCode: { type: String, default: null },
+      setupCompleted: { type: Boolean, default: false },
+      setupTimestamp: { type: Date, default: null },
+      lobbyCreated: { type: Boolean, default: false },
+      gameId: { type: String, default: null }, // Game ID from Riot callback
+      gameCompleted: { type: Boolean, default: false },
+      gameCompletedAt: { type: Date, default: null },
+      riotCallbackData: { type: Object, default: null } // Store full callback data
+    },
   },
   { timestamps: true, optimisticConcurrency: true, versionKey: 'version' }
 );
+
+// Indexes for query optimization
+// Compound index for date and region filtering (most common query)
+Scrim.index({ gameStartTime: 1, region: 1, isPrivate: 1 });
+
+// Individual indexes for common queries
+Scrim.index({ gameStartTime: 1 });
+Scrim.index({ region: 1 });
+Scrim.index({ createdBy: 1 });
+Scrim.index({ lobbyHost: 1 });
+Scrim.index({ teamWon: 1 });
+Scrim.index({ isPrivate: 1 });
+Scrim.index({ 'riotTournament.setupCompleted': 1 });
+
+// Text index for searching by title
+Scrim.index({ title: 'text' });
+
+// Compound index for user participation queries
+Scrim.index({ 'teamOne._user': 1 });
+Scrim.index({ 'teamTwo._user': 1 });
+Scrim.index({ casters: 1 });
+
+// Index for sorting by creation date
+Scrim.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Scrim', Scrim, 'scrims');

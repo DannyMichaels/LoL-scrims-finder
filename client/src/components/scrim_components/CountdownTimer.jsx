@@ -27,7 +27,13 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
   );
 
   const gameStatusText = useMemo(() => {
-    if (!teamsFilled) return 'WAITING FOR PLAYERS';
+    if (!teamsFilled) {
+      // Check if we have a tournament code but teams aren't full
+      if (scrim.riotTournament?.tournamentCode) {
+        return 'TOURNAMENT CODE NOT GENERATED - TEAMS NOT FULL';
+      }
+      return 'WAITING FOR PLAYERS';
+    }
 
     const winnerAliases = {
       teamOne: 'Team One (Blue Side)',
@@ -41,8 +47,13 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
         </Sparkles>
       );
 
+    // Check if tournament is ready
+    if (scrim.riotTournament?.tournamentCode) {
+      return 'TOURNAMENT LOBBY READY';
+    }
+    
     return 'GAME IN PROGRESS';
-  }, [scrim.teamWon, teamsFilled]);
+  }, [scrim.teamWon, teamsFilled, scrim.riotTournament]);
 
   if (!isTimerStarted) {
     return (

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:developer.riotgames.com)"
+    ],
+    "deny": []
+  }
+}

@@ -14,7 +14,7 @@ import { banUser, unbanUser } from '../../services/admin.services.js';
 
 // icons
 import BanIcon from '@mui/icons-material/Gavel';
-import UnbanIcon from '@mui/icons-material/AccessibilityNew';
+import AccessibilityNewIcon from '@mui/icons-material/AccessibilityNew';
 
 export default function BanUser({ user, setUser }) {
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
@@ -142,7 +142,7 @@ export default function BanUser({ user, setUser }) {
               marginLeft: !matchesSm ? '0' : '20px',
               marginTop: '20px',
             }}
-            startIcon={<UnbanIcon />}
+            startIcon={<AccessibilityNewIcon />}
             variant="contained"
             disabled={buttonsDisabled || !isBanned}
             onClick={onUnbanClick}>
