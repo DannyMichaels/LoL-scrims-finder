@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import AdminArea from './../shared/AdminArea';
 import MessengerButton from './../Messenger_components/MessengerButton';
+import AdminPlayerControls from './AdminPlayerControls';
 
 // utils
 import 'moment-timezone';
@@ -32,6 +33,8 @@ import { findScrimConversation } from '../../services/conversations.services';
 export default function ScrimSectionHeader({
   // props passed from ScrimSection.jsx
   scrim,
+  setScrim,
+  socket,
   gameEnded,
   casterEntered,
   joinCast,
@@ -194,6 +197,14 @@ export default function ScrimSectionHeader({
                   Close event
                 </Button>
               </Tooltip>
+            </Grid>
+
+            <Grid item>
+              <AdminPlayerControls 
+                scrim={scrim}
+                setScrim={setScrim}
+                socket={socket}
+              />
             </Grid>
           </AdminArea>
         </Grid>

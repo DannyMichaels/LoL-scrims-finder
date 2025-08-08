@@ -99,4 +99,18 @@ router.patch(
   controllers.swapPlayersInScrim
 ); // PATCH
 
+router.patch(
+  '/scrims/:scrimId/admin-assign-player',
+  passport.authenticate('jwt', { session: false }),
+  admin,
+  controllers.adminAssignPlayer
+); // PATCH
+
+router.patch(
+  '/scrims/:scrimId/admin-fill-random',
+  passport.authenticate('jwt', { session: false }),
+  admin,
+  controllers.adminFillRandomPositions
+); // PATCH
+
 module.exports = router;

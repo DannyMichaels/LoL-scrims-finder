@@ -13,6 +13,7 @@ import ScrimSectionMiddleAreaBox from './ScrimSectionMiddleAreaBox';
 import ScrimSectionHeader from './ScrimSectionHeader';
 import { PageSection } from '../shared/PageComponents';
 import ScrimSectionExpander from './ScrimSectionExpander';
+import AdminPlayerControls from './AdminPlayerControls';
 
 // services
 import {
@@ -241,6 +242,8 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       <div className={classes.scrimBox} ref={scrimBoxRef}>
         <ScrimSectionHeader
           scrim={scrim}
+          setScrim={setScrim}
+          socket={socket}
           joinCast={joinCast}
           leaveCast={leaveCast}
           handleDeleteScrim={handleDeleteScrim}

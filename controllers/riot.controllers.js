@@ -253,7 +253,7 @@ const updateTournamentParticipants = async (req, res) => {
     }
 
     // Update tournament code with participants
-    await riotServices.updateTournamentCode(scrim.riotTournament.tournamentCode, {
+    await riotServices.updateTournamentCode(scrim.riotTournament.tournamentCode, scrim.region, {
       allowedParticipants: participants
     });
 
@@ -297,7 +297,7 @@ const getLobbyEvents = async (req, res) => {
       });
     }
 
-    const lobbyEvents = await riotServices.getLobbyEvents(scrim.riotTournament.tournamentCode);
+    const lobbyEvents = await riotServices.getLobbyEvents(scrim.riotTournament.tournamentCode, scrim.region);
 
     return res.status(200).json({
       success: true,

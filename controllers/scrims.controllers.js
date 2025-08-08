@@ -1389,6 +1389,243 @@ const cancelScrim = async (req, res) => {
   }
 };
 
+// @route   PATCH /api/scrims/:scrimId/admin-assign-player
+// @desc    Admin manually assigns a player to a specific position
+// @access  Private (admin only)
+const adminAssignPlayer = async (req, res) => {
+  try {
+    const { scrimId } = req.params;
+    const { userId, teamName, role } = req.body;
+
+    // Validate required fields
+    if (!userId || !teamName || !role) {
+      return res.status(400).json({
+        error: 'userId, teamName, and role are required'
+      });
+    }
+
+    // Check if scrim exists
+    const scrim = await Scrim.findById(scrimId);
+    if (!scrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Validate team name
+    if (!['teamOne', 'teamTwo'].includes(teamName)) {
+      return res.status(400).json({ error: 'Invalid team name. Must be teamOne or teamTwo' });
+    }
+
+    // Validate role
+    const validRoles = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ error: `Invalid role. Must be one of: ${validRoles.join(', ')}` });
+    }
+
+    // Check if player is already in the scrim
+    const playerExists = [...scrim.teamOne, ...scrim.teamTwo].find(
+      (player) => String(player._user) === String(user._id)
+    );
+
+    // Check if player is a caster
+    const casterExists = scrim.casters.find(
+      (caster) => String(caster._id) === String(user._id)
+    );
+
+    if (casterExists) {
+      return res.status(400).json({
+        error: 'User is already a caster for this game'
+      });
+    }
+
+    // Check if position is already taken
+    const spotTaken = scrim[teamName].find(
+      (player) => player.role === role
+    );
+
+    if (spotTaken) {
+      return res.status(400).json({
+        error: `${role} position in ${teamName} is already taken by ${spotTaken._user?.name || 'another player'}`
+      });
+    }
+
+    const playerData = {
+      role,
+      team: { name: teamName },
+      _user: user._id
+    };
+
+    let updateQuery = {};
+
+    if (playerExists) {
+      // Remove player from current position first
+      const currentTeam = playerExists.team.name;
+      const currentTeamArray = scrim[currentTeam].filter(
+        (player) => String(player._user) !== String(user._id)
+      );
+      
+      // Add to new position
+      const newTeamArray = [...scrim[teamName], playerData];
+      
+      updateQuery = {
+        [currentTeam]: currentTeamArray,
+        [teamName]: newTeamArray
+      };
+    } else {
+      // Just add player to the team
+      updateQuery = {
+        [teamName]: [...scrim[teamName], playerData]
+      };
+    }
+
+    const updatedScrim = await Scrim.findByIdAndUpdate(
+      scrimId,
+      updateQuery,
+      { new: true }
+    )
+      .populate('createdBy', populateUser)
+      .populate('casters', populateUser)
+      .populate('lobbyHost', populateUser)
+      .populate(populateTeam('teamOne'))
+      .populate(populateTeam('teamTwo'));
+
+    if (!updatedScrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    return res.status(200).json(updatedScrim);
+  } catch (error) {
+    console.error('Error in admin assign player:', error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// @route   PATCH /api/scrims/:scrimId/admin-fill-random
+// @desc    Admin fills all empty positions with random available users
+// @access  Private (admin only)
+const adminFillRandomPositions = async (req, res) => {
+  try {
+    const { scrimId } = req.params;
+    const { region } = req.body; // Optional region filter
+
+    const scrim = await Scrim.findById(scrimId);
+    if (!scrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    // Get all empty positions
+    const allRoles = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
+    const emptyPositions = [];
+
+    // Check teamOne
+    const teamOneRoles = scrim.teamOne.map(player => player.role);
+    const teamOneEmpty = allRoles.filter(role => !teamOneRoles.includes(role));
+    teamOneEmpty.forEach(role => {
+      emptyPositions.push({ team: 'teamOne', role });
+    });
+
+    // Check teamTwo
+    const teamTwoRoles = scrim.teamTwo.map(player => player.role);
+    const teamTwoEmpty = allRoles.filter(role => !teamTwoRoles.includes(role));
+    teamTwoEmpty.forEach(role => {
+      emptyPositions.push({ team: 'teamTwo', role });
+    });
+
+    if (emptyPositions.length === 0) {
+      return res.status(400).json({ error: 'No empty positions to fill' });
+    }
+
+    // Get users already in this scrim
+    const currentPlayers = [...scrim.teamOne, ...scrim.teamTwo].map(
+      player => String(player._user)
+    );
+    const currentCasters = scrim.casters.map(caster => String(caster._id));
+    const excludeUsers = [...currentPlayers, ...currentCasters];
+
+    // Build query to find available users
+    const userQuery = {
+      _id: { $nin: excludeUsers }
+    };
+
+    // Add region filter if provided
+    if (region) {
+      userQuery.region = region.toUpperCase();
+    } else {
+      // Default to scrim's region
+      userQuery.region = scrim.region;
+    }
+
+    // Get random users (more than needed in case some are filtered out)
+    const availableUsers = await User.find(userQuery)
+      .select(['_id', 'name', 'discord', 'rank', 'region'])
+      .limit(emptyPositions.length * 3) // Get extra users in case we need them
+      .lean();
+
+    if (availableUsers.length < emptyPositions.length) {
+      return res.status(400).json({
+        error: `Not enough available users. Found ${availableUsers.length}, need ${emptyPositions.length}`
+      });
+    }
+
+    // Shuffle available users
+    const shuffledUsers = availableUsers.sort(() => 0.5 - Math.random());
+
+    // Assign users to positions
+    const updatedTeamOne = [...scrim.teamOne];
+    const updatedTeamTwo = [...scrim.teamTwo];
+
+    emptyPositions.forEach((position, index) => {
+      const user = shuffledUsers[index];
+      const playerData = {
+        role: position.role,
+        team: { name: position.team },
+        _user: user._id
+      };
+
+      if (position.team === 'teamOne') {
+        updatedTeamOne.push(playerData);
+      } else {
+        updatedTeamTwo.push(playerData);
+      }
+    });
+
+    const updatedScrim = await Scrim.findByIdAndUpdate(
+      scrimId,
+      {
+        teamOne: updatedTeamOne,
+        teamTwo: updatedTeamTwo
+      },
+      { new: true }
+    )
+      .populate('createdBy', populateUser)
+      .populate('casters', populateUser)
+      .populate('lobbyHost', populateUser)
+      .populate(populateTeam('teamOne'))
+      .populate(populateTeam('teamTwo'));
+
+    if (!updatedScrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    return res.status(200).json({
+      scrim: updatedScrim,
+      filledPositions: emptyPositions.length,
+      assignedUsers: shuffledUsers.slice(0, emptyPositions.length).map(user => ({
+        name: user.name,
+        region: user.region
+      }))
+    });
+  } catch (error) {
+    console.error('Error in admin fill random positions:', error);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getAllScrims,
   getTodaysScrims,
@@ -1406,4 +1643,6 @@ module.exports = {
   setScrimWinner,
   swapPlayersInScrim,
   cancelScrim,
+  adminAssignPlayer,
+  adminFillRandomPositions,
 };

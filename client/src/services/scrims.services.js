@@ -433,3 +433,87 @@ export const swapPlayersInScrim = async ({
     return;
   }
 };
+
+// ===============================
+// ADMIN FUNCTIONS
+// ===============================
+
+export const adminAssignPlayer = async ({
+  scrimId,
+  userId,
+  teamName,
+  role,
+  setAlert,
+  setButtonsDisabled,
+  setScrim,
+}) => {
+  try {
+    const response = await api.patch(
+      `/scrims/${scrimId}/admin-assign-player`,
+      { userId, teamName, role }
+    );
+
+    setAlert({ 
+      type: 'Success', 
+      message: 'Player assigned successfully!' 
+    });
+
+    // Update the local state with the response data
+    if (setScrim && response.data) {
+      setScrim(response.data);
+    }
+
+    return response.data;
+  } catch (error) {
+    const errorMsg =
+      error?.response?.data?.error ?? error?.message ?? JSON.stringify(error);
+
+    setAlert({ type: 'Error', message: errorMsg });
+
+    if (setButtonsDisabled) {
+      setButtonsDisabled(false);
+    }
+
+    return;
+  }
+};
+
+export const adminFillRandomPositions = async ({
+  scrimId,
+  region,
+  setAlert,
+  setButtonsDisabled,
+  setScrim,
+}) => {
+  try {
+    const response = await api.patch(
+      `/scrims/${scrimId}/admin-fill-random`,
+      { region }
+    );
+
+    const { filledPositions, assignedUsers, scrim } = response.data;
+    
+    setAlert({ 
+      type: 'Success', 
+      message: `Successfully filled ${filledPositions} positions with random players!` 
+    });
+
+    // Update the local state with the response data
+    if (setScrim && scrim) {
+      setScrim(scrim);
+    }
+
+    return response.data;
+  } catch (error) {
+    const errorMsg =
+      error?.response?.data?.error ?? error?.message ?? JSON.stringify(error);
+
+    setAlert({ type: 'Error', message: errorMsg });
+
+    if (setButtonsDisabled) {
+      setButtonsDisabled(false);
+    }
+
+    return;
+  }
+};

@@ -78,3 +78,4 @@ export const getOPGGData = async (summonerName, region = 'na') => {
     throw error;
   }
 };
+
