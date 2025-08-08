@@ -21,7 +21,6 @@ import ListSubheader from '@mui/material/ListSubheader';
 // components
 import Tooltip from '../shared/Tooltip';
 import AdminArea from '../shared/AdminArea';
-import AdminPlayerControls from './AdminPlayerControls';
 import { Link } from 'react-router-dom';
 
 // utils
@@ -451,34 +450,25 @@ export default function ScrimTeamList({
                     <Avatar alt={teamRole} src={ROLE_IMAGES[teamRole]} />
                   </ListItemAvatar>
                   <ListItemText primary={teamRole} />
-                  <AdminArea>
-                    <AdminPlayerControls 
-                      scrim={scrim}
-                      setScrim={setScrim}
-                      socket={socket}
-                      specificRole={teamRole}
-                      specificTeam={teamName}
-                    />
-                  </AdminArea>
                   {!playerEntered ? (
                     <Tooltip
                       title={`Join: ${teamTitleName} as ${teamRole}`}
                       className={classes.iconButton}>
-                      <span>
+                      <Box>
                         <IconButton
                           disabled={buttonsDisabled}
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => joinGame(teamName, teamRole)}>
                           <JoinIcon />
                         </IconButton>
-                      </span>
+                      </Box>
                     </Tooltip>
                   ) : (
-                    <>
+                    <Box>
                       <Tooltip
                         title={`Move to: ${teamTitleName} as ${teamRole}`}
                         className={classes.iconButton}>
-                        <span>
+                        <Box>
                           <IconButton
                             disabled={buttonsDisabled}
                             onMouseDown={(e) => e.preventDefault()}
@@ -487,9 +477,9 @@ export default function ScrimTeamList({
                             }>
                             <SwapIcon />
                           </IconButton>
-                        </span>
+                        </Box>
                       </Tooltip>
-                    </>
+                    </Box>
                   )}
                 </ListItem>
                 {idx !== teamRoles.length - 1 ? (

@@ -58,6 +58,24 @@ const createSocket = (server) => {
       sendScrimMessage(io, data);
     });
 
+    // Join scrim room for real-time updates
+    socket.on('join_scrim_room', ({ scrimId }) => {
+      if (scrimId) {
+        const room = `scrim_${scrimId}`;
+        socket.join(room);
+        console.log(`Socket ${socket.id} joined room ${room}`);
+      }
+    });
+
+    // Leave scrim room
+    socket.on('leave_scrim_room', ({ scrimId }) => {
+      if (scrimId) {
+        const room = `scrim_${scrimId}`;
+        socket.leave(room);
+        console.log(`Socket ${socket.id} left room ${room}`);
+      }
+    });
+
     // scrim team list socket here:
     socket.on('sendScrimTransaction', async (updatedScrim) => {
       console.log('sendScrimTransaction: ', updatedScrim);

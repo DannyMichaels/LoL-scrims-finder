@@ -409,7 +409,7 @@ export function useFetchScrims() {
   }, [dispatch, scrimsDate, scrimsRegion]);
 
   useEffect(() => {
-    if (location.pathname === '/' && currentUser) {
+    if ((location.pathname === '/' || location.pathname === '/scrims') && currentUser) {
       fetchScrims();
     }
   }, [location.pathname, currentUser, fetchScrims, scrimsDate, scrimsRegion]);
@@ -435,16 +435,41 @@ export const useScrimSocket = (scrimData, isBoxExpanded) => {
       if (data && data.scrim) {
         setScrim(data.scrim);
         dispatch({ type: 'scrims/updateScrim', payload: data.scrim });
+      } else if (data && typeof data === 'object') {
+        // Handle scrimUpdate event from backend (which sends the scrim directly)
+        setScrim(data);
+        dispatch({ type: 'scrims/updateScrim', payload: data });
+      }
+    };
+
+    const handleTournamentInitialized = (data) => {
+      if (data && data.scrimId === scrimData._id) {
+        // Update the local scrim state with tournament data
+        setScrim(prevScrim => ({
+          ...prevScrim,
+          riotTournament: {
+            tournamentCode: data.tournamentCode,
+            providerId: data.providerId,
+            tournamentId: data.tournamentId,
+            setupCompleted: true,
+            lobbyCreated: true
+          },
+          lobbyName: data.tournamentCode
+        }));
       }
     };
 
     socket.on('scrim_updated', handleScrimUpdate);
     socket.on('getScrimTransaction', handleScrimUpdate);
+    socket.on('scrimUpdate', handleScrimUpdate);
+    socket.on('tournamentInitialized', handleTournamentInitialized);
 
     return () => {
       socket.emit('leave_scrim_room', { scrimId: scrimData._id });
       socket.off('scrim_updated', handleScrimUpdate);
       socket.off('getScrimTransaction', handleScrimUpdate);
+      socket.off('scrimUpdate', handleScrimUpdate);
+      socket.off('tournamentInitialized', handleTournamentInitialized);
     };
   }, [socket, scrimData, isBoxExpanded, dispatch]);
 

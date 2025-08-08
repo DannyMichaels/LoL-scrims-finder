@@ -611,6 +611,34 @@ const insertPlayerInScrim = async (req, res) => {
       updatedScrim.lobbyHost = lobbyHost;
 
       await updatedScrim.save();
+      
+      // Check if we should generate tournament code
+      // Conditions: teams are full, game time has passed, no tournament code exists yet
+      const now = new Date();
+      const gameStartTime = new Date(updatedScrim.gameStartTime);
+      const gameHasStarted = now >= gameStartTime;
+      const teamsFull = updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
+      const noTournamentCode = !updatedScrim.riotTournament?.tournamentCode;
+      
+      if (gameHasStarted && teamsFull && noTournamentCode) {
+        // Teams just became full after countdown reached 0 - generate tournament code
+        console.log(`Teams filled after countdown for scrim ${scrimId}, initializing tournament`);
+        const io = req.app.get('io');
+        
+        // Use the existing function to initialize tournament
+        await scrimScheduler.initializeRiotTournamentForScrim(scrimId, io);
+        
+        // Fetch the updated scrim with tournament data
+        const finalScrim = await Scrim.findById(scrimId)
+          .populate('createdBy', populateUser)
+          .populate('casters', populateUser)
+          .populate('lobbyHost', populateUser)
+          .populate(populateTeam('teamOne'))
+          .populate(populateTeam('teamTwo'));
+          
+        return res.status(200).json(finalScrim);
+      }
+      
       return res.status(200).json(updatedScrim);
     });
 
@@ -1498,6 +1526,33 @@ const adminAssignPlayer = async (req, res) => {
       return res.status(404).json({ error: 'Scrim not found' });
     }
 
+    // Check if we should generate tournament code after assigning
+    // Conditions: teams are now full, game time has passed, no tournament code exists yet
+    const now = new Date();
+    const gameStartTime = new Date(updatedScrim.gameStartTime);
+    const gameHasStarted = now >= gameStartTime;
+    const teamsFull = updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
+    const noTournamentCode = !updatedScrim.riotTournament?.tournamentCode;
+    
+    if (gameHasStarted && teamsFull && noTournamentCode) {
+      // Teams just became full after countdown reached 0 - generate tournament code
+      console.log(`Teams filled after countdown for scrim ${scrimId}, initializing tournament`);
+      const io = req.app.get('io');
+      
+      // Use the existing function to initialize tournament
+      await scrimScheduler.initializeRiotTournamentForScrim(scrimId, io);
+      
+      // Fetch the updated scrim with tournament data
+      const finalScrim = await Scrim.findById(scrimId)
+        .populate('createdBy', populateUser)
+        .populate('casters', populateUser)
+        .populate('lobbyHost', populateUser)
+        .populate(populateTeam('teamOne'))
+        .populate(populateTeam('teamTwo'));
+      
+      return res.status(200).json(finalScrim);
+    }
+
     return res.status(200).json(updatedScrim);
   } catch (error) {
     console.error('Error in admin assign player:', error);
@@ -1610,6 +1665,40 @@ const adminFillRandomPositions = async (req, res) => {
 
     if (!updatedScrim) {
       return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    // Check if we should generate tournament code after filling
+    // Conditions: teams are now full, game time has passed, no tournament code exists yet
+    const now = new Date();
+    const gameStartTime = new Date(updatedScrim.gameStartTime);
+    const gameHasStarted = now >= gameStartTime;
+    const teamsFull = updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
+    const noTournamentCode = !updatedScrim.riotTournament?.tournamentCode;
+    
+    if (gameHasStarted && teamsFull && noTournamentCode) {
+      // Teams just became full after countdown reached 0 - generate tournament code
+      console.log(`Teams filled after countdown for scrim ${scrimId}, initializing tournament`);
+      const io = req.app.get('io');
+      
+      // Use the existing function to initialize tournament
+      await scrimScheduler.initializeRiotTournamentForScrim(scrimId, io);
+      
+      // Fetch the updated scrim with tournament data
+      const finalScrim = await Scrim.findById(scrimId)
+        .populate('createdBy', populateUser)
+        .populate('casters', populateUser)
+        .populate('lobbyHost', populateUser)
+        .populate(populateTeam('teamOne'))
+        .populate(populateTeam('teamTwo'));
+      
+      return res.status(200).json({
+        scrim: finalScrim,
+        filledPositions: emptyPositions.length,
+        assignedUsers: shuffledUsers.slice(0, emptyPositions.length).map(user => ({
+          name: user.name,
+          region: user.region
+        }))
+      });
     }
 
     return res.status(200).json({

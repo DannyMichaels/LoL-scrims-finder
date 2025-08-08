@@ -234,14 +234,18 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     }
   };
 
-  if (!scrim) return null;
+  // Don't return null immediately - use original scrimData as fallback
+  // This prevents the component from unmounting during updates
+  const displayScrim = scrim || scrimData;
+  
+  if (!displayScrim) return null;
 
   // the "Scrim Box"
   return (
     <PageSection aria-label="scrim section">
       <div className={classes.scrimBox} ref={scrimBoxRef}>
         <ScrimSectionHeader
-          scrim={scrim}
+          scrim={displayScrim}
           setScrim={setScrim}
           socket={socket}
           joinCast={joinCast}
@@ -268,7 +272,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
                 teamArray: teamOne,
               }}
               setScrim={setScrim}
-              scrim={scrim}
+              scrim={displayScrim}
               playerEntered={playerEntered}
               casterEntered={casterEntered}
               gameStarted={gameStarted === scrim._id}
@@ -281,7 +285,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
             {/* the middle box that contains the countdown timer and other details. */}
             <ScrimSectionMiddleAreaBox
               imageUploaded={imageUploaded === scrim._id}
-              scrim={scrim}
+              scrim={displayScrim}
               setScrim={setScrim}
               gameStarted={gameStarted === scrim._id}
               setGameStarted={setGameStarted}
@@ -299,7 +303,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
                 teamTitleName: 'Team 2 (Red Side)',
                 teamArray: teamTwo,
               }}
-              scrim={scrim}
+              scrim={displayScrim}
               setScrim={setScrim}
               playerEntered={playerEntered}
               casterEntered={casterEntered}
@@ -318,7 +322,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
           scrimBoxRef={scrimBoxRef}
           isBoxExpanded={isBoxExpanded}
           setIsBoxExpanded={setIsBoxExpanded}
-          scrimId={scrim._id}
+          scrimId={displayScrim._id}
         />
       )}
     </PageSection>
