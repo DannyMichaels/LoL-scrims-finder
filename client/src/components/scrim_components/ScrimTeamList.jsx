@@ -145,11 +145,10 @@ export default function ScrimTeamList({
       userId: playerEntered?._user?._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
+      setScrim,
     });
 
     if (updatedScrim?.createdBy) {
-      setScrim(updatedScrim);
-
       socket?.emit('sendScrimTransaction', updatedScrim);
     }
 
@@ -166,11 +165,10 @@ export default function ScrimTeamList({
       userId: playerToKick?._user?._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
+      setScrim,
     });
 
     if (updatedScrim?.createdBy) {
-      setScrim(updatedScrim);
-
       socket?.emit('sendScrimTransaction', updatedScrim);
     }
 

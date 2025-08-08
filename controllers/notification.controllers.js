@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/user.model');
+const Scrim = require('../models/scrim.model');
 
 // @route   GET /api/notifications/user-notifications
 // @desc    get a specific users notifications
@@ -16,9 +17,11 @@ const getUserNotifications = async (req, res) => {
 
     let user = await User.findById(id);
 
-    if (!user) return res.status(404).json({ message: 'User not found!' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-    return res.json({ notifications: user.notifications });
+    return res.status(200).json({ notifications: user.notifications || [] });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -62,7 +65,7 @@ const pushUserNotification = async (req, res) => {
   };
 
   const reqBody = {
-    notifications: [...user.notifications, newNotification],
+    notifications: [...(user.notifications || []), newNotification],
   };
 
   const updatedUser = await User.findByIdAndUpdate(
@@ -98,7 +101,7 @@ const removeUserNotification = async (req, res) => {
     }
 
     const reqBody = {
-      notifications: user.notifications.filter(
+      notifications: (user.notifications || []).filter(
         (notification) => String(notification._id) !== String(notificationId)
       ),
     };

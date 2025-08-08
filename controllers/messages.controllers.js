@@ -27,15 +27,15 @@ const postMessage = async (req, res) => {
     const sender = await User.findById(senderId);
 
     if (!sender) {
-      return res.status(500).json({ error: 'Sender not found!' });
+      return res.status(404).json({ error: 'Sender not found!' });
     }
 
     if (!text) {
-      return res.status(500).json({ error: 'Message text not provided!' });
+      return res.status(400).json({ error: 'Message text not provided!' });
     }
 
     if (!conversation) {
-      return res.status(500).json({ error: 'Conversation not found!' });
+      return res.status(404).json({ error: 'Conversation not found!' });
     }
 
     const newMessage = new Message({
@@ -64,18 +64,15 @@ const postMessage = async (req, res) => {
 // @access  Public
 const getConversationMessages = async (req, res) => {
   try {
-    await Message.find({
+    const messagesData = await Message.find({
       _conversation: req.params.conversationId,
     })
       .populate('_sender', ['name', 'discord', 'region', 'rank'])
-      .exec((err, messagesData) => {
-        if (err) {
-          console.log(err);
-          return res.status(400).end();
-        }
-        return res.status(200).json(messagesData);
-      });
+      .exec();
+
+    return res.status(200).json(messagesData);
   } catch (error) {
+    console.log('Error fetching conversation messages:', error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -93,14 +90,25 @@ const postMessageSeenByUser = async (req, res) => {
     }
 
     if (!seenByUserId) {
-      return res.status(500).json({
-        error: 'seen by user id not provided! (req.body.seenByUserId)',
+      return res.status(401).json({
+        error: 'User not authenticated',
       });
     }
 
     let message = await Message.findById(messageId);
 
-    message._seenBy = [...message._seenBy, seenByUserId];
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    if (!message._seenBy) {
+      message._seenBy = [];
+    }
+
+    // Only add if not already seen
+    if (!message._seenBy.includes(seenByUserId)) {
+      message._seenBy = [...message._seenBy, seenByUserId];
+    }
 
     const savedMessage = await message.save();
 
@@ -116,15 +124,19 @@ const postMessageSeenByUser = async (req, res) => {
 const getUserUnseenMessages = async (req, res) => {
   try {
     const userId = req.user._id;
-    const currentUser = await User.findById(userId).select(['friends']);
-
     if (!handleValidId(userId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
+    const currentUser = await User.findById(userId).select(['friends']);
+
+    if (!currentUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     const messages = await Message.find({ _receiver: userId });
 
-    const friendIds = currentUser.friends.map(({ _id }) => _id);
+    const friendIds = currentUser.friends?.map(({ _id }) => _id) || [];
 
     const unseenMessages = messages.filter((message) => {
       if (!message?._seenBy.some((id) => friendIds.includes(id))) return false; // if not friend, return false. (if unfriended)

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useScrimsActions } from '../../hooks/useScrims';
+import { useFetchScrims } from '../../hooks/useScrims';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
 import useAlerts from '../../hooks/useAlerts';
 import useAuth from '../../hooks/useAuth';
@@ -24,7 +24,7 @@ import Tooltip from '../../components/shared/Tooltip';
 import Loading from '../../components/shared/Loading';
 import DatePicker from '../../components/shared/DatePicker';
 import TimePicker from '../../components/shared/TimePicker';
-import LobbyNameFieldOld from './../../components/shared/Form_components/LobbyNameField__Old';
+// Removed LobbyNameFieldOld - using simple TextField instead
 
 // utils // services
 import devLog from '../../utils/devLog';
@@ -36,7 +36,7 @@ const RANDOM_HOST_CODE = '_$random'; // because input doesn't want value to be n
 
 function ScrimEdit() {
   const { currentUser } = useAuth();
-  const { fetchScrims } = useScrimsActions();
+  const { fetchScrims } = useFetchScrims();
   const { setCurrentAlert } = useAlerts();
 
   const [scrimData, setScrimData] = useState({
@@ -46,7 +46,7 @@ function ScrimEdit() {
     casters: [],
     teamOne: [],
     teamTwo: [],
-    gameStartTime: new Date().toISOString(),
+    gameStartTime: moment(),
     lobbyName: '',
     lobbyPassword: '',
     lobbyHost: null,
@@ -133,10 +133,34 @@ function ScrimEdit() {
   };
 
   const handleChangeDate = (newDateValue) => {
-    setScrimData((prevState) => ({
-      ...prevState,
-      gameStartTime: newDateValue,
-    }));
+    if (newDateValue && moment.isMoment(newDateValue)) {
+      setScrimData((prevState) => ({
+        ...prevState,
+        gameStartTime: newDateValue,
+      }));
+    }
+  };
+
+  const handleChangeTime = (newTimeValue) => {
+    if (newTimeValue && moment.isMoment(newTimeValue)) {
+      setScrimData((prevState) => {
+        // Keep the current date but update the time
+        const currentDate = moment.isMoment(prevState.gameStartTime) 
+          ? prevState.gameStartTime 
+          : moment();
+        
+        const updatedDateTime = currentDate.clone()
+          .hour(newTimeValue.hour())
+          .minute(newTimeValue.minute())
+          .second(0)
+          .millisecond(0);
+
+        return {
+          ...prevState,
+          gameStartTime: updatedDateTime,
+        };
+      });
+    }
   };
 
   let usersArr = useMemo(() => {
@@ -237,7 +261,7 @@ function ScrimEdit() {
           : 0,
       };
 
-      const updatedScrim = await updateScrim(id, dataSending, setCurrentAlert);
+      const updatedScrim = await updateScrim(id, dataSending);
 
       if (updatedScrim) {
         await fetchScrims();
@@ -248,11 +272,22 @@ function ScrimEdit() {
         setUpdated(true);
         setIsUpdating(false);
         return;
+      } else {
+        // This shouldn't happen if API returned 200, but let's log it
+        console.error('updateScrim returned falsy value despite success:', updatedScrim);
+        setCurrentAlert({
+          type: 'Error',
+          message: 'Error updating Scrim - No data returned',
+        });
+        setIsUpdating(false);
+        return;
       }
     } catch (error) {
+      console.error('Error updating scrim:', error);
+      const errorMsg = error?.response?.data?.error || error?.message || 'Error updating Scrim';
       setCurrentAlert({
         type: 'Error',
-        message: 'Error updating Scrim',
+        message: errorMsg,
       });
       setIsUpdating(false);
 
@@ -317,9 +352,9 @@ function ScrimEdit() {
                       label={
                         <span className="text-white">Game Start Time</span>
                       }
-                      onChange={handleChangeDate}
+                      onChange={handleChangeTime}
                       required
-                      name="gameStartHours"
+                      name="gameStartTime"
                       variant="standard"
                       value={scrimData?.gameStartTime}
                     />
@@ -364,12 +399,17 @@ function ScrimEdit() {
                 </Grid>
 
                 <Grid item>
-                  <LobbyNameFieldOld
-                    buttonText="Random"
-                    value={scrimData.lobbyName || scrimData.title || ''}
-                    onInputChange={handleChange}
-                    setScrimData={setScrimData}
-                    isGenerateOnMount={false}
+                  <FormHelperText className="text-white">
+                    Lobby Name
+                  </FormHelperText>
+                  <TextField
+                    fullWidth
+                    variant="standard"
+                    name="lobbyName"
+                    value={scrimData.lobbyName || ''}
+                    onChange={handleChange}
+                    placeholder="Enter custom lobby name"
+                    required
                   />
                 </Grid>
 

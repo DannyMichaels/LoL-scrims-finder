@@ -164,17 +164,13 @@ export const createScrim = async (scrim, setCurrentAlert) => {
   }
 };
 
-export const updateScrim = async (id, scrim, setCurrentAlert) => {
+export const updateScrim = async (id, scrim) => {
   try {
     const response = await api.put(`/scrims/${id}`, scrim);
     return response.data;
   } catch (error) {
-    if (setCurrentAlert) {
-      setCurrentAlert({
-        type: 'Error',
-        message: 'Error updating Scrim',
-      });
-    }
+    // Let the calling code handle the error alert to avoid conflicts
+    console.error('updateScrim service error:', error);
     throw error;
   }
 };
@@ -193,6 +189,12 @@ export const insertPlayerInScrim = async ({
       `/scrims/${scrimId}/insert-player/${userId}`,
       { playerData }
     );
+    
+    // Update the local state with the response data
+    if (setScrim && response.data) {
+      setScrim(response.data);
+    }
+    
     return response.data;
   } catch (error) {
     const errorMsg =
@@ -223,11 +225,18 @@ export const removePlayerFromScrim = async ({
   userId,
   setAlert,
   setButtonsDisabled,
+  setScrim,
 }) => {
   try {
     const response = await api.patch(
       `/scrims/${scrimId}/remove-player/${userId}`
     );
+    
+    // Update the local state with the response data
+    if (setScrim && response.data) {
+      setScrim(response.data);
+    }
+    
     return response.data;
   } catch (error) {
     const errorMsg = error.response.data?.error ?? error;
@@ -253,6 +262,11 @@ export const movePlayerInScrim = async ({
       `/scrims/${scrimId}/move-player/${userId}`,
       { playerData }
     );
+
+    // Update the local state with the response data
+    if (setScrim && response.data) {
+      setScrim(response.data);
+    }
 
     return response.data;
   } catch (error) {
@@ -396,6 +410,12 @@ export const swapPlayersInScrim = async ({
       swapPlayers
     );
     setAlert({ type: 'Success', message: 'Players swapped!' });
+    
+    // Update the local state with the response data
+    if (setScrim && response.data) {
+      setScrim(response.data);
+    }
+    
     return response.data;
   } catch (error) {
     const errorMsg =

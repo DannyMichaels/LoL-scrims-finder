@@ -166,6 +166,10 @@ const handleRiotCallback = async (req, res) => {
     }
 
     // Update scrim with game completion data
+    if (!scrim.riotTournament) {
+      scrim.riotTournament = {};
+    }
+    
     scrim.riotTournament.gameId = gameId;
     scrim.riotTournament.gameCompleted = true;
     scrim.riotTournament.gameCompletedAt = new Date(endTime);
@@ -230,18 +234,22 @@ const updateTournamentParticipants = async (req, res) => {
       participants = [];
       
       // Add team one summoner names
-      scrim.teamOne.forEach(player => {
-        if (player._user?.name) {
-          participants.push(player._user.name);
-        }
-      });
+      if (scrim.teamOne) {
+        scrim.teamOne.forEach(player => {
+          if (player._user?.name) {
+            participants.push(player._user.name);
+          }
+        });
+      }
       
       // Add team two summoner names
-      scrim.teamTwo.forEach(player => {
-        if (player._user?.name) {
-          participants.push(player._user.name);
-        }
-      });
+      if (scrim.teamTwo) {
+        scrim.teamTwo.forEach(player => {
+          if (player._user?.name) {
+            participants.push(player._user.name);
+          }
+        });
+      }
     }
 
     // Update tournament code with participants

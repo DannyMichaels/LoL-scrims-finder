@@ -104,6 +104,12 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 ### 5/16/2023
 - rewrite some queries
 - change scrollbar in user profile page
+
+
+## 8/9/2025
+- user profile page created scrims and participated scrims are now collapsible glass accordions.
+- refactored the backend controllers.
+- added riot api support
 ---
 
 <br />

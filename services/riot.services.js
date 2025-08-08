@@ -5,35 +5,54 @@ const { RIOT_API_KEY } = require('../utils/constants');
 // Use tournament-stub for testing with development keys
 const RIOT_API_BASE_URL = process.env.RIOT_TOURNAMENT_STUB === 'true' 
   ? 'https://americas.api.riotgames.com/lol/tournament-stub/v5'
-  : 'https://americas.api.riotgames.com'; // Americas routing for tournament API
+  : 'https://americas.api.riotgames.com/lol/tournament/v5'; // Fixed: Added /lol/tournament/v5 to base URL
 
-// Region mapping for Riot API
-const REGION_MAP = {
-  'NA': 'NA1',
-  'EUW': 'EUW1',
-  'EUNE': 'EUN1',
-  'BR': 'BR1',
-  'LAN': 'LA1',
-  'LAS': 'LA2',
-  'OCE': 'OC1',
-  'RU': 'RU',
-  'TR': 'TR1',
-  'JP': 'JP1',
-  'KR': 'KR',
-  'PH': 'PH2',
-  'SG': 'SG2',
-  'TH': 'TH2',
-  'TW': 'TW2',
-  'VN': 'VN2'
+// Valid regions for Tournament API v5 (as per official documentation)
+// These are the EXACT values accepted by the API - no mapping needed!
+const VALID_REGIONS = [
+  'BR', 'EUNE', 'EUW', 'JP', 'LAN', 'LAS', 'NA', 'OCE', 
+  'PBE', 'RU', 'TR', 'KR', 'PH', 'SG', 'TH', 'TW', 'VN'
+];
+
+// Regional routing for API endpoints (determines which server to hit)
+const REGIONAL_ROUTING = {
+  'NA': 'americas',
+  'BR': 'americas',
+  'LAN': 'americas',
+  'LAS': 'americas',
+  'OCE': 'sea',
+  'KR': 'asia',
+  'JP': 'asia',
+  'EUW': 'europe',
+  'EUNE': 'europe',
+  'TR': 'europe',
+  'RU': 'europe',
+  'PH': 'sea',
+  'SG': 'sea',
+  'TH': 'sea',
+  'TW': 'sea',
+  'VN': 'sea',
+  'PBE': 'americas'  // PBE uses americas routing
 };
 
-// Axios instance with default headers
-const riotApi = axios.create({
-  baseURL: RIOT_API_BASE_URL,
-  headers: {
-    'X-Riot-Token': RIOT_API_KEY
-  }
-});
+// Helper function to get the correct base URL for a region
+const getRegionalBaseUrl = (region) => {
+  const routing = REGIONAL_ROUTING[region.toUpperCase()] || 'americas';
+  const apiPath = process.env.RIOT_TOURNAMENT_STUB === 'true' 
+    ? '/lol/tournament-stub/v5'
+    : '/lol/tournament/v5';
+  return `https://${routing}.api.riotgames.com${apiPath}`;
+};
+
+// Create axios instance with default headers
+const createRiotApi = (region) => {
+  return axios.create({
+    baseURL: getRegionalBaseUrl(region),
+    headers: {
+      'X-Riot-Token': RIOT_API_KEY
+    }
+  });
+};
 
 /**
  * Register a tournament provider
@@ -43,26 +62,28 @@ const riotApi = axios.create({
  */
 const createTournamentProvider = async (region, callbackUrl) => {
   try {
-    // Ensure region is uppercase for mapping
+    // Ensure region is uppercase
     const upperRegion = region?.toUpperCase() || 'NA';
-    const regionCode = REGION_MAP[upperRegion];
     
-    if (!regionCode) {
-      console.error(`No region mapping found for: ${region}`);
-      console.log('Available mappings:', REGION_MAP);
-      throw new Error(`Unsupported region: ${region}. Please use one of: ${Object.keys(REGION_MAP).join(', ')}`);
+    // Validate region
+    if (!VALID_REGIONS.includes(upperRegion)) {
+      console.error(`Invalid region: ${region}`);
+      console.log('Valid regions:', VALID_REGIONS.join(', '));
+      throw new Error(`Unsupported region: ${region}. Please use one of: ${VALID_REGIONS.join(', ')}`);
     }
     
+    // Create API instance for the correct regional endpoint
+    const riotApi = createRiotApi(upperRegion);
+    
     const payload = {
-      region: regionCode,
+      region: upperRegion, // Use the region AS-IS, no mapping!
       url: callbackUrl || `${process.env.API_URL || 'http://localhost:3000'}/api/riot/callback`
     };
 
     console.log('Creating tournament provider with payload:', JSON.stringify(payload, null, 2));
-    console.log(`Region mapping: ${region} -> ${regionCode}`);
-    console.log(`Using API endpoint: ${riotApi.defaults.baseURL}/lol/tournament/v5/providers`);
+    console.log(`Using regional endpoint: ${riotApi.defaults.baseURL}/providers`);
     
-    const response = await riotApi.post('/lol/tournament/v5/providers', payload);
+    const response = await riotApi.post('/providers', payload);
     
     console.log('Tournament provider created successfully. Provider ID:', response.data);
     return response.data; // Returns the provider ID
@@ -82,10 +103,13 @@ const createTournamentProvider = async (region, callbackUrl) => {
  * Create a tournament
  * @param {string} name - Name of the tournament
  * @param {number} providerId - Provider ID from createTournamentProvider
+ * @param {string} region - Region for correct routing
  * @returns {Promise<number>} Tournament ID
  */
-const createTournament = async (name, providerId) => {
+const createTournament = async (name, providerId, region) => {
   try {
+    const riotApi = createRiotApi(region);
+    
     const payload = {
       name: name || 'LoL Scrim Tournament',
       providerId: providerId
@@ -93,7 +117,7 @@ const createTournament = async (name, providerId) => {
 
     console.log('Creating tournament with payload:', payload);
     
-    const response = await riotApi.post('/lol/tournament/v5/tournaments', payload);
+    const response = await riotApi.post('/tournaments', payload);
     
     console.log('Tournament created successfully. Tournament ID:', response.data);
     return response.data; // Returns the tournament ID
@@ -107,11 +131,14 @@ const createTournament = async (name, providerId) => {
 /**
  * Create tournament codes (lobby codes)
  * @param {number} tournamentId - Tournament ID from createTournament
+ * @param {string} region - Region for correct routing
  * @param {Object} options - Tournament code options
  * @returns {Promise<string[]>} Array of tournament codes
  */
-const createTournamentCode = async (tournamentId, options = {}) => {
+const createTournamentCode = async (tournamentId, region, options = {}) => {
   try {
+    const riotApi = createRiotApi(region);
+    
     const {
       count = 1,
       teamSize = 5,
@@ -132,7 +159,7 @@ const createTournamentCode = async (tournamentId, options = {}) => {
       enoughPlayers
     };
 
-    // Add allowed participants if provided (specific summoner IDs)
+    // Add allowed participants if provided (specific PUUIDs)
     if (allowedParticipants && Array.isArray(allowedParticipants)) {
       payload.allowedParticipants = allowedParticipants;
     }
@@ -140,7 +167,7 @@ const createTournamentCode = async (tournamentId, options = {}) => {
     console.log('Creating tournament code with payload:', payload);
     
     const response = await riotApi.post(
-      `/lol/tournament/v5/codes?tournamentId=${tournamentId}&count=${count}`,
+      `/codes?tournamentId=${tournamentId}&count=${count}`,
       payload
     );
     
@@ -156,11 +183,13 @@ const createTournamentCode = async (tournamentId, options = {}) => {
 /**
  * Get tournament code details
  * @param {string} tournamentCode - The tournament code to look up
+ * @param {string} region - Region for correct routing
  * @returns {Promise<Object>} Tournament code details
  */
-const getTournamentCode = async (tournamentCode) => {
+const getTournamentCode = async (tournamentCode, region) => {
   try {
-    const response = await riotApi.get(`/lol/tournament/v5/codes/${tournamentCode}`);
+    const riotApi = createRiotApi(region);
+    const response = await riotApi.get(`/codes/${tournamentCode}`);
     return response.data;
   } catch (error) {
     console.error('Error getting tournament code:', error.response?.data || error.message);
@@ -172,11 +201,14 @@ const getTournamentCode = async (tournamentCode) => {
 /**
  * Update tournament code
  * @param {string} tournamentCode - The tournament code to update
+ * @param {string} region - Region for correct routing
  * @param {Object} updates - Updates to apply
  * @returns {Promise<void>}
  */
-const updateTournamentCode = async (tournamentCode, updates) => {
+const updateTournamentCode = async (tournamentCode, region, updates) => {
   try {
+    const riotApi = createRiotApi(region);
+    
     const payload = {
       allowedParticipants: updates.allowedParticipants,
       mapType: updates.mapType || 'SUMMONERS_RIFT',
@@ -184,7 +216,7 @@ const updateTournamentCode = async (tournamentCode, updates) => {
       spectatorType: updates.spectatorType || 'ALL'
     };
 
-    await riotApi.put(`/lol/tournament/v5/codes/${tournamentCode}`, payload);
+    await riotApi.put(`/codes/${tournamentCode}`, payload);
     console.log('Tournament code updated successfully');
   } catch (error) {
     console.error('Error updating tournament code:', error.response?.data || error.message);
@@ -196,11 +228,13 @@ const updateTournamentCode = async (tournamentCode, updates) => {
 /**
  * Get lobby events for a tournament code
  * @param {string} tournamentCode - The tournament code
+ * @param {string} region - Region for correct routing
  * @returns {Promise<Object>} Lobby events
  */
-const getLobbyEvents = async (tournamentCode) => {
+const getLobbyEvents = async (tournamentCode, region) => {
   try {
-    const response = await riotApi.get(`/lol/tournament/v5/lobby-events/by-code/${tournamentCode}`);
+    const riotApi = createRiotApi(region);
+    const response = await riotApi.get(`/lobby-events/by-code/${tournamentCode}`);
     return response.data;
   } catch (error) {
     console.error('Error getting lobby events:', error.response?.data || error.message);
@@ -218,17 +252,23 @@ const setupRiotTournamentForScrim = async (scrimData) => {
   try {
     const { region, title, _id } = scrimData;
     
+    // Validate region
+    const upperRegion = region?.toUpperCase();
+    if (!VALID_REGIONS.includes(upperRegion)) {
+      throw new Error(`Invalid region: ${region}. Valid regions are: ${VALID_REGIONS.join(', ')}`);
+    }
+    
     // Step 1: Create provider
-    console.log('Step 1: Creating tournament provider for region:', region);
-    const providerId = await createTournamentProvider(region);
+    console.log('Step 1: Creating tournament provider for region:', upperRegion);
+    const providerId = await createTournamentProvider(upperRegion);
     
     // Step 2: Create tournament
     console.log('Step 2: Creating tournament with provider ID:', providerId);
-    const tournamentId = await createTournament(title || `Scrim ${_id}`, providerId);
+    const tournamentId = await createTournament(title || `Scrim ${_id}`, providerId, upperRegion);
     
     // Step 3: Create tournament code (lobby)
     console.log('Step 3: Creating tournament code for tournament ID:', tournamentId);
-    const tournamentCodes = await createTournamentCode(tournamentId, {
+    const tournamentCodes = await createTournamentCode(tournamentId, upperRegion, {
       count: 1,
       metadata: `scrim_${_id}`,
       teamSize: 5,
@@ -262,5 +302,6 @@ module.exports = {
   updateTournamentCode,
   getLobbyEvents,
   setupRiotTournamentForScrim,
-  REGION_MAP
+  VALID_REGIONS,
+  REGIONAL_ROUTING
 };

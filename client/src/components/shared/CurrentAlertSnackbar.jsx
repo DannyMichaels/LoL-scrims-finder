@@ -34,7 +34,16 @@ function CurrentAlertSnackbar() {
         <Alert
           variant="filled"
           onClose={closeAlert}
-          severity={currentAlert.type.toLowerCase()}>
+          severity={currentAlert.type.toLowerCase()}
+          sx={{
+            color: 'white',
+            '& .MuiAlert-message': {
+              color: 'white',
+            },
+            '& .MuiIconButton-root': {
+              color: 'white',
+            }
+          }}>
           {/* example: success - scrim created successfully! */}
           <strong>{currentAlert.type}</strong> - {message}
         </Alert>

@@ -12,19 +12,19 @@ const banUser = async (req, res) => {
 
     if (!banUserId) {
       return res.status(400).json({
-        error: 'no user id provided',
+        error: 'User ID not provided',
       });
     }
 
     if (!dateFrom) {
       return res.status(400).json({
-        error: 'no date from provided',
+        error: 'Start date not provided',
       });
     }
 
     if (!dateTo) {
       return res.status(400).json({
-        error: 'no date to provided',
+        error: 'End date not provided',
       });
     }
 
@@ -32,13 +32,13 @@ const banUser = async (req, res) => {
 
     if (!userToBan) {
       return res.status(404).json({
-        error: 'no user found',
+        error: 'User not found',
       });
     }
 
-    if (userToBan.currentBan && userToBan.currentBan.isActive) {
+    if (userToBan.currentBan?.isActive) {
       return res.status(400).json({
-        error: 'user is already banned',
+        error: 'User is already banned',
       });
     }
 
@@ -98,18 +98,18 @@ const unbanUser = async (req, res) => {
     const { bannedUserId = '' } = req.body;
 
     if (Object.keys(user) <= 0) {
-      return res.status(401).message({ error: 'unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
     if (user.adminKey !== KEYS.ADMIN_KEY) {
       return res.status(401).json({
-        error: 'unauthorized',
+        error: 'Unauthorized',
       });
     }
 
     if (!bannedUserId) {
       return res.status(400).json({
-        error: 'no user id provided',
+        error: 'User ID not provided',
       });
     }
 
@@ -117,13 +117,13 @@ const unbanUser = async (req, res) => {
 
     if (!selectedUser) {
       return res.status(404).json({
-        error: 'no user found',
+        error: 'User not found',
       });
     }
 
-    if (!selectedUser.currentBan || !selectedUser.currentBan.isActive) {
+    if (!selectedUser.currentBan?.isActive) {
       return res.status(400).json({
-        error: 'user is not banned',
+        error: 'User is not banned',
       });
     }
 
@@ -149,7 +149,7 @@ const getAllBans = async (req, res) => {
       .populate('_unbannedBy', populateUser)
       .populate('_user', populateUser);
     
-    return res.json(_allBans);
+    return res.status(200).json(_allBans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

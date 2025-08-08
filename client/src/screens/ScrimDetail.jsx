@@ -19,6 +19,15 @@ export default function ScrimDetail() {
   useEffect(() => {
     const fetchScrimData = async () => {
       try {
+        // Check if scrim exists in the global scrims array (updated when scrim is deleted)
+        const scrimExistsInList = scrims.some(s => s._id === id);
+        
+        // If scrim doesn't exist in the list, it was likely deleted - redirect silently
+        if (scrims.length > 0 && !scrimExistsInList) {
+          history.push('/scrims');
+          return;
+        }
+
         const scrimData = await getScrimById(id);
         if (scrimData?.createdBy) {
           setScrim(scrimData);
@@ -31,6 +40,18 @@ export default function ScrimDetail() {
         }
       } catch (error) {
         console.log({ error });
+        
+        // Check if this error is due to scrim being deleted (404 error)
+        if (error?.response?.status === 404 || error?.response?.status === 500) {
+          // Check if scrim was deleted from the list
+          const scrimExistsInList = scrims.some(s => s._id === id);
+          if (!scrimExistsInList && scrims.length > 0) {
+            // Scrim was deleted - redirect silently without error message
+            history.push('/scrims');
+            return;
+          }
+        }
+
         setCurrentAlert({
           type: 'Error',
           message: 'Error finding scrim, redirecting to home',

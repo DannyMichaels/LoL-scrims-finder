@@ -63,10 +63,34 @@ function ScrimCreate() {
   };
 
   const handleChangeDate = (newDateValue) => {
-    setScrimData((prevState) => ({
-      ...prevState,
-      gameStartTime: newDateValue,
-    }));
+    if (newDateValue && moment.isMoment(newDateValue)) {
+      setScrimData((prevState) => ({
+        ...prevState,
+        gameStartTime: newDateValue,
+      }));
+    }
+  };
+
+  const handleChangeTime = (newTimeValue) => {
+    if (newTimeValue && moment.isMoment(newTimeValue)) {
+      setScrimData((prevState) => {
+        // Keep the current date but update the time
+        const currentDate = moment.isMoment(prevState.gameStartTime) 
+          ? prevState.gameStartTime 
+          : moment();
+        
+        const updatedDateTime = currentDate.clone()
+          .hour(newTimeValue.hour())
+          .minute(newTimeValue.minute())
+          .second(0)
+          .millisecond(0);
+
+        return {
+          ...prevState,
+          gameStartTime: updatedDateTime,
+        };
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -264,9 +288,9 @@ function ScrimCreate() {
                     fullWidth
                     label={<span className="text-white">Game Start Time</span>}
                     variant="standard"
-                    onChange={handleChangeDate}
+                    onChange={handleChangeTime}
                     required
-                    name="gameStartHours"
+                    name="gameStartTime"
                     value={scrimData.gameStartTime}
                   />
                 </Grid>

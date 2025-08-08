@@ -9,11 +9,11 @@ const postConversation = async (req, res) => {
     const { senderId, receiverId } = req.body;
 
     if (!senderId) {
-      return res.status(500).json({ message: 'senderId not provided' });
+      return res.status(400).json({ error: 'senderId not provided' });
     }
 
     if (!receiverId) {
-      return res.status(500).json({ message: 'receiverId not provided' });
+      return res.status(400).json({ error: 'receiverId not provided' });
     }
 
     const newConversation = new Conversation({
@@ -46,7 +46,7 @@ const getUserConversations = async (req, res) => {
     const foundUser = await User.findById(user._id);
 
     if (!foundUser) {
-      return res.status(500).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'User not found' });
     }
 
     const isMatch = user.email === foundUser.email; // tbh ofc it's going to be a match, if it found the user it already will match LOL...
@@ -107,7 +107,7 @@ const findOneConversation = async (req, res) => {
 
     return res.status(200).json(conversation);
   } catch (err) {
-    return res.status(500).json(err);
+    return res.status(500).json({ error: err.message || 'Error finding conversation' });
   }
 };
 
@@ -119,19 +119,19 @@ const findOneConversationById = async (req, res) => {
     const { conversationId } = req.params;
 
     if (!conversationId) {
-      return res.status(500).json({ message: 'conversationId not provided!' });
+      return res.status(400).json({ error: 'conversationId not provided!' });
     }
 
     let conversation = await Conversation.findById(conversationId)
       .populate('members', ['name', 'discord', 'rank', 'region']);
 
     if (!conversation) {
-      return res.status(404).json({ message: 'Conversation not found' });
+      return res.status(404).json({ error: 'Conversation not found' });
     }
 
     return res.status(200).json(conversation);
   } catch (err) {
-    return res.status(500).json(err);
+    return res.status(500).json({ error: err.message || 'Error finding conversation' });
   }
 };
 
@@ -143,19 +143,19 @@ const findScrimConversation = async (req, res) => {
     const { scrimId } = req.params;
 
     if (!scrimId) {
-      return res.status(500).json({ message: 'scrimId not provided!' });
+      return res.status(400).json({ error: 'scrimId not provided!' });
     }
 
     let conversation = await Conversation.findOne({ _scrim: scrimId })
       .populate('members', ['name', 'discord', 'rank', 'region']);
 
     if (!conversation) {
-      return res.status(404).json({ message: 'Conversation not found' });
+      return res.status(404).json({ error: 'Conversation not found' });
     }
 
     return res.status(200).json(conversation);
   } catch (err) {
-    return res.status(500).json(err);
+    return res.status(500).json({ error: err.message || 'Error finding conversation' });
   }
 };
 

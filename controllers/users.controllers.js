@@ -134,13 +134,15 @@ const getUserCreatedScrims = async (req, res) => {
 
     const user = await User.findById(id);
 
-    if (!user) return res.status(404).json({ message: 'User not found!' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     const userCreatedScrims = await Scrim.find({
       createdBy: user._id,
     });
 
-    return res.json(userCreatedScrims);
+    return res.status(200).json(userCreatedScrims);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -160,7 +162,9 @@ const getUserParticipatedScrims = async (req, res) => {
     }
 
     let user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: 'User not found!' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     const userParticipatedScrims = await Scrim.find({
       $and: [{ teamWon: { $exists: true } }, { teamWon: { $ne: null } }],
@@ -173,7 +177,7 @@ const getUserParticipatedScrims = async (req, res) => {
       ],
     });
 
-    return res.json(userParticipatedScrims);
+    return res.status(200).json(userParticipatedScrims);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -203,7 +207,7 @@ const getUserById = async (req, res) => {
     if (!user)
       return res
         .status(404)
-        .json({ message: `User not found with id: ${escape(id)}` });
+        .json({ error: `User not found with id: ${escape(id)}` });
 
     return res.status(200).json(user);
   } catch (error) {

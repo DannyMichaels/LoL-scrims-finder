@@ -403,12 +403,17 @@ const updateScrim = async (req, res) => {
   };
 
 
-  await Scrim.findByIdAndUpdate(id, payload, { new: true }, (error, scrim) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
+  try {
+    const scrim = await Scrim.findByIdAndUpdate(id, payload, { new: true })
+      .populate('createdBy', populateUser)
+      .populate('casters', populateUser)
+      .populate('lobbyHost', populateUser)
+      .populate(populateTeam('teamOne'))
+      .populate(populateTeam('teamTwo'))
+      .exec();
+
     if (!scrim) {
-      return res.status(500).send('Scrim not found');
+      return res.status(404).json({ error: 'Scrim not found' });
     }
 
     // If game start time was updated, reschedule the Riot tournament initialization
@@ -418,13 +423,10 @@ const updateScrim = async (req, res) => {
     }
 
     return res.status(200).json(scrim);
-  })
-    .populate('createdBy', populateUser)
-    .populate('casters', populateUser)
-    .populate('lobbyHost', populateUser)
-    .populate(populateTeam('teamOne'))
-    .populate(populateTeam('teamTwo'))
-    .exec();
+  } catch (error) {
+    console.error('Error updating scrim:', error);
+    return res.status(500).json({ error: error.message });
+  }
 };
 
 // @route   DELETE /api/scrims/:id
@@ -870,26 +872,10 @@ const movePlayerInScrim = async (req, res) => {
         return;
       }
 
-      await Scrim.findByIdAndUpdate(
+      const updatedScrim = await Scrim.findByIdAndUpdate(
         scrimId,
         newBody,
-        { new: true },
-        async (error, scrim) => {
-          if (error) {
-            return res.status(500).json({ error: error.message });
-          }
-
-          if (!scrim) {
-            return res.status(500).send('Scrim not found');
-          }
-
-          // check to select lobby host / captain for the scrim everytime someone moves
-          const lobbyHost = await getLobbyHost(scrim);
-          scrim.lobbyHost = lobbyHost;
-
-          await scrim.save();
-          return res.status(200).json(scrim);
-        }
+        { new: true }
       )
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
@@ -897,12 +883,24 @@ const movePlayerInScrim = async (req, res) => {
         .populate(populateTeam('teamOne'))
         .populate(populateTeam('teamTwo'))
         .exec();
+
+      if (!updatedScrim) {
+        return res.status(404).json({ error: 'Scrim not found' });
+      }
+
+      // check to select lobby host / captain for the scrim everytime someone moves
+      const lobbyHost = await getLobbyHost(updatedScrim);
+      updatedScrim.lobbyHost = lobbyHost;
+
+      await updatedScrim.save();
+      return res.status(200).json(updatedScrim);
     });
 
     // end of session
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err });
+    console.log('Error moving player in scrim:', err);
+    return res.status(500).json({ error: err.message || 'Error moving player' });
   }
 };
 
@@ -998,6 +996,7 @@ const swapPlayersInScrim = async (req, res) => {
 
     session.endSession();
   } catch (err) {
+    console.log('Error swapping players:', err);
     return res.status(500).json({ error: err.message || 'Error swapping players' });
   }
 };
@@ -1126,7 +1125,6 @@ const removeCasterFromScrim = async (req, res) => {
       const { scrimId, casterId } = req.params; // scrim id
       const currentUser = req.user;
 
-      const scrim = await Scrim.findOne({ _id: scrimId });
 
       const isValid = mongoose.Types.ObjectId.isValid(casterId);
 
@@ -1156,20 +1154,10 @@ const removeCasterFromScrim = async (req, res) => {
         ),
       };
 
-      await Scrim.findByIdAndUpdate(
+      const scrim = await Scrim.findByIdAndUpdate(
         scrimId,
         bodyData,
-        { new: true },
-        (error, scrim) => {
-          if (error) {
-            return res.status(500).json({ error: error.message });
-          }
-          if (!scrim) {
-            return res.status(500).send('Scrim not found');
-          }
-
-          return res.status(200).json(scrim);
-        }
+        { new: true }
       )
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
@@ -1177,10 +1165,16 @@ const removeCasterFromScrim = async (req, res) => {
         .populate(populateTeam('teamOne'))
         .populate(populateTeam('teamTwo'))
         .exec();
+
+      if (!scrim) {
+        return res.status(404).json({ error: 'Scrim not found' });
+      }
+
+      return res.status(200).json(scrim);
     });
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error removing caster' });
   }
 };
 
@@ -1193,10 +1187,14 @@ const addImageToScrim = async (req, res) => {
     const { id } = req.params;
     const { timestampNow = Date.now(), uploadedBy, base64 } = req.body;
 
-    const scrim = await Scrim.findById(id);
+    const scrim1 = await Scrim.findById(id);
+
+    if (!scrim1?._id) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
 
     const isLobbyHost =
-      String(scrim._doc.lobbyHost?._id) === String(req.user?._id);
+      String(scrim1._doc.lobbyHost?._id) === String(req.user?._id);
 
     if (!base64) {
       return res.status(500).json({
@@ -1214,8 +1212,8 @@ const addImageToScrim = async (req, res) => {
     }
 
     const { bucket, key, location } = await uploadToBucket({
-      fileName: `${scrim._id}-${timestampNow}`,
-      dirName: `postGameLobbyImages/${scrim._id}`,
+      fileName: `${scrim1._id}-${timestampNow}`,
+      dirName: `postGameLobbyImages/${scrim1._id}`,
       base64,
     });
 
@@ -1228,20 +1226,10 @@ const addImageToScrim = async (req, res) => {
       },
     };
 
-    await Scrim.findByIdAndUpdate(
+    const scrim = await Scrim.findByIdAndUpdate(
       id,
       dataSending,
-      { new: true },
-      (error, scrim) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-        if (!scrim) {
-          return res.status(500).send('Scrim not found');
-        }
-
-        return res.status(200).json(scrim);
-      }
+      { new: true }
     )
       .populate('createdBy', populateUser)
       .populate('casters', populateUser)
@@ -1249,9 +1237,15 @@ const addImageToScrim = async (req, res) => {
       .populate(populateTeam('teamOne'))
       .populate(populateTeam('teamTwo'))
       .exec();
+
+    if (!scrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    return res.status(200).json(scrim);
   } catch (err) {
     console.log('error uploading image', err);
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error uploading image' });
   }
 };
 
@@ -1262,19 +1256,19 @@ const removeImageFromScrim = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const scrim = await Scrim.findById(id);
+    const scrim1 = await Scrim.findById(id);
 
-    if (!scrim) {
-      return res.status(500).send('Scrim not found');
+    if (!scrim1?._id) {
+      return res.status(404).json({ error: 'Scrim not found' });
     }
 
-    if (scrim.postGameImage === null) {
-      return res.status(500).send('Image does not exist!');
+    if (!scrim1.postGameImage) {
+      return res.status(400).json({ error: 'Image does not exist!' });
     }
 
     const params = {
       Bucket: KEYS.S3_BUCKET_NAME,
-      Key: scrim.postGameImage.key,
+      Key: scrim1.postGameImage.key,
     };
 
     const dataSending = {
@@ -1285,20 +1279,10 @@ const removeImageFromScrim = async (req, res) => {
     await s3Bucket.deleteObject(params).promise();
 
     // delete it from the scrim object in the mongoose database
-    await Scrim.findByIdAndUpdate(
+    const scrim = await Scrim.findByIdAndUpdate(
       id,
       dataSending,
-      { new: true },
-      (error, scrim) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-        if (!scrim) {
-          return res.status(500).send('Scrim not found');
-        }
-
-        return res.status(200).json(scrim);
-      }
+      { new: true }
     )
       .populate('createdBy', populateUser)
       .populate('casters', populateUser)
@@ -1306,8 +1290,14 @@ const removeImageFromScrim = async (req, res) => {
       .populate(populateTeam('teamOne'))
       .populate(populateTeam('teamTwo'))
       .exec();
+
+    if (!scrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    return res.status(200).json(scrim);
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error removing image' });
   }
 };
 
@@ -1356,7 +1346,7 @@ const setScrimWinner = async (req, res) => {
 
     return res.status(200).send(populatedScrim);
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error setting scrim winner' });
   }
 };
 

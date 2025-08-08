@@ -1,19 +1,26 @@
 import { memo } from 'react';
-import TextField from '@mui/material/TextField';
-import MomentDateAdapter from '@mui/lab/AdapterMoment';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import MuiTimePicker from '@mui/lab/TimePicker';
+import moment from 'moment';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker as MuiTimePicker } from '@mui/x-date-pickers/TimePicker';
 
-function TimePicker({ value, onChange, variant, fullWidth, ...rest }) {
+function TimePicker({ value, onChange, variant, fullWidth, label, ...rest }) {
+  // Ensure value is always a valid moment object
+  const validValue = moment.isMoment(value) ? value : moment(value);
+
   return (
-    <LocalizationProvider dateAdapter={MomentDateAdapter}>
+    <LocalizationProvider dateAdapter={AdapterMoment}>
       <MuiTimePicker
-        value={value}
-        {...rest}
+        value={validValue}
         onChange={onChange}
-        renderInput={(params) => (
-          <TextField fullWidth={fullWidth} variant={variant} {...params} />
-        )}
+        label={label}
+        slotProps={{
+          textField: {
+            fullWidth: fullWidth,
+            variant: variant,
+          }
+        }}
+        {...rest}
       />
     </LocalizationProvider>
   );

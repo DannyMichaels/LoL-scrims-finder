@@ -71,7 +71,7 @@ const loginUser = async (req, res) => {
           error: `You are banned until ${new Date(
             foundUser.currentBan.dateTo
           ).toLocaleDateString()}. ${
-            foundBan.reason ? `\nReason: ${foundBan.reason}` : ''
+            foundBan?.reason ? `\nReason: ${foundBan.reason}` : ''
           }`,
         });
       }
@@ -207,50 +207,47 @@ const registerUser = async (req, res) => {
     const newUser = new User(userData);
 
     const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(newUser.uid, salt);
+    
+    newUser.uid = hash; // hash google uid to use as token, maybe there's something better that google provides as token.
 
-    bcrypt.hash(newUser.uid, salt, async (err, hash) => {
-      if (err) throw err;
+    const payload = {
+      uid: newUser.uid,
+      email: newUser.email,
+      rank: newUser.rank,
+      _id: newUser._id,
+      region: newUser.region,
+      discord: newUser.discord,
+      adminKey: newUser.adminKey,
+      canSendEmailsToUser: newUser.canSendEmailsToUser ?? false,
+      isAdmin: false,
+      name: newUser.name,
+      notifications: [],
+      friendRequests: [],
+      friends: [],
+    };
 
-      newUser.uid = hash; // hash google uid to use as token, maybe there's something better that google provides as token.
+    const accessToken = jwt.sign(payload, KEYS.SECRET_OR_KEY, {
+      expiresIn: KEYS.JWT_EXPIRATION,
+    });
 
-      const payload = {
-        uid: newUser.uid,
-        email: newUser.email,
-        rank: newUser.rank,
-        _id: newUser._id,
-        region: newUser.region,
-        discord: newUser.discord,
-        adminKey: newUser.adminKey,
-        canSendEmailsToUser: newUser.canSendEmailsToUser ?? false,
-        isAdmin: false,
-        name: newUser.name,
-        notifications: [],
-        friendRequests: [],
-        friends: [],
-      };
-
-      const accessToken = jwt.sign(payload, KEYS.SECRET_OR_KEY, {
-        expiresIn: KEYS.JWT_EXPIRATION,
-      });
-
-      // get login info for security purposes.
-      if (process.env.NODE_ENV === 'production') {
-        try {
-          await createLoginHistory(req, newUser);
-        } catch (error) {
-          error = error;
-        }
+    // get login info for security purposes.
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        await createLoginHistory(req, newUser);
+      } catch (error) {
+        error = error;
       }
+    }
 
-      await newUser.save();
+    await newUser.save();
 
-      console.log('User created: ', newUser);
-      return res.status(201).json({
-        success: true,
-        token: `Bearer ${accessToken}`,
-        user: newUser,
-        error,
-      });
+    console.log('User created: ', newUser);
+    return res.status(201).json({
+      success: true,
+      token: `Bearer ${accessToken}`,
+      user: newUser,
+      error,
     });
   } catch (error) {
     console.log(error);
@@ -352,12 +349,14 @@ const updateUser = async (req, res) => {
       }
     }
 
-    const summonerNameInvalid = checkSummonerNameValid(req.body.name);
+    if (req.body.name) {
+      const summonerNameInvalid = checkSummonerNameValid(req.body.name);
 
-    if (summonerNameInvalid) {
-      return res.status(400).json({
-        error: 'Error: no special characters in name field allowed!',
-      });
+      if (summonerNameInvalid) {
+        return res.status(400).json({
+          error: 'Error: no special characters in name field allowed!',
+        });
+      }
     }
 
     const isAdmin = req.body.adminKey === KEYS.ADMIN_KEY;
@@ -412,7 +411,7 @@ const updateUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json(error);
+    return res.status(500).json({ error: error.message });
   }
 };
 

@@ -1,3 +1,4 @@
+require('dotenv').config();
 // models
 const Scrim = require('../models/scrim.model');
 const User = require('../models/user.model');

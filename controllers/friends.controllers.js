@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const escape = require('escape-html');
 
 const nestedPopulate = (path, modelPath) => {
   // nested populate
@@ -18,17 +19,18 @@ const nestedPopulate = (path, modelPath) => {
 const getUserFriends = async (req, res) => {
   try {
     const { id } = req.params;
-    return await User.findById(id)
+    const user = await User.findById(id)
       .populate(nestedPopulate('friends', '_id'))
-      .exec((err, user) => {
-        const friends = user?.friends ?? [];
-        if (err) {
-          console.log(err);
-          return res.status(500).json({ error: err.message });
-        }
-        return res.status(200).json(friends);
-      });
+      .exec();
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const friends = user?.friends ?? [];
+    return res.status(200).json(friends);
   } catch (error) {
+    console.log('Error fetching user friends:', error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -40,18 +42,18 @@ const getUserFriendRequests = async (req, res) => {
   try {
     const id = req.user._id;
 
-    return await User.findById(id)
+    const user = await User.findById(id)
       .populate(nestedPopulate('friendRequests', '_user'))
-      .exec((err, user) => {
-        const friendRequests = user?.friendRequests ?? [];
-        if (err) {
-          console.log(err);
-          return res.status(500).json({ error: err.message });
-        }
-        console.log('success');
-        return res.status(200).json(friendRequests);
-      });
+      .exec();
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const friendRequests = user?.friendRequests ?? [];
+    return res.status(200).json(friendRequests);
   } catch (error) {
+    console.log('Error fetching user friend requests:', error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -67,12 +69,12 @@ const checkFriendRequestSent = async (req, res) => {
     const receiverUser = await User.findById(receiverId);
 
     if (!receiverUser) {
-      return res.status(500).json({ error: 'receiver not found' });
+      return res.status(404).json({ error: 'Receiver not found' });
     }
 
-    const isFriendRequestSentBySender = receiverUser.friendRequests.some(
+    const isFriendRequestSentBySender = receiverUser.friendRequests?.some(
       (request) => String(request?._user) === String(senderId)
-    );
+    ) || false;
 
     return res.status(200).json(isFriendRequestSentBySender);
   } catch (error) {
@@ -106,7 +108,7 @@ const sendFriendRequest = async (req, res) => {
       return res.status(404).json({ error: 'Receiving user not found' });
     }
 
-    const friendRequestFound = userReceiving.friendRequests.find(
+    const friendRequestFound = userReceiving.friendRequests?.find(
       ({ _user }) => String(_user) === String(userSending._id)
     );
 
@@ -135,8 +137,8 @@ const sendFriendRequest = async (req, res) => {
     };
 
     const reqBody = {
-      friendRequests: [...userReceiving.friendRequests, newFriendRequest],
-      notifications: [...userReceiving.notifications, newNotification],
+      friendRequests: [...(userReceiving.friendRequests || []), newFriendRequest],
+      notifications: [...(userReceiving.notifications || []), newNotification],
     };
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -146,7 +148,7 @@ const sendFriendRequest = async (req, res) => {
     );
 
     if (!updatedUser) {
-      return res.status(500).send('Failed to update user');
+      return res.status(500).json({ error: 'Failed to update user' });
     }
 
     await updatedUser.save();
@@ -174,10 +176,10 @@ const rejectFriendRequest = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(500).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    const filteredFriendRequests = user.friendRequests.filter(
+    const filteredFriendRequests = (user.friendRequests || []).filter(
       ({ _id }) => String(_id) !== requestId
     );
 
@@ -205,7 +207,7 @@ const acceptFriendRequest = async (req, res) => {
   const sendingToSelf = String(newFriendUserId) === String(id);
 
   if (sendingToSelf) {
-    return res.status(500).json({
+    return res.status(400).json({
       error: 'Friend request cannot be accepted by yourself',
     });
   }
@@ -217,23 +219,19 @@ const acceptFriendRequest = async (req, res) => {
   let friendUser = await User.findById(newFriendUserId);
 
   if (!user) {
-    return res.status(500).send(`User not found with id: ${escape(id)}`);
+    return res.status(404).json({ error: `User not found with id: ${id}` });
   }
 
   if (!friendUser) {
-    return res
-      .status(500)
-      .send(`Friend user not found with id: ${escape(newFriendUserId)}`);
+    return res.status(404).json({ error: `Friend user not found with id: ${newFriendUserId}` });
   }
 
-  if (user.friends.find(({ _id }) => String(_id) === String(friendUser._id))) {
-    res.status(500).send({ error: 'Friend already added!' });
-    return;
+  if (user.friends?.find(({ _id }) => String(_id) === String(friendUser._id))) {
+    return res.status(400).json({ error: 'Friend already added!' });
   }
 
-  if (friendUser.friends.find(({ _id }) => String(_id) === String(user._id))) {
-    res.status(500).send({ error: 'Friend already added!' });
-    return;
+  if (friendUser.friends?.find(({ _id }) => String(_id) === String(user._id))) {
+    return res.status(400).json({ error: 'Friend already added!' });
   }
 
   if (user.friends) {
@@ -272,24 +270,20 @@ const unfriendUser = async (req, res) => {
   let friendUser = await User.findById(friendUserId);
 
   if (!user) {
-    return res
-      .status(500)
-      .send(`User not found with id: ${escape(currentUserId)}`);
+    return res.status(404).json({ error: `User not found with id: ${currentUserId}` });
   }
 
   if (!friendUser) {
-    return res
-      .status(500)
-      .send(`Friend user not found with id: ${escape(friendUserId)}`);
+    return res.status(404).json({ error: `Friend user not found with id: ${friendUserId}` });
   }
 
-  user.friends = user.friends.filter(
+  user.friends = (user.friends || []).filter(
     ({ _id }) => String(_id) !== String(friendUser._id)
   );
 
   await user.save();
 
-  friendUser.friends = friendUser.friends.filter(
+  friendUser.friends = (friendUser.friends || []).filter(
     ({ _id }) => String(_id) !== String(user._id)
   );
 
