@@ -58,6 +58,9 @@ export default function ScrimTeamList({
   setScrim,
   socket,
   setSwapPlayers,
+  joinGame: joinGameProp,
+  leaveGame: leaveGameProp,
+  handleMovePlayer: handleMovePlayerProp,
 }) {
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
@@ -70,7 +73,7 @@ export default function ScrimTeamList({
 
   const { teamRoles, teamName, teamTitleName, teamArray } = teamData;
 
-  const joinGame = async (teamJoiningName, role) => {
+  const joinGame = joinGameProp || async (teamJoiningName, role) => {
     setButtonsDisabled(true);
 
     if (casterEntered) {
@@ -112,7 +115,7 @@ export default function ScrimTeamList({
     setButtonsDisabled(false);
   };
 
-  const handleMovePlayer = async (teamName, role) => {
+  const handleMovePlayer = handleMovePlayerProp || async (teamName, role) => {
     // toggleDisableButtons();
     setButtonsDisabled(true);
 
@@ -137,7 +140,7 @@ export default function ScrimTeamList({
     setButtonsDisabled(false);
   };
 
-  const leaveGame = async () => {
+  const leaveGame = leaveGameProp || async () => {
     setButtonsDisabled(true);
 
     const updatedScrim = await removePlayerFromScrim({

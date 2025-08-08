@@ -9,6 +9,7 @@ import useMessenger from './hooks/useMessenger';
 import useNotifications from './hooks/useNotifications';
 import useServerStatus from './hooks/useServerStatus';
 import { useCreateSocket } from './hooks/useSocket';
+import useScrimSocket from './hooks/useScrimSocket';
 
 // styles
 import { useAppStyles } from './styles/App.styles';
@@ -31,6 +32,7 @@ function App() {
 
   useServerStatus(); // check if server is online, if it's not redirects to error page.
   useCreateSocket(); // create socket for messenger
+  useScrimSocket(); // initialize socket connection with scrim store
   useAuthVerify(); // verify user is authenticated.
   useFetchUsers(); // fetch all users (for search and settings page)
   useSetScrimsRegion(); // set scrims region to users region on mount and when user changes it on settings

@@ -44,7 +44,8 @@
     "sharp": "^0.29.3",
     "socket.io-client": "^4.8.1",
     "use-sound": "^4.0.4",
-    "web-vitals": "^1.1.2"
+    "web-vitals": "^1.1.2",
+    "zustand": "^5.0.7"
   },
   "scripts": {
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-app-rewired start",
