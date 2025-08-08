@@ -114,15 +114,25 @@ const main = async () => {
 };
 
 const run = async () => {
-  let connection = mongooseConnect.dbConnect(MONGODB_URI);
-  connection.once('open', () =>
-    console.log('running mongoose to seed files on ' + MONGODB_URI)
-  );
-  connection.on('error', (error) => done(error));
+  try {
+    let connection = mongooseConnect.dbConnect(MONGODB_URI);
+    
+    // Wait for connection to be established
+    await new Promise((resolve, reject) => {
+      connection.once('open', () => {
+        console.log('running mongoose to seed files on ' + MONGODB_URI);
+        resolve();
+      });
+      connection.on('error', (error) => reject(error));
+    });
 
-  await main();
-
-  await connection.close();
+    await main();
+    await connection.close();
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during seeding:', error);
+    process.exit(1);
+  }
 };
 
 run();

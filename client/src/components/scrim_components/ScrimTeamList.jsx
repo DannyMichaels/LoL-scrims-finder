@@ -443,7 +443,7 @@ export default function ScrimTeamList({
                   alignItems="center"
                   className={classes.teamListItem}
                   data-role={teamRole}
-                  data-teamName={teamData.teamName}
+                  data-teamname={teamData.teamName}
                   onDragEnter={(e) => e.preventDefault()}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={onDrop}

@@ -1,14 +1,13 @@
-const AWS = require('aws-sdk');
+const { S3Client } = require('@aws-sdk/client-s3');
 const KEYS = require('../config/keys');
 
 const createS3 = () => {
-  // const spacesEndpoint = new AWS.Endpoint(KEYS.S3_ENDPOINT); // this is needed for Digital Ocean, not with normal aws s3
-
-  const s3 = new AWS.S3({
-    // endpoint: spacesEndpoint,
-    Bucket: KEYS.S3_BUCKET_NAME,
-    accessKeyId: KEYS.S3_ACCESS_KEY_ID,
-    secretAccessKey: KEYS.S3_SECRET_ACCESS_KEY,
+  const s3 = new S3Client({
+    region: KEYS.AWS_REGION || 'us-east-1',
+    credentials: {
+      accessKeyId: KEYS.S3_ACCESS_KEY_ID,
+      secretAccessKey: KEYS.S3_SECRET_ACCESS_KEY,
+    },
   });
 
   return s3;

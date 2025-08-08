@@ -26,6 +26,10 @@ import Box from '@mui/material/Box';
 import FormGroup from '@mui/material/FormGroup';
 import CustomTooltip from '../shared/Tooltip';
 import Tooltip from '@mui/material/Tooltip';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 // scrims passed in props from UserProfile.jsx (userParticipatedScrims)
 export default function UserParticipatedScrims({ scrims, user }) {
@@ -90,23 +94,29 @@ export default function UserParticipatedScrims({ scrims, user }) {
     <>
       <SectionDivider />
 
-      <Grid
-        container
-        alignItems="center"
-        flexWrap="nowrap"
-        justifyContent="space-between"
-        direction="row"
-        marginTop={2}>
-        <Grid item>
-          <CustomTooltip
-            title={`Scrims that ${user?.name} has been a part of (caster or player)`}>
-            <Typography style={{ cursor: 'help' }} variant="h1">
-              Scrims Participated In
-            </Typography>
-          </CustomTooltip>
-        </Grid>
-
-        <FormGroup row>
+      <Accordion defaultExpanded sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="participated-scrims-content"
+          id="participated-scrims-header">
+          <Grid
+            container
+            alignItems="center"
+            flexWrap="nowrap"
+            justifyContent="space-between"
+            direction="row"
+            sx={{ width: '100%' }}>
+            <Grid item>
+              <CustomTooltip
+                title={`Scrims that ${user?.name} has been a part of (caster or player)`}>
+                <Typography style={{ cursor: 'help' }} variant="h1">
+                  Scrims Participated In
+                  {` (${scrims.length})`}
+                </Typography>
+              </CustomTooltip>
+            </Grid>
+            <Grid item onClick={(e) => e.stopPropagation()}>
+              <FormGroup row>
           <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
               <InputLabel>Filter By</InputLabel>
@@ -140,10 +150,12 @@ export default function UserParticipatedScrims({ scrims, user }) {
               </Select>
             </FormControl>
           </Box>
-        </FormGroup>
-      </Grid>
-
-      <ul className={classes.myCreatedScrimsList}>
+              </FormGroup>
+            </Grid>
+          </Grid>
+        </AccordionSummary>
+        <AccordionDetails>
+          <ul className={classes.myCreatedScrimsList}>
         {filteredUserScrims.length > 0 ? (
           filteredUserScrims.map((scrim) => (
             <li key={scrim._id}>
@@ -166,7 +178,9 @@ export default function UserParticipatedScrims({ scrims, user }) {
               : `No ${filterType} found`}
           </Typography>
         )}
-      </ul>
+          </ul>
+        </AccordionDetails>
+      </Accordion>
     </>
   );
 }

@@ -12,7 +12,6 @@ import Grid from '@mui/material/Grid';
 import DiceIcon from '@mui/icons-material/Casino';
 
 // services
-import { generateRandomLobbyName } from '../../../services/wordsApi';
 
 export default function LobbyNameField({
   value,
@@ -28,7 +27,7 @@ export default function LobbyNameField({
     setIsFetchingLobbyName(true);
 
     try {
-      const randomLobbyName = await generateRandomLobbyName(wordsCount);
+      const randomLobbyName = '';
       setScrimData((prevState) => ({
         ...prevState,
         lobbyName: randomLobbyName,

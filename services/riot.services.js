@@ -2,7 +2,10 @@ const axios = require('axios');
 const { RIOT_API_KEY } = require('../utils/constants');
 
 // Riot API configuration
-const RIOT_API_BASE_URL = 'https://americas.api.riotgames.com'; // Americas routing for tournament API
+// Use tournament-stub for testing with development keys
+const RIOT_API_BASE_URL = process.env.RIOT_TOURNAMENT_STUB === 'true' 
+  ? 'https://americas.api.riotgames.com/lol/tournament-stub/v5'
+  : 'https://americas.api.riotgames.com'; // Americas routing for tournament API
 
 // Region mapping for Riot API
 const REGION_MAP = {
@@ -40,22 +43,38 @@ const riotApi = axios.create({
  */
 const createTournamentProvider = async (region, callbackUrl) => {
   try {
-    const regionCode = REGION_MAP[region] || region;
+    // Ensure region is uppercase for mapping
+    const upperRegion = region?.toUpperCase() || 'NA';
+    const regionCode = REGION_MAP[upperRegion];
+    
+    if (!regionCode) {
+      console.error(`No region mapping found for: ${region}`);
+      console.log('Available mappings:', REGION_MAP);
+      throw new Error(`Unsupported region: ${region}. Please use one of: ${Object.keys(REGION_MAP).join(', ')}`);
+    }
     
     const payload = {
       region: regionCode,
       url: callbackUrl || `${process.env.API_URL || 'http://localhost:3000'}/api/riot/callback`
     };
 
-    console.log('Creating tournament provider with payload:', payload);
+    console.log('Creating tournament provider with payload:', JSON.stringify(payload, null, 2));
+    console.log(`Region mapping: ${region} -> ${regionCode}`);
+    console.log(`Using API endpoint: ${riotApi.defaults.baseURL}/lol/tournament/v5/providers`);
     
     const response = await riotApi.post('/lol/tournament/v5/providers', payload);
     
     console.log('Tournament provider created successfully. Provider ID:', response.data);
     return response.data; // Returns the provider ID
   } catch (error) {
-    console.error('Error creating tournament provider:', error.response?.data || error.message);
-    throw new Error(`Failed to create tournament provider: ${error.response?.data?.status?.message || error.message}`);
+    console.error('Full error object:', error.response?.data || error);
+    console.error('Error status:', error.response?.status);
+    console.error('Error headers:', error.response?.headers);
+    
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.status?.message || 
+                        error.message;
+    throw new Error(`Failed to create tournament provider: ${errorMessage}`);
   }
 };
 
@@ -80,7 +99,8 @@ const createTournament = async (name, providerId) => {
     return response.data; // Returns the tournament ID
   } catch (error) {
     console.error('Error creating tournament:', error.response?.data || error.message);
-    throw new Error(`Failed to create tournament: ${error.response?.data?.status?.message || error.message}`);
+    const errorMessage = error.response?.data?.message || error.response?.data?.status?.message || error.message;
+    throw new Error(`Failed to create tournament: ${errorMessage}`);
   }
 };
 
@@ -128,7 +148,8 @@ const createTournamentCode = async (tournamentId, options = {}) => {
     return response.data; // Returns array of tournament codes
   } catch (error) {
     console.error('Error creating tournament code:', error.response?.data || error.message);
-    throw new Error(`Failed to create tournament code: ${error.response?.data?.status?.message || error.message}`);
+    const errorMessage = error.response?.data?.message || error.response?.data?.status?.message || error.message;
+    throw new Error(`Failed to create tournament code: ${errorMessage}`);
   }
 };
 
@@ -143,7 +164,8 @@ const getTournamentCode = async (tournamentCode) => {
     return response.data;
   } catch (error) {
     console.error('Error getting tournament code:', error.response?.data || error.message);
-    throw new Error(`Failed to get tournament code: ${error.response?.data?.status?.message || error.message}`);
+    const errorMessage = error.response?.data?.message || error.response?.data?.status?.message || error.message;
+    throw new Error(`Failed to get tournament code: ${errorMessage}`);
   }
 };
 
@@ -166,7 +188,8 @@ const updateTournamentCode = async (tournamentCode, updates) => {
     console.log('Tournament code updated successfully');
   } catch (error) {
     console.error('Error updating tournament code:', error.response?.data || error.message);
-    throw new Error(`Failed to update tournament code: ${error.response?.data?.status?.message || error.message}`);
+    const errorMessage = error.response?.data?.message || error.response?.data?.status?.message || error.message;
+    throw new Error(`Failed to update tournament code: ${errorMessage}`);
   }
 };
 
@@ -181,7 +204,8 @@ const getLobbyEvents = async (tournamentCode) => {
     return response.data;
   } catch (error) {
     console.error('Error getting lobby events:', error.response?.data || error.message);
-    throw new Error(`Failed to get lobby events: ${error.response?.data?.status?.message || error.message}`);
+    const errorMessage = error.response?.data?.message || error.response?.data?.status?.message || error.message;
+    throw new Error(`Failed to get lobby events: ${errorMessage}`);
   }
 };
 

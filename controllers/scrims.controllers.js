@@ -42,10 +42,10 @@ const buildScrimQuery = (req) => {
   
   // Date filtering
   if (req.query.date) {
-    const startDate = new Date(req.query.date);
-    startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(req.query.date);
-    endDate.setHours(23, 59, 59, 999);
+    // Parse the date string and set to start/end of day in UTC
+    const dateStr = req.query.date; // Expected format: YYYY-MM-DD
+    const startDate = new Date(`${dateStr}T00:00:00.000Z`);
+    const endDate = new Date(`${dateStr}T23:59:59.999Z`);
     
     query.gameStartTime = {
       $gte: startDate,
@@ -116,6 +116,16 @@ const buildScrimQuery = (req) => {
       { $expr: { $eq: [{ $size: '$teamOne' }, 5] } },
       { $expr: { $eq: [{ $size: '$teamTwo' }, 5] } }
     ];
+  }
+  
+  // Status filtering (pending, active, completed, cancelled, abandoned)
+  if (req.query.scrimStatus) {
+    query.status = req.query.scrimStatus;
+  }
+  
+  // By default, exclude cancelled and abandoned scrims unless specifically requested
+  if (!req.query.scrimStatus && req.query.includeInactive !== 'true') {
+    query.status = { $nin: ['cancelled', 'abandoned'] };
   }
   
   return query;
@@ -256,28 +266,24 @@ const getScrimById = async (req, res) => {
     let isValid = mongoose.Types.ObjectId.isValid(id);
 
     if (!isValid) {
-      return res.status(500).json({ error: 'invalid id' });
+      return res.status(400).json({ error: 'Invalid scrim ID' });
     }
 
-    let scrim = Scrim.findOne({ _id: { $eq: id } }).select('-editHistory');
-
-    if (!scrim) return res.status(404).json({ message: 'Scrim not found!' });
-
-    // using populate to show more than _id when using Ref on the model.
-    return await scrim
+    let scrim = await Scrim.findOne({ _id: { $eq: id } })
+      .select('-editHistory')
       .populate('casters', populateUser)
       .populate('createdBy', populateUser)
       .populate('lobbyHost', populateUser)
       .populate(populateTeam('teamOne'))
-      .populate(populateTeam('teamTwo'))
-      .exec((err, scrimData) => {
-        if (err) {
-          console.log(err);
-          return res.status(400).end();
-        }
-        return res.json(scrimData);
-      });
+      .populate(populateTeam('teamTwo'));
+
+    if (!scrim) {
+      return res.status(404).json({ message: 'Scrim not found!' });
+    }
+
+    return res.json(scrim);
   } catch (error) {
+    console.error('Error finding scrim by id:', error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -287,23 +293,38 @@ const getScrimById = async (req, res) => {
 // @access  Private (only people with the admin key can see this page in the app and create one)
 const createScrim = async (req, res) => {
   try {
+    // Safely get the user ID
+    const createdById = req.body.createdBy?._id || req.body.createdBy;
+    
+    if (!createdById) {
+      return res.status(400).json({ error: 'Creator user ID is required' });
+    }
+
     let createdByUser = await User.findOne({
-      _id: { $eq: req.body.createdBy._id },
+      _id: { $eq: createdById },
     });
+
+    if (!createdByUser) {
+      return res.status(404).json({ error: 'Creator user not found' });
+    }
 
     const requestBody = {
       ...req.body,
       lobbyName:
-        req.body.lobbyName ??
+        req.body.lobbyName ||
         getLobbyName(
-          req.body.title ?? `${createdByUser?.name}'s Scrim`,
-          req.body?.region ?? 'NA'
+          req.body.title || `${createdByUser.name}'s Scrim`,
+          req.body.region || 'NA'
         ),
       lobbyPassword: generatePassword(),
       createdBy: createdByUser,
     };
 
-    const scrim = new Scrim(requestBody);
+    const scrim = new Scrim({
+      ...requestBody,
+      status: 'pending', // Initialize with pending status
+      statusUpdatedAt: new Date()
+    });
 
     // add scrim to new conversation
     const scrimConversation = new Conversation({
@@ -315,7 +336,6 @@ const createScrim = async (req, res) => {
     scrim._conversation = scrimConversation._id;
 
     await scrim.save(); // save scrim
-    allScrimsCache.clear(); // clear
 
     const savedConversation = await scrimConversation.save(); // save conv
 
@@ -328,7 +348,7 @@ const createScrim = async (req, res) => {
 
     return res.status(201).json(scrim);
   } catch (error) {
-    console.log(error);
+    console.log('error creating scrim:', error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -382,7 +402,6 @@ const updateScrim = async (req, res) => {
     editHistory,
   };
 
-  allScrimsCache.clear(); // clear
 
   await Scrim.findByIdAndUpdate(id, payload, { new: true }, (error, scrim) => {
     if (error) {
@@ -421,10 +440,15 @@ const deleteScrim = async (req, res) => {
       return res.status(500).json({ error: 'invalid id' });
     }
 
+    // First update status to cancelled before deleting
+    await Scrim.findByIdAndUpdate(id, {
+      status: 'cancelled',
+      statusUpdatedAt: new Date()
+    });
+    
     const deleted = await Scrim.findByIdAndDelete(id);
 
     if (deleted) {
-      allScrimsCache.clear(); // clear
       
       // Cancel any scheduled tournament initialization
       scrimScheduler.cancelScheduledTournament(id);
@@ -565,39 +589,33 @@ const insertPlayerInScrim = async (req, res) => {
         return;
       }
 
-      await Scrim.findByIdAndUpdate(
+      const updatedScrim = await Scrim.findByIdAndUpdate(
         scrimId,
         reqBody,
-        { new: true },
-        async (error, scrim) => {
-          if (error) {
-            return res.status(500).json({ error: error.message });
-          }
-
-          if (!scrim) {
-            return res.status(500).send('Scrim not found');
-          }
-
-          // check for lobby host / captain everytime player joins
-          const lobbyHost = await getLobbyHost(scrim);
-          scrim.lobbyHost = lobbyHost;
-
-          await scrim.save();
-          return res.status(200).json(scrim);
-        }
+        { new: true }
       )
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
         .populate('lobbyHost', populateUser)
         .populate(populateTeam('teamOne'))
-        .populate(populateTeam('teamTwo'))
-        .exec();
+        .populate(populateTeam('teamTwo'));
+
+      if (!updatedScrim) {
+        return res.status(500).send('Scrim not found');
+      }
+
+      // check for lobby host / captain everytime player joins
+      const lobbyHost = await getLobbyHost(updatedScrim);
+      updatedScrim.lobbyHost = lobbyHost;
+
+      await updatedScrim.save();
+      return res.status(200).json(updatedScrim);
     });
 
     // end of session
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error inserting player' });
   }
 };
 
@@ -640,9 +658,15 @@ const removePlayerFromScrim = async (req, res) => {
       return res.status(500).json('user not found!');
     }
 
-    const teamLeavingName = [...scrim._doc.teamOne, ...scrim._doc.teamTwo].find(
+    const playerInScrim = [...scrim._doc.teamOne, ...scrim._doc.teamTwo].find(
       (player) => String(player._user) === String(userId)
-    ).team.name;
+    );
+
+    if (!playerInScrim) {
+      return res.status(400).json({ error: 'Player not found in scrim' });
+    }
+
+    const teamLeavingName = playerInScrim.team.name;
 
     const teamLeavingArr =
       teamLeavingName === 'teamOne' ? scrim._doc.teamOne : scrim._doc.teamTwo;
@@ -659,29 +683,24 @@ const removePlayerFromScrim = async (req, res) => {
       lobbyHost: isLobbyHost ? null : scrim?._doc?.lobbyHost ?? null, // if player leaving is hosting, reset the host to null
     };
 
-    await Scrim.findByIdAndUpdate(
+    const updatedScrim = await Scrim.findByIdAndUpdate(
       scrimId,
       scrimData,
-      { new: true },
-      (error, scrim) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-        if (!scrim) {
-          return res.status(500).send('Scrim not found');
-        }
-
-        return res.status(200).json(scrim);
-      }
+      { new: true }
     )
       .populate('createdBy', populateUser)
       .populate('casters', populateUser)
       .populate('lobbyHost', populateUser)
       .populate(populateTeam('teamOne'))
-      .populate(populateTeam('teamTwo'))
-      .exec();
+      .populate(populateTeam('teamTwo'));
+
+    if (!updatedScrim) {
+      return res.status(500).send('Scrim not found');
+    }
+
+    return res.status(200).json(updatedScrim);
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error removing player' });
   }
 };
 
@@ -897,6 +916,11 @@ const swapPlayersInScrim = async (req, res) => {
 
       const scrimId = req.params.scrimId;
       let scrim = await Scrim.findOne({ _id: scrimId });
+      
+      if (!scrim) {
+        return res.status(404).json({ error: 'Scrim not found' });
+      }
+      
       const teams = [...scrim.teamOne, ...scrim.teamTwo];
 
       let updatedTeamOne = [];
@@ -904,7 +928,7 @@ const swapPlayersInScrim = async (req, res) => {
 
       if (!!playerOne._user && !!playerTwo._user) {
         // if swapping between two players
-        for await (player of scrim.teamOne) {
+        for (const player of scrim.teamOne) {
           if (String(player._user) === String(playerOne._user)) {
             const swappedPlayer = {
               ...player._doc,
@@ -924,7 +948,7 @@ const swapPlayersInScrim = async (req, res) => {
           }
         }
 
-        for await (player of scrim.teamTwo) {
+        for (const player of scrim.teamTwo) {
           if (String(player._user) === String(playerOne._user)) {
             const swappedPlayer = {
               ...player._doc,
@@ -974,7 +998,7 @@ const swapPlayersInScrim = async (req, res) => {
 
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error swapping players' });
   }
 };
 
@@ -1008,6 +1032,10 @@ const insertCasterInScrim = async (req, res) => {
       }
 
       const scrim = await Scrim.findById(scrimId);
+
+      if (!scrim) {
+        return res.status(404).json({ error: 'Scrim not found' });
+      }
 
       if (!scrim.isWithCasters) {
         return res.status(500).json({
@@ -1058,27 +1086,22 @@ const insertCasterInScrim = async (req, res) => {
       };
 
       if (scrim._doc.casters.length < 2) {
-        await Scrim.findByIdAndUpdate(
+        const updatedScrim = await Scrim.findByIdAndUpdate(
           scrimId,
           bodyData,
-          { new: true },
-          (error, scrim) => {
-            if (error) {
-              return res.status(500).json({ error: error.message });
-            }
-            if (!scrim) {
-              return res.status(500).send('Scrim not found');
-            }
-
-            return res.status(200).json(scrim);
-          }
+          { new: true }
         )
           .populate('createdBy', populateUser)
           .populate('casters', populateUser)
           .populate('lobbyHost', populateUser)
           .populate(populateTeam('teamOne'))
-          .populate(populateTeam('teamTwo'))
-          .exec();
+          .populate(populateTeam('teamTwo'));
+
+        if (!updatedScrim) {
+          return res.status(500).send('Scrim not found');
+        }
+
+        return res.status(200).json(updatedScrim);
       } else {
         return res.status(500).json({
           error: 'Caster spots full!',
@@ -1088,7 +1111,7 @@ const insertCasterInScrim = async (req, res) => {
     });
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res.status(500).json({ error: err.message || 'Error inserting caster' });
   }
 };
 
@@ -1324,6 +1347,8 @@ const setScrimWinner = async (req, res) => {
     }
 
     scrim.teamWon = winnerTeamName;
+    scrim.status = 'completed';
+    scrim.statusUpdatedAt = new Date();
 
     await scrim.save();
 
@@ -1332,6 +1357,45 @@ const setScrimWinner = async (req, res) => {
     return res.status(200).send(populatedScrim);
   } catch (err) {
     return res.status(500).json({ error: err });
+  }
+};
+
+// @route   PATCH /api/scrims/:id/cancel
+// @desc    Cancel a scrim (sets status to cancelled)
+// @access  Private (admin only)
+const cancelScrim = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let isValid = mongoose.Types.ObjectId.isValid(id);
+
+    if (!isValid) {
+      return res.status(500).json({ error: 'invalid id' });
+    }
+
+    const scrim = await Scrim.findByIdAndUpdate(
+      id,
+      { 
+        status: 'cancelled',
+        statusUpdatedAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!scrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+
+    // Cancel any scheduled tournament initialization
+    scrimScheduler.cancelScheduledTournament(id);
+    
+
+    // Populate and return the updated scrim
+    const populatedScrim = await populateOneScrim(scrim._id);
+    
+    return res.status(200).json(populatedScrim);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
 
@@ -1351,4 +1415,5 @@ module.exports = {
   removeImageFromScrim,
   setScrimWinner,
   swapPlayersInScrim,
+  cancelScrim,
 };

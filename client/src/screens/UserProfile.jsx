@@ -89,7 +89,8 @@ export default function UserProfile() {
         });
 
         // don't fetch userCreatedScrims if user isn't himself
-        if (isCurrentUser || isCurrentUserAdmin) {
+        const isUserOwnProfile = fetchedUserData._id === currentUser?._id;
+        if (isUserOwnProfile || isCurrentUserAdmin) {
           const userCreatedScrims = await getUserCreatedScrims(userId);
 
           setUserCreatedScrims(userCreatedScrims);

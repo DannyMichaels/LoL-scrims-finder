@@ -64,14 +64,20 @@ const getOneUser = async (req, res) => {
         .sort({ createdAt: 'desc' }) // first user created first
         .exec();
 
+      if (!foundUser) {
+        return res.status(404).json({
+          message: 'No user found with that name',
+        });
+      }
+
       region = foundUser.region;
     }
 
     // upper case region if casing misspelled on postman.
     region = region.toUpperCase();
 
-    if (!REGIONS.includes(region)) {
-      return res.status(404).json({
+    if (!region || !REGIONS.includes(region)) {
+      return res.status(400).json({
         message:
           'Invalid region, please select one of the following: NA, EUW, EUNE, LAN, OCE',
       });
@@ -105,7 +111,7 @@ const getOneUser = async (req, res) => {
         .status(404)
         .json({ message: `User not found in region: ${escape(region)}` });
 
-    const isAdmin = userAdminKey.adminKey === KEYS.ADMIN_KEY;
+    const isAdmin = userAdminKey && userAdminKey.adminKey === KEYS.ADMIN_KEY;
 
     return res.status(200).json({ ...user._doc, isAdmin });
   } catch (error) {
@@ -123,16 +129,16 @@ const getUserCreatedScrims = async (req, res) => {
     let isValid = mongoose.Types.ObjectId.isValid(id);
 
     if (!isValid) {
-      return res.status(500).json({ error: 'invalid id' });
+      return res.status(400).json({ error: 'invalid id' });
     }
 
     const user = await User.findById(id);
 
+    if (!user) return res.status(404).json({ message: 'User not found!' });
+
     const userCreatedScrims = await Scrim.find({
       createdBy: user._id,
     });
-
-    if (!user) return res.status(404).json({ message: 'User not found!' });
 
     return res.json(userCreatedScrims);
   } catch (error) {
@@ -150,7 +156,7 @@ const getUserParticipatedScrims = async (req, res) => {
     let isValid = mongoose.Types.ObjectId.isValid(id);
 
     if (!isValid) {
-      return res.status(500).json({ error: 'invalid id' });
+      return res.status(400).json({ error: 'invalid id' });
     }
 
     let user = await User.findById(id);

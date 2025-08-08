@@ -3,6 +3,7 @@ import { useScrimsActions } from '../../hooks/useScrims';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
 import useAlerts from '../../hooks/useAlerts';
 import useAuth from '../../hooks/useAuth';
+import moment from 'moment';
 
 // components
 import Navbar from '../../components/shared/Navbar/Navbar';
@@ -83,7 +84,7 @@ function ScrimEdit() {
           lobbyName,
           lobbyPassword,
           teamWon: oneScrim?.teamWon ?? null,
-          gameStartTime,
+          gameStartTime: moment(gameStartTime),
           teamOne,
           teamTwo,
           previousLobbyHost: oneScrim?.lobbyHost ?? null,
@@ -226,6 +227,7 @@ function ScrimEdit() {
 
       const dataSending = {
         ...scrimData,
+        gameStartTime: moment(scrimData.gameStartTime).toISOString(),
         lobbyHost: await getLobbyHost(),
         // if user selected N//A send null for teamWon, else send the actual value and result to null if undefined
         teamWon:

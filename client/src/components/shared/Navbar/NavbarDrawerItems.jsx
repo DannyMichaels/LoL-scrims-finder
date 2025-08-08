@@ -12,7 +12,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 // icons
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExitIcon from '@mui/icons-material/ExitToApp';
-import MyProfileIcon from '@mui/icons-material/AccountCircle';
+import MyProfileIcon from '@mui/icons-material/Person2'
 import GamesIcon from '@mui/icons-material/Games';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 

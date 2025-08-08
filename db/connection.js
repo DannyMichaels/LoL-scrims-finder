@@ -1,11 +1,7 @@
 const mongoose = require('mongoose');
 
 function dbConnect(dbUri) {
-  mongoose.connect(dbUri, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-  });
+  mongoose.connect(dbUri);
   return mongoose.connection;
 }
 

@@ -4,12 +4,8 @@ const User = require('../models/user.model');
 
 const mongoose = require('mongoose');
 
-const handleValidId = async (id, res) => {
-  let isValid = mongoose.Types.ObjectId.isValid(id);
-
-  if (!isValid) {
-    return res.status(500).json({ error: 'invalid id' });
-  }
+const handleValidId = (id) => {
+  return mongoose.Types.ObjectId.isValid(id);
 };
 
 // @route   POST /api/messages
@@ -20,8 +16,12 @@ const postMessage = async (req, res) => {
     const { text, conversationId, receiverId } = req.body;
     const senderId = req.user._id ?? '';
 
-    await handleValidId(conversationId, res);
-    await handleValidId(senderId, res);
+    if (!handleValidId(conversationId)) {
+      return res.status(400).json({ error: 'Invalid conversation ID' });
+    }
+    if (!handleValidId(senderId)) {
+      return res.status(400).json({ error: 'Invalid sender ID' });
+    }
 
     const conversation = await Conversation.findById(conversationId);
     const sender = await User.findById(senderId);
@@ -49,9 +49,8 @@ const postMessage = async (req, res) => {
     let savedMessage = await newMessage.save();
 
     // make sure we get _sender.name, region, rank etc after creating with populate, or else it will only return id to the client
-    savedMessage = await savedMessage
-      .populate('_sender', ['name', 'discord', 'rank', 'region'])
-      .execPopulate();
+    savedMessage = await Message.findById(savedMessage._id)
+      .populate('_sender', ['name', 'discord', 'rank', 'region']);
 
     return res.status(200).json(savedMessage);
   } catch (error) {
@@ -89,7 +88,9 @@ const postMessageSeenByUser = async (req, res) => {
     const { messageId } = req.params;
     const seenByUserId = req.user._id ?? false;
 
-    await handleValidId(messageId, res);
+    if (!handleValidId(messageId)) {
+      return res.status(400).json({ error: 'Invalid message ID' });
+    }
 
     if (!seenByUserId) {
       return res.status(500).json({
@@ -117,7 +118,9 @@ const getUserUnseenMessages = async (req, res) => {
     const userId = req.user._id;
     const currentUser = await User.findById(userId).select(['friends']);
 
-    await handleValidId(userId, res);
+    if (!handleValidId(userId)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
 
     const messages = await Message.find({ _receiver: userId });
 

@@ -78,6 +78,13 @@ router.patch(
   controllers.setScrimWinner
 ); // PATCH
 
+router.patch(
+  '/scrims/:id/cancel',
+  passport.authenticate('jwt', { session: false }),
+  admin,
+  controllers.cancelScrim
+); // PATCH
+
 router.delete(
   '/scrims/:id',
   passport.authenticate('jwt', { session: false }),

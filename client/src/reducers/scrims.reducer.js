@@ -2,6 +2,7 @@ import moment from 'moment';
 
 const initialState = {
   scrims: [],
+  allScrims: [], // all scrims from the server
   filteredScrims: [], // filtered scrims by date and region
   scrimsLoaded: false,
 
@@ -24,6 +25,8 @@ export default function scrimsReducer(state = initialState, action) {
       return {
         ...state,
         scrims: payload,
+        allScrims: payload, // Store all scrims for client-side filtering
+        filteredScrims: payload, // Backend already filters, so use the same data
         scrimsLoaded: true,
       };
     }
@@ -43,25 +46,11 @@ export default function scrimsReducer(state = initialState, action) {
     }
 
     case 'scrims/setFilteredScrims': {
-      const dateFilteredScrims = state.scrims.filter(({ gameStartTime }) => {
-        //  if gameStartTime equals to the scrimsDate, show it.
-        return (
-          new Date(gameStartTime).toLocaleDateString() ===
-          new Date(state.scrimsDate).toLocaleDateString()
-        );
-      });
-
-      const filteredScrimsByDateAndRegion = dateFilteredScrims.filter(
-        (scrim) => scrim.region === state.scrimsRegion
-      );
-
-      const filteredScrims = filteredScrimsByDateAndRegion.filter(
-        (scrim) => !scrim.isPrivate
-      );
-
+      // Since backend now handles filtering, we just return the current scrims
+      // This action is kept for backward compatibility but doesn't filter anymore
       return {
         ...state,
-        filteredScrims: filteredScrims, // date and region filtered scrims
+        filteredScrims: state.scrims,
       };
     }
 

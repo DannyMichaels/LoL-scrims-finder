@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:developer.riotgames.com)"
+      "WebFetch(domain:developer.riotgames.com)",
+      "Bash(rm:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(yarn remove:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)"
     ],
     "deny": []
   }

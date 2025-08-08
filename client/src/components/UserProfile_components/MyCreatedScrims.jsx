@@ -15,6 +15,10 @@ import Box from '@mui/material/Box';
 import FormGroup from '@mui/material/FormGroup';
 import CustomTooltip from '../shared/Tooltip';
 import Tooltip from '@mui/material/Tooltip';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 // utils
 import {
@@ -62,34 +66,39 @@ export default function MyCreatedScrims({
   }, [sortType, filterType, sortedCreatedScrims]);
 
   if (!isCurrentUser && !isCurrentUserAdmin) return null;
-  if (!user?.isAdmin) return null;
 
   return (
     <>
       <SectionDivider />
 
-      <Grid
-        container
-        alignItems="center"
-        flexWrap="nowrap"
-        justifyContent="space-between"
-        direction="row"
-        marginTop={2}>
-        <Grid item>
-          <CustomTooltip
-            placement="top"
-            title={`Scrims that ${
-              isCurrentUser ? 'you have' : `${user?.name} has`
-            } created`}>
-            <Typography style={{ cursor: 'help' }} variant="h1">
-              {isCurrentUser
-                ? 'My Created Scrims'
-                : `${user?.name}'s Created Scrims`}
-            </Typography>
-          </CustomTooltip>
-        </Grid>
-
-        <FormGroup row>
+      <Accordion defaultExpanded sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="created-scrims-content"
+          id="created-scrims-header">
+          <Grid
+            container
+            alignItems="center"
+            flexWrap="nowrap"
+            justifyContent="space-between"
+            direction="row"
+            sx={{ width: '100%' }}>
+            <Grid item>
+              <CustomTooltip
+                placement="top"
+                title={`Scrims that ${
+                  isCurrentUser ? 'you have' : `${user?.name} has`
+                } created`}>
+                <Typography style={{ cursor: 'help' }} variant="h1">
+                  {isCurrentUser
+                    ? 'My Created Scrims'
+                    : `${user?.name}'s Created Scrims`}
+                  {` (${scrims.length})`}
+                </Typography>
+              </CustomTooltip>
+            </Grid>
+            <Grid item onClick={(e) => e.stopPropagation()}>
+              <FormGroup row>
           <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
               <InputLabel>Filter By</InputLabel>
@@ -120,33 +129,38 @@ export default function MyCreatedScrims({
               </Select>
             </FormControl>
           </Box>
-        </FormGroup>
-      </Grid>
-      <ul className={classes.myCreatedScrimsList}>
-        {filteredCreatedScrims.length > 0 ? (
-          filteredCreatedScrims.map((scrim) => (
-            <li key={scrim._id}>
-              <Tooltip arrow placement="top" title="Redirect to game page">
-                <Link className="link" to={`/scrims/${scrim._id}`}>
-                  {scrim.title} |&nbsp;
-                  <Moment format="MM/DD/yyyy hh:mm A">
-                    {scrim.gameStartTime}
-                  </Moment>
-                  &nbsp;| {scrim.region}&nbsp;
-                  {scrim?.isPrivate ? '| Private' : '| Public'}
-                </Link>
-              </Tooltip>
-            </li>
-          ))
-        ) : (
-          <Typography variant="h3">
-            {/* if user didn't set a filter, just say no scrims found */}
-            {filterType === 'none'
-              ? 'No created scrims found'
-              : `No ${filterType} created scrims found`}
-          </Typography>
-        )}
-      </ul>
+              </FormGroup>
+            </Grid>
+          </Grid>
+        </AccordionSummary>
+        <AccordionDetails>
+          <ul className={classes.myCreatedScrimsList}>
+              {filteredCreatedScrims.length > 0 ? (
+                filteredCreatedScrims.map((scrim) => (
+                  <li key={scrim._id}>
+                    <Tooltip arrow placement="top" title="Redirect to game page">
+                      <Link className="link" to={`/scrims/${scrim._id}`}>
+                        {scrim.title} |&nbsp;
+                        <Moment format="MM/DD/yyyy hh:mm A">
+                          {scrim.gameStartTime}
+                        </Moment>
+                        &nbsp;| {scrim.region}&nbsp;
+                        {scrim?.isPrivate ? '| Private' : '| Public'}
+                      </Link>
+                    </Tooltip>
+                  </li>
+                ))
+              ) : (
+                <Typography variant="h3">
+                  {/* if user didn't set a filter, just say no scrims found */}
+                  {filterType === 'none'
+                    ? 'No created scrims found'
+                    : `No ${filterType} created scrims found`}
+                </Typography>
+              )}
+          </ul>
+        </AccordionDetails>
+      </Accordion>
     </>
   );
 }

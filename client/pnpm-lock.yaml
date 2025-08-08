@@ -14,6 +14,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.1.9)(react@17.0.2))(@types/react@19.1.9)(react@17.0.2)
+      '@hello-pangea/dnd':
+        specifier: ^18.0.1
+        version: 18.0.1(@types/react@19.1.9)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       '@material-ui/lab':
         specifier: 4.0.0-alpha.61
         version: 4.0.0-alpha.61(@material-ui/core@4.12.4(@types/react@19.1.9)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@19.1.9)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -86,9 +89,6 @@ importers:
       react-dom:
         specifier: ^17.0.2
         version: 17.0.2(react@17.0.2)
-      react-draggable:
-        specifier: ^4.5.0
-        version: 4.5.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react-favicon:
         specifier: ^0.0.23
         version: 0.0.23(react@17.0.2)
@@ -129,6 +129,15 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2
     devDependencies:
+      '@babel/plugin-proposal-nullish-coalescing-operator':
+        specifier: ^7.18.6
+        version: 7.18.6(@babel/core@7.12.3)
+      '@babel/plugin-proposal-optional-chaining':
+        specifier: ^7.21.0
+        version: 7.21.0(@babel/core@7.12.3)
+      react-app-rewired:
+        specifier: ^2.2.1
+        version: 2.2.1(react-scripts@4.0.3(@types/webpack@4.41.40)(eslint@7.32.0)(react@17.0.2)(sockjs-client@1.6.1)(typescript@4.9.5))
       react-s3:
         specifier: ^1.3.1
         version: 1.3.1
@@ -1166,6 +1175,12 @@ packages:
     resolution: {integrity: sha512-tAag0jEcjwH+P2quUfipd7liWCNX2F8NvYjQp2wtInsZxnMlypdw0FtAOLxtvvkO+GSRRbmNi8m/5y42PQJYCQ==}
     deprecated: This version has been deprecated and is no longer supported or maintained
 
+  '@hello-pangea/dnd@18.0.1':
+    resolution: {integrity: sha512-xojVWG8s/TGrKT1fC8K2tIWeejJYTAeJuj36zM//yEm/ZrnZUSFGS15BpO+jGZT1ybWvyXmeDJwPYb4dhWlbZQ==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+
   '@humanwhocodes/config-array@0.5.0':
     resolution: {integrity: sha512-FagtKFz74XrTl7y6HCzQpwDfXP0yhxe9lHLD1UZxjvZIcbyRz8zTFF/yYNfSfzU414eDwZ1SrO0Qvtyf+wFMQg==}
     engines: {node: '>=10.10.0'}
@@ -1775,8 +1790,8 @@ packages:
     resolution: {integrity: sha512-zmPitbQ8+6zNutpwgcQuLcsEpn/Cj54Kbn7L5pX0Os5kdWplB7xPgEh/g+SWOB/qmows2gpuCaPyduq8ZZRnxA==}
     deprecated: This is a stub types definition. minimatch provides its own type definitions, so you do not need this installed.
 
-  '@types/node@24.2.0':
-    resolution: {integrity: sha512-3xyG3pMCq3oYCNg7/ZP+E1ooTaGB4cG8JWRsqqOYQdbWNY4zbaV0Ennrd7stjiJEFZCaybcIgpTjJWHRfBSIDw==}
+  '@types/node@24.2.1':
+    resolution: {integrity: sha512-DRh5K+ka5eJic8CjH7td8QpYEV6Zo10gfRkjHCO3weqZHWDtAaSTFtl4+VMqOJ4N5jcuhZ9/l+yy8rVgw7BQeQ==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -1830,6 +1845,9 @@ packages:
 
   '@types/uglify-js@3.17.5':
     resolution: {integrity: sha512-TU+fZFBTBcXj/GpDpDaBmgWk/gn96kMZ+uocaFUlV2f8a6WdMzzI44QBCmGcCiYR0Y6ZlNRiyUyKKt5nl/lbzQ==}
+
+  '@types/use-sync-external-store@0.0.6':
+    resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
 
   '@types/webpack-sources@3.2.3':
     resolution: {integrity: sha512-4nZOdMwSPHZ4pTEZzSp0AsTM4K7Qmu40UKW4tJDiOVs20UzYF9l+qUe4s0ftfN0pin06n+5cWWDJXH+sbhAiDw==}
@@ -3071,6 +3089,9 @@ packages:
     resolution: {integrity: sha512-LHz35Hr83dnFeipc7oqFDmsjHdljj3TQtxGGiNWSOsTLIAubSm4TEz8qCaKFpk7idaQ1GfWscF4E6mgpBysA1w==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  css-box-model@1.2.1:
+    resolution: {integrity: sha512-a7Vr4Q/kd/aw96bnJG332W9V9LkJO69JRcaCYDUqjp6/z0w6VcZjgAcTbgFxEPfBgdnAwlh3iwu+hLopa+flJw==}
 
   css-color-names@0.0.4:
     resolution: {integrity: sha512-zj5D7X1U2h2zsXOAM8EyUREBnnts6H+Jm+d1M2DbiQQcUtnqgQsMrdo8JW9R80YFUmIdBZeMu5wvYM7hcgWP/Q==}
@@ -6926,6 +6947,9 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
+  raf-schd@4.0.3:
+    resolution: {integrity: sha512-tQkJl2GRWh83ui2DiPTJz9wEiMN20syf+5oKfB03yYP7ioZcJwsIK8FjrtLwH1m7C7e+Tt2yYBlrOpdT+dyeIQ==}
+
   raf@3.4.1:
     resolution: {integrity: sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==}
 
@@ -6954,6 +6978,12 @@ packages:
     resolution: {integrity: sha512-0sF4ny9v/B7s6aoehwze9vJNWcmCemAUYBVasscVr92+UYiEqDXOxfKjXN685mDaMRNF3WdhHQs76oTODMocFA==}
     engines: {node: '>=10'}
 
+  react-app-rewired@2.2.1:
+    resolution: {integrity: sha512-uFQWTErXeLDrMzOJHKp0h8P1z0LV9HzPGsJ6adOtGlA/B9WfT6Shh4j2tLTTGlXOfiVx6w6iWpp7SOC5pvk+gA==}
+    hasBin: true
+    peerDependencies:
+      react-scripts: '>=2.1.3'
+
   react-awesome-reveal@3.8.1:
     resolution: {integrity: sha512-cB+XubgAa7QJ9ibkHePiVGTOzRKokqdDOP+yLfQtw5uu+xsAR/kwktLntMZev+1GBz2NhlcpbYvKqEbVIkKfLw==}
     peerDependencies:
@@ -6973,12 +7003,6 @@ packages:
     resolution: {integrity: sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==}
     peerDependencies:
       react: 17.0.2
-
-  react-draggable@4.5.0:
-    resolution: {integrity: sha512-VC+HBLEZ0XJxnOxVAZsdRi8rD04Iz3SiiKOoYzamjylUcju/hP9np/aZdLHf/7WOD268WMoNJMvYfB5yAK45cw==}
-    peerDependencies:
-      react: '>= 16.3.0'
-      react-dom: '>= 16.3.0'
 
   react-error-overlay@6.1.0:
     resolution: {integrity: sha512-SN/U6Ytxf1QGkw/9ve5Y+NxBbZM6Ht95tuXNMKs8EJyFa/Vy/+Co3stop3KBHARfn/giv+Lj1uUnTfOJ3moFEQ==}
@@ -7031,6 +7055,18 @@ packages:
       react-dom:
         optional: true
       react-native:
+        optional: true
+
+  react-redux@9.2.0:
+    resolution: {integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==}
+    peerDependencies:
+      '@types/react': ^18.2.25 || ^19
+      react: ^18.0 || ^19
+      redux: ^5.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      redux:
         optional: true
 
   react-refresh@0.8.3:
@@ -7137,6 +7173,9 @@ packages:
 
   redux@4.2.1:
     resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
+
+  redux@5.0.1:
+    resolution: {integrity: sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==}
 
   reflect.getprototypeof@1.0.10:
     resolution: {integrity: sha512-00o4I+DVrefhv+nX0ulyi3biSHCPDe+yLv5o/p6d/UVlirijB8E16FtfwSAi4g3tcqrQ4lRAqQSoFEZJehYEcw==}
@@ -8381,6 +8420,11 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
+  use-sync-external-store@1.5.0:
+    resolution: {integrity: sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   use@3.1.1:
     resolution: {integrity: sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==}
     engines: {node: '>=0.10.0'}
@@ -9178,6 +9222,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@babel/plugin-proposal-nullish-coalescing-operator@7.18.6(@babel/core@7.12.3)':
+    dependencies:
+      '@babel/core': 7.12.3
+      '@babel/helper-plugin-utils': 7.27.1
+      '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3(@babel/core@7.12.3)
+
   '@babel/plugin-proposal-nullish-coalescing-operator@7.18.6(@babel/core@7.28.0)':
     dependencies:
       '@babel/core': 7.28.0
@@ -9189,6 +9239,15 @@ snapshots:
       '@babel/core': 7.28.0
       '@babel/helper-plugin-utils': 7.27.1
       '@babel/plugin-syntax-numeric-separator': 7.10.4(@babel/core@7.28.0)
+
+  '@babel/plugin-proposal-optional-chaining@7.21.0(@babel/core@7.12.3)':
+    dependencies:
+      '@babel/core': 7.12.3
+      '@babel/helper-plugin-utils': 7.27.1
+      '@babel/helper-skip-transparent-expression-wrappers': 7.27.1
+      '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.12.3)
+    transitivePeerDependencies:
+      - supports-color
 
   '@babel/plugin-proposal-optional-chaining@7.21.0(@babel/core@7.28.0)':
     dependencies:
@@ -10738,7 +10797,7 @@ snapshots:
   '@grpc/grpc-js@1.6.12':
     dependencies:
       '@grpc/proto-loader': 0.7.15
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@grpc/proto-loader@0.6.13':
     dependencies:
@@ -10779,6 +10838,18 @@ snapshots:
   '@hapi/topo@3.1.6':
     dependencies:
       '@hapi/hoek': 8.5.1
+
+  '@hello-pangea/dnd@18.0.1(@types/react@19.1.9)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)':
+    dependencies:
+      '@babel/runtime': 7.28.2
+      css-box-model: 1.2.1
+      raf-schd: 4.0.3
+      react: 17.0.2
+      react-dom: 17.0.2(react@17.0.2)
+      react-redux: 9.2.0(@types/react@19.1.9)(react@17.0.2)(redux@5.0.1)
+      redux: 5.0.1
+    transitivePeerDependencies:
+      - '@types/react'
 
   '@humanwhocodes/config-array@0.5.0':
     dependencies:
@@ -10824,7 +10895,7 @@ snapshots:
   '@jest/console@26.6.2':
     dependencies:
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       chalk: 4.1.2
       jest-message-util: 26.6.2
       jest-util: 26.6.2
@@ -10837,7 +10908,7 @@ snapshots:
       '@jest/test-result': 26.6.2
       '@jest/transform': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       exit: 0.1.2
@@ -10873,7 +10944,7 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       jest-mock: 26.6.2
 
   '@jest/expect-utils@30.0.5':
@@ -10884,7 +10955,7 @@ snapshots:
     dependencies:
       '@jest/types': 26.6.2
       '@sinonjs/fake-timers': 6.0.1
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       jest-message-util: 26.6.2
       jest-mock: 26.6.2
       jest-util: 26.6.2
@@ -10899,7 +10970,7 @@ snapshots:
 
   '@jest/pattern@30.0.1':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       jest-regex-util: 30.0.1
 
   '@jest/reporters@26.6.2':
@@ -10984,7 +11055,7 @@ snapshots:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       '@types/yargs': 15.0.19
       chalk: 4.1.2
 
@@ -10994,7 +11065,7 @@ snapshots:
       '@jest/schemas': 30.0.5
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       '@types/yargs': 17.0.33
       chalk: 4.1.2
 
@@ -11502,7 +11573,7 @@ snapshots:
 
   '@types/duplexify@3.6.4':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@types/eslint@7.29.0':
     dependencies:
@@ -11516,11 +11587,11 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@types/graceful-fs@4.1.9':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@types/hoist-non-react-statics@3.3.7(@types/react@19.1.9)':
     dependencies:
@@ -11550,7 +11621,7 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@types/long@4.0.2': {}
 
@@ -11558,7 +11629,7 @@ snapshots:
     dependencies:
       minimatch: 10.0.3
 
-  '@types/node@24.2.0':
+  '@types/node@24.2.1':
     dependencies:
       undici-types: 7.10.0
 
@@ -11589,15 +11660,15 @@ snapshots:
 
   '@types/readdir-glob@1.1.5':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@types/resolve@0.0.8':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   '@types/source-list-map@0.1.6': {}
 
@@ -11615,15 +11686,17 @@ snapshots:
     dependencies:
       source-map: 0.6.1
 
+  '@types/use-sync-external-store@0.0.6': {}
+
   '@types/webpack-sources@3.2.3':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       '@types/source-list-map': 0.1.6
       source-map: 0.7.6
 
   '@types/webpack@4.41.40':
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       '@types/tapable': 1.0.12
       '@types/uglify-js': 3.17.5
       '@types/webpack-sources': 3.2.3
@@ -13237,6 +13310,10 @@ snapshots:
   css-blank-pseudo@0.1.4:
     dependencies:
       postcss: 7.0.39
+
+  css-box-model@1.2.1:
+    dependencies:
+      tiny-invariant: 1.3.3
 
   css-color-names@0.0.4: {}
 
@@ -15740,7 +15817,7 @@ snapshots:
       '@jest/test-result': 26.6.2
       '@jest/types': 26.6.2
       '@types/babel__traverse': 7.28.0
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       chalk: 4.1.2
       co: 4.6.0
       dedent: 0.7.0
@@ -15838,7 +15915,7 @@ snapshots:
       '@jest/environment': 26.6.2
       '@jest/fake-timers': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       jest-mock: 26.6.2
       jest-util: 26.6.2
       jsdom: 16.7.0
@@ -15853,7 +15930,7 @@ snapshots:
       '@jest/environment': 26.6.2
       '@jest/fake-timers': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       jest-mock: 26.6.2
       jest-util: 26.6.2
 
@@ -15863,7 +15940,7 @@ snapshots:
     dependencies:
       '@jest/types': 26.6.2
       '@types/graceful-fs': 4.1.9
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       graceful-fs: 4.2.11
@@ -15886,7 +15963,7 @@ snapshots:
       '@jest/source-map': 26.6.2
       '@jest/test-result': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       chalk: 4.1.2
       co: 4.6.0
       expect: 26.6.2
@@ -15948,12 +16025,12 @@ snapshots:
   jest-mock@26.6.2:
     dependencies:
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
 
   jest-mock@30.0.5:
     dependencies:
       '@jest/types': 30.0.5
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       jest-util: 30.0.5
 
   jest-pnp-resolver@1.2.3(jest-resolve@26.6.0):
@@ -16004,7 +16081,7 @@ snapshots:
       '@jest/environment': 26.6.2
       '@jest/test-result': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       chalk: 4.1.2
       emittery: 0.7.2
       exit: 0.1.2
@@ -16065,7 +16142,7 @@ snapshots:
 
   jest-serializer@26.6.2:
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       graceful-fs: 4.2.11
 
   jest-snapshot@26.6.2:
@@ -16092,7 +16169,7 @@ snapshots:
   jest-util@26.6.2:
     dependencies:
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       chalk: 4.1.2
       graceful-fs: 4.2.11
       is-ci: 2.0.0
@@ -16101,7 +16178,7 @@ snapshots:
   jest-util@30.0.5:
     dependencies:
       '@jest/types': 30.0.5
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       chalk: 4.1.2
       ci-info: 4.3.0
       graceful-fs: 4.2.11
@@ -16131,7 +16208,7 @@ snapshots:
     dependencies:
       '@jest/test-result': 26.6.2
       '@jest/types': 26.6.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       jest-util: 26.6.2
@@ -16144,13 +16221,13 @@ snapshots:
 
   jest-worker@26.6.2:
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       merge-stream: 2.0.0
       supports-color: 7.2.0
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -18018,7 +18095,7 @@ snapshots:
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
       '@types/long': 4.0.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       long: 4.0.0
 
   protobufjs@6.11.4:
@@ -18034,7 +18111,7 @@ snapshots:
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
       '@types/long': 4.0.2
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       long: 4.0.0
 
   protobufjs@7.5.3:
@@ -18049,7 +18126,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       long: 5.3.2
 
   proxy-addr@2.0.7:
@@ -18140,6 +18217,8 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
+  raf-schd@4.0.3: {}
+
   raf@3.4.1:
     dependencies:
       performance-now: 2.1.0
@@ -18186,6 +18265,11 @@ snapshots:
       raf: 3.4.1
       regenerator-runtime: 0.13.11
       whatwg-fetch: 3.6.20
+
+  react-app-rewired@2.2.1(react-scripts@4.0.3(@types/webpack@4.41.40)(eslint@7.32.0)(react@17.0.2)(sockjs-client@1.6.1)(typescript@4.9.5)):
+    dependencies:
+      react-scripts: 4.0.3(@types/webpack@4.41.40)(eslint@7.32.0)(react@17.0.2)(sockjs-client@1.6.1)(typescript@4.9.5)
+      semver: 5.7.2
 
   react-awesome-reveal@3.8.1(@types/react@19.1.9)(react@17.0.2):
     dependencies:
@@ -18238,13 +18322,6 @@ snapshots:
       react: 17.0.2
       scheduler: 0.20.2
 
-  react-draggable@4.5.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
-    dependencies:
-      clsx: 2.1.1
-      prop-types: 15.8.1
-      react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
-
   react-error-overlay@6.1.0: {}
 
   react-fast-compare@3.2.2: {}
@@ -18290,6 +18367,15 @@ snapshots:
       react-is: 17.0.2
     optionalDependencies:
       react-dom: 17.0.2(react@17.0.2)
+
+  react-redux@9.2.0(@types/react@19.1.9)(react@17.0.2)(redux@5.0.1):
+    dependencies:
+      '@types/use-sync-external-store': 0.0.6
+      react: 17.0.2
+      use-sync-external-store: 1.5.0(react@17.0.2)
+    optionalDependencies:
+      '@types/react': 19.1.9
+      redux: 5.0.1
 
   react-refresh@0.8.3: {}
 
@@ -18513,6 +18599,8 @@ snapshots:
   redux@4.2.1:
     dependencies:
       '@babel/runtime': 7.28.2
+
+  redux@5.0.1: {}
 
   reflect.getprototypeof@1.0.10:
     dependencies:
@@ -18747,7 +18835,7 @@ snapshots:
   rollup@1.32.1:
     dependencies:
       '@types/estree': 1.0.8
-      '@types/node': 24.2.0
+      '@types/node': 24.2.1
       acorn: 7.4.1
 
   router@1.3.8:
@@ -20041,6 +20129,10 @@ snapshots:
   use-sound@4.0.4(react@17.0.2):
     dependencies:
       howler: 2.2.4
+      react: 17.0.2
+
+  use-sync-external-store@1.5.0(react@17.0.2):
+    dependencies:
       react: 17.0.2
 
   use@3.1.1: {}

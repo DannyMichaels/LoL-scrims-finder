@@ -22,9 +22,8 @@ const postConversation = async (req, res) => {
 
     let savedConversation = await newConversation.save();
 
-    savedConversation = await savedConversation
-      .populate('members', ['name', 'discord', 'rank', 'region'])
-      .execPopulate();
+    savedConversation = await Conversation.findById(savedConversation._id)
+      .populate('members', ['name', 'discord', 'rank', 'region']);
 
     return res.status(200).json(savedConversation);
   } catch (error) {
@@ -88,6 +87,11 @@ const findOneConversation = async (req, res) => {
       members: { $all: [req.params.firstUserId, req.params.secondUserId] },
     });
 
+    // Check if conversation exists
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found', status: false });
+    }
+
     const authorized = conversation.members.find((memberId) => {
       return String(memberId) === String(userId);
     });
@@ -97,9 +101,9 @@ const findOneConversation = async (req, res) => {
     }
 
     // populate so client can receive the members attributes
-    conversation = await conversation
-      .populate('members', ['name', 'discord', 'rank', 'region'])
-      .execPopulate();
+    conversation = await Conversation.findOne({
+      members: { $all: [req.params.firstUserId, req.params.secondUserId] },
+    }).populate('members', ['name', 'discord', 'rank', 'region']);
 
     return res.status(200).json(conversation);
   } catch (err) {
@@ -118,12 +122,12 @@ const findOneConversationById = async (req, res) => {
       return res.status(500).json({ message: 'conversationId not provided!' });
     }
 
-    let conversation = await Conversation.findById(conversationId);
+    let conversation = await Conversation.findById(conversationId)
+      .populate('members', ['name', 'discord', 'rank', 'region']);
 
-    // populate so client can receive the members attributes
-    conversation = await conversation
-      .populate('members', ['name', 'discord', 'rank', 'region'])
-      .execPopulate();
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
 
     return res.status(200).json(conversation);
   } catch (err) {
@@ -142,12 +146,12 @@ const findScrimConversation = async (req, res) => {
       return res.status(500).json({ message: 'scrimId not provided!' });
     }
 
-    let conversation = await Conversation.findOne({ _scrim: scrimId });
+    let conversation = await Conversation.findOne({ _scrim: scrimId })
+      .populate('members', ['name', 'discord', 'rank', 'region']);
 
-    // populate so client can receive the members attributes
-    conversation = await conversation
-      .populate('members', ['name', 'discord', 'rank', 'region'])
-      .execPopulate();
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
 
     return res.status(200).json(conversation);
   } catch (err) {

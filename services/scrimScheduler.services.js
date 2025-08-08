@@ -24,12 +24,27 @@ const scheduleRiotTournamentInit = (scrim, io) => {
     return;
   }
 
+  // Don't schedule if scrim is cancelled or abandoned
+  if (scrim.status === 'cancelled' || scrim.status === 'abandoned' || scrim.status === 'completed') {
+    console.log(`Scrim ${scrimId} has status ${scrim.status}, skipping tournament init`);
+    return;
+  }
+
   const now = new Date();
   const gameStartTime = new Date(scrim.gameStartTime);
   const timeUntilStart = gameStartTime - now;
 
-  // If game start time has passed, initialize immediately
+  // If game start time has passed, check if it's within a reasonable window
   if (timeUntilStart <= 0) {
+    const timeSinceStart = Math.abs(timeUntilStart);
+    const maxInitWindowMs = 30 * 60 * 1000; // 30 minutes window
+    
+    if (timeSinceStart > maxInitWindowMs) {
+      console.log(`Scrim ${scrimId} start time passed more than 30 minutes ago, marking as abandoned`);
+      markScrimAsAbandoned(scrimId);
+      return;
+    }
+    
     console.log(`Game start time passed for scrim ${scrimId}, initializing tournament now`);
     initializeRiotTournamentForScrim(scrimId, io);
     return;
@@ -67,6 +82,17 @@ const initializeRiotTournamentForScrim = async (scrimId, io) => {
       console.log(`Tournament already initialized for scrim ${scrimId}`);
       return;
     }
+
+    // Check scrim status
+    if (scrim.status === 'cancelled' || scrim.status === 'abandoned' || scrim.status === 'completed') {
+      console.log(`Scrim ${scrimId} has status ${scrim.status}, skipping tournament init`);
+      return;
+    }
+
+    // Update status to active
+    scrim.status = 'active';
+    scrim.statusUpdatedAt = new Date();
+    await scrim.save();
 
     // Check if teams are full
     if (scrim.teamOne.length !== 5 || scrim.teamTwo.length !== 5) {
@@ -136,6 +162,29 @@ const initializeRiotTournamentForScrim = async (scrimId, io) => {
 };
 
 /**
+ * Mark a scrim as abandoned
+ * @param {string} scrimId - The scrim ID
+ */
+const markScrimAsAbandoned = async (scrimId) => {
+  try {
+    const scrim = await Scrim.findByIdAndUpdate(
+      scrimId,
+      { 
+        status: 'abandoned',
+        statusUpdatedAt: new Date()
+      },
+      { new: true }
+    );
+    
+    if (scrim) {
+      console.log(`Marked scrim ${scrimId} as abandoned`);
+    }
+  } catch (error) {
+    console.error(`Error marking scrim ${scrimId} as abandoned:`, error);
+  }
+};
+
+/**
  * Cancel scheduled tournament initialization
  * @param {string} scrimId - The scrim ID
  */
@@ -177,7 +226,8 @@ const initializeScheduler = async (io) => {
     const now = new Date();
     const activeScrimsToSchedule = await Scrim.find({
       gameStartTime: { $gt: now },
-      'riotTournament.setupCompleted': { $ne: true }
+      'riotTournament.setupCompleted': { $ne: true },
+      status: { $in: ['pending', 'active', null] } // Only schedule pending/active scrims
     });
 
     console.log(`Found ${activeScrimsToSchedule.length} scrims to schedule`);
@@ -187,19 +237,36 @@ const initializeScheduler = async (io) => {
       scheduleRiotTournamentInit(scrim, io);
     }
 
-    // Also check for scrims that should have started but haven't been initialized
+    // Check for recent scrims that should have started but haven't been initialized
+    // Only process scrims that started within the last 30 minutes
+    const thirtyMinutesAgo = new Date(now - 30 * 60 * 1000);
     const pastScrimsToInit = await Scrim.find({
-      gameStartTime: { $lte: now },
+      gameStartTime: { 
+        $lte: now,
+        $gte: thirtyMinutesAgo // Only scrims that started within last 30 minutes
+      },
       'riotTournament.setupCompleted': { $ne: true },
-      // Only init if created within last 2 hours
-      createdAt: { $gte: new Date(now - 2 * 60 * 60 * 1000) }
+      status: { $in: ['pending', 'active', null] } // Only process pending/active scrims
     });
 
-    console.log(`Found ${pastScrimsToInit.length} past scrims to initialize`);
+    console.log(`Found ${pastScrimsToInit.length} recent past scrims to initialize`);
 
-    // Initialize tournaments for past scrims
+    // Initialize tournaments for recent past scrims
     for (const scrim of pastScrimsToInit) {
       await initializeRiotTournamentForScrim(scrim._id.toString(), io);
+    }
+
+    // Mark old scrims as abandoned
+    const oldScrimsToAbandon = await Scrim.find({
+      gameStartTime: { $lt: thirtyMinutesAgo },
+      'riotTournament.setupCompleted': { $ne: true },
+      status: { $in: ['pending', 'active', null] }
+    });
+
+    console.log(`Found ${oldScrimsToAbandon.length} old scrims to mark as abandoned`);
+    
+    for (const scrim of oldScrimsToAbandon) {
+      await markScrimAsAbandoned(scrim._id.toString());
     }
 
     console.log('Scrim scheduler initialized');

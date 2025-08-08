@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
+import moment from 'moment';
 
 // components
 import Grid from '@mui/material/Grid';
@@ -71,7 +72,7 @@ export default function NavbarDropdowns() {
             style: { color: '#fff' },
           }}
           variant="standard"
-          value={scrimsDate}
+          value={moment.isMoment(scrimsDate) ? scrimsDate : moment()}
           onChange={onSelectDate}
         />
         <FormHelperText className="text-white">

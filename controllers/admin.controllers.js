@@ -11,19 +11,19 @@ const banUser = async (req, res) => {
     const { banUserId = '', dateFrom, dateTo, reason = '' } = req.body;
 
     if (!banUserId) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'no user id provided',
       });
     }
 
     if (!dateFrom) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'no date from provided',
       });
     }
 
     if (!dateTo) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'no date to provided',
       });
     }
@@ -31,19 +31,19 @@ const banUser = async (req, res) => {
     let userToBan = await User.findById(String(banUserId));
 
     if (!userToBan) {
-      return res.status(500).json({
+      return res.status(404).json({
         error: 'no user found',
       });
     }
 
-    if (userToBan.currentBan.isActive) {
-      return res.status(500).json({
+    if (userToBan.currentBan && userToBan.currentBan.isActive) {
+      return res.status(400).json({
         error: 'user is already banned',
       });
     }
 
     if (userToBan.adminKey === KEYS.ADMIN_KEY) {
-      return res.status(500).json({
+      return res.status(403).json({
         error: 'You cannot ban an admin',
       });
     }
@@ -108,7 +108,7 @@ const unbanUser = async (req, res) => {
     }
 
     if (!bannedUserId) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'no user id provided',
       });
     }
@@ -116,13 +116,13 @@ const unbanUser = async (req, res) => {
     const selectedUser = await User.findOne({ _id: { $eq: bannedUserId } });
 
     if (!selectedUser) {
-      return res.status(500).json({
+      return res.status(404).json({
         error: 'no user found',
       });
     }
 
-    if (!selectedUser.currentBan.isActive) {
-      return res.status(500).json({
+    if (!selectedUser.currentBan || !selectedUser.currentBan.isActive) {
+      return res.status(400).json({
         error: 'user is not banned',
       });
     }
@@ -147,14 +147,9 @@ const getAllBans = async (req, res) => {
     const _allBans = await Ban.find()
       .populate('_bannedBy', populateUser)
       .populate('_unbannedBy', populateUser)
-      .populate('_user', populateUser)
-      .exec((err, data) => {
-        if (err) {
-          console.log(err);
-          return res.status(400).end();
-        }
-        return res.json(data);
-      });
+      .populate('_user', populateUser);
+    
+    return res.json(_allBans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -175,24 +170,19 @@ const updateUserAsAdmin = async (req, res) => {
       if (!isValidRank) return;
     }
 
-    return await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
       userId,
       req.body,
-      { new: true },
-      async (error, user) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        if (!user) {
-          return res.status(500).send('User not found');
-        }
-
-        user.save();
-
-        return res.status(200).json(user);
-      }
+      { new: true }
     );
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await user.save();
+
+    return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

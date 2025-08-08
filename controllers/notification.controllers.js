@@ -11,7 +11,7 @@ const getUserNotifications = async (req, res) => {
     let isValid = mongoose.Types.ObjectId.isValid(id);
 
     if (!isValid) {
-      return res.status(500).json({ error: 'invalid id' });
+      return res.status(400).json({ error: 'invalid id' });
     }
 
     let user = await User.findById(id);
@@ -34,6 +34,10 @@ const pushUserNotification = async (req, res) => {
 
   const user = await User.findById(userId);
 
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
   const foundRelatedUser = relatedUserId
     ? await User.findById(relatedUserId)
     : null;
@@ -43,11 +47,11 @@ const pushUserNotification = async (req, res) => {
     : null;
 
   if (!req.body.message) {
-    return res.status(500).json({ error: 'no message provided!' });
+    return res.status(400).json({ error: 'no message provided!' });
   }
 
   if (!req.body.createdDate) {
-    return res.status(500).json({ error: 'no createdDate provided!' });
+    return res.status(400).json({ error: 'no createdDate provided!' });
   }
 
   const newNotification = {
@@ -61,26 +65,21 @@ const pushUserNotification = async (req, res) => {
     notifications: [...user.notifications, newNotification],
   };
 
-  await User.findByIdAndUpdate(
+  const updatedUser = await User.findByIdAndUpdate(
     userId,
     reqBody,
-    { new: true },
-    async (error, user) => {
-      if (error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      if (!user) {
-        return res.status(500).send('User not found');
-      }
-
-      user.save();
-      return res.status(200).json({
-        notifications: user.notifications,
-        newNotification: newNotification,
-      });
-    }
+    { new: true }
   );
+
+  if (!updatedUser) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  await updatedUser.save();
+  return res.status(200).json({
+    notifications: updatedUser.notifications,
+    newNotification: newNotification,
+  });
 };
 
 // @route   POST api/notifications/remove-user-notification/:notificationId
@@ -95,7 +94,7 @@ const removeUserNotification = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(500).send('user not found');
+      return res.status(404).json({ error: 'user not found' });
     }
 
     const reqBody = {
@@ -104,27 +103,22 @@ const removeUserNotification = async (req, res) => {
       ),
     };
 
-    await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       reqBody,
-      { new: true },
-      async (error, user) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        if (!user) {
-          return res.status(500).send('User not found');
-        }
-
-        await user.save();
-
-        return res.status(200).json({
-          deletedNotificationId: notificationId,
-          notifications: user.notifications,
-        });
-      }
+      { new: true }
     );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await updatedUser.save();
+
+    return res.status(200).json({
+      deletedNotificationId: notificationId,
+      notifications: updatedUser.notifications,
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -140,7 +134,7 @@ const removeAllUserNotifications = async (req, res) => {
     let user = await User.findById(id);
 
     if (!user) {
-      return res.status(500).send('User not found');
+      return res.status(404).json({ error: 'User not found' });
     }
 
     user.notifications = [];

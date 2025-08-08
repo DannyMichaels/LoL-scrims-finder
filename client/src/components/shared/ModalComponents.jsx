@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import MuiDialog from '@mui/material/Dialog';
 import MuiDialogContent from '@mui/material/DialogContent';
 import MuiPaper from '@mui/material/Paper';
 import MuiDialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
-import Draggable from 'react-draggable';
 import Button from '@mui/material/Button';
 import { withStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -94,14 +93,72 @@ export const DialogActions = withStyles((theme) => ({
   },
 }))(MuiDialogActions);
 
-const DraggablePaper = (props) => {
+const DraggablePaper = React.forwardRef((props, ref) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const paperRef = useRef(null);
+
+  const handleMouseDown = (e) => {
+    // Don't start drag if clicking on input elements or buttons
+    const clickedElement = e.target;
+    if (
+      clickedElement.tagName === 'INPUT' ||
+      clickedElement.tagName === 'TEXTAREA' ||
+      clickedElement.tagName === 'BUTTON' ||
+      clickedElement.closest('._draggable__input') ||
+      clickedElement.closest('button')
+    ) {
+      return;
+    }
+
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    });
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    
+    setPosition({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, dragStart]);
+
   return (
-    // https://stackoverflow.com/questions/46427946/react-draggable-components-with-inputs-lose-the-ability-to-focus-when-clicking
-    <Draggable cancel="._draggable__input">
-      <MuiPaper {...props} />
-    </Draggable>
+    <MuiPaper
+      {...props}
+      ref={paperRef}
+      onMouseDown={handleMouseDown}
+      style={{
+        ...props.style,
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        userSelect: isDragging ? 'none' : 'auto',
+      }}
+    />
   );
-};
+});
 
 const DraggableModal = ({ children, ...rest }) => {
   const isMobileDevice = isMobile();

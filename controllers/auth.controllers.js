@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
   const foundUser = await User.findOne({ email });
 
   if (!foundUser) {
-    res.status(500).json({
+    res.status(404).json({
       error: `User not found with the email: ${escape(
         email
       )}, please sign up or try again.`,
@@ -63,7 +63,9 @@ const loginUser = async (req, res) => {
       if (banDateExpired(foundUser.currentBan.dateTo)) {
         await unbanUser(foundUser);
       } else {
-        const foundBan = await Ban.findById(foundUser.currentBan?._ban);
+        const foundBan = foundUser.currentBan?._ban 
+        ? await Ban.findById(foundUser.currentBan._ban)
+        : null;
 
         return res.status(401).json({
           error: `You are banned until ${new Date(
@@ -171,25 +173,25 @@ const registerUser = async (req, res) => {
     if (!isValidRank) return;
 
     if (regionInvalid) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'Invalid region provided.',
       });
     }
 
     if (discordTaken) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: `Error: User with discord: ${discord} already exists!`,
       });
     }
 
     if (userExists) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: `Error: User with email ${email} already exists!`,
       });
     }
 
     if (summonerNameTaken) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: `Error: User with summoer name ${name} already exists in ${region}!`,
       });
     }
@@ -197,7 +199,7 @@ const registerUser = async (req, res) => {
     const summonerNameInvalid = checkSummonerNameValid(userData.name);
 
     if (summonerNameInvalid) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'Error: no special characters in name field allowed!',
       });
     }
@@ -274,7 +276,7 @@ const verifyUser = async (req, res) => {
     });
 
     if (!foundUser) {
-      return res.status(500).json({
+      return res.status(404).json({
         message: 'User not found!',
       });
     }
@@ -318,13 +320,13 @@ const updateUser = async (req, res) => {
     const user = req.user ?? false; // comes from auth middleware
 
     if (!user) {
-      return res.status(500).json({ status: false, message: 'unauthorized' });
+      return res.status(401).json({ status: false, message: 'unauthorized' });
     }
 
     const foundUser = await User.findById(user?._id);
 
     if (!foundUser) {
-      return res.status(500).json({ status: false, message: 'user not found' });
+      return res.status(404).json({ status: false, message: 'user not found' });
     }
 
     // check for valid rank
@@ -343,7 +345,7 @@ const updateUser = async (req, res) => {
       const regionInvalid = !REGIONS.includes(req.body.region);
 
       if (regionInvalid) {
-        return res.status(500).json({
+        return res.status(400).json({
           error: 'Invalid region provided.',
           status: false,
         });
@@ -353,7 +355,7 @@ const updateUser = async (req, res) => {
     const summonerNameInvalid = checkSummonerNameValid(req.body.name);
 
     if (summonerNameInvalid) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'Error: no special characters in name field allowed!',
       });
     }
@@ -393,27 +395,23 @@ const updateUser = async (req, res) => {
       expiresIn: KEYS.JWT_EXPIRATION,
     });
 
-    await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       user._id,
       payload,
-      { new: true },
-      (error, updatedUser) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        if (!updatedUser) {
-          return res.status(404).json(updatedUser);
-        }
-
-        return res.status(201).json({
-          success: true,
-          token: `Bearer ${accessToken}`,
-          user: updatedUser,
-        });
-      }
+      { new: true }
     );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.status(201).json({
+      success: true,
+      token: `Bearer ${accessToken}`,
+      user: updatedUser,
+    });
   } catch (error) {
+    console.log(error);
     return res.status(500).json(error);
   }
 };

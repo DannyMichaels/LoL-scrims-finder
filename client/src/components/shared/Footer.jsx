@@ -23,7 +23,7 @@ const currentYear = new Date().getFullYear();
 
 const blacklist = ['/scrims', '/'];
 
-const gitcatDiscordId = 1045871493587939379;
+// const gitcatDiscordId = 1045871493587939379;
 
 const Footer = ({ location }) => (
   <>

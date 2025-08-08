@@ -81,8 +81,8 @@ const Scrim = new Schema(
     },
     teamWon: { type: String, default: null }, // the winning team of the scrim, should've probably been named winnerTeamName (teamOne, teamTwo)
     postGameImage: { type: ImageSchema }, // image of the post-game lobby
-    isPrivate: false, // if it's private, only people with share link can see.
-    isWithCasters: false, // allow players to cast the scrim?
+    isPrivate: { type: Boolean, default: false }, // if it's private, only people with share link can see.
+    isWithCasters: { type: Boolean, default: false }, // allow players to cast the scrim?
     maxCastersAllowedCount: { type: Number, default: 2, min: 0, max: 2 }, // if the scrim allows casters, how many do we want?
 
     _conversation: {
@@ -107,6 +107,14 @@ const Scrim = new Schema(
       gameCompletedAt: { type: Date, default: null },
       riotCallbackData: { type: Object, default: null } // Store full callback data
     },
+
+    // Scrim status to track lifecycle
+    status: {
+      type: String,
+      enum: ['pending', 'active', 'completed', 'cancelled', 'abandoned'],
+      default: 'pending'
+    },
+    statusUpdatedAt: { type: Date, default: null },
   },
   { timestamps: true, optimisticConcurrency: true, versionKey: 'version' }
 );
@@ -123,6 +131,7 @@ Scrim.index({ lobbyHost: 1 });
 Scrim.index({ teamWon: 1 });
 Scrim.index({ isPrivate: 1 });
 Scrim.index({ 'riotTournament.setupCompleted': 1 });
+Scrim.index({ status: 1 });
 
 // Text index for searching by title
 Scrim.index({ title: 'text' });

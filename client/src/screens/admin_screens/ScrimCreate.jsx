@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useScrimsActions } from '../../hooks/useScrims';
+import { useFetchScrims } from '../../hooks/useScrims';
 import useAlerts from '../../hooks/useAlerts';
 import useAuth from '../../hooks/useAuth';
+import moment from 'moment';
 
 // components
 import Navbar from '../../components/shared/Navbar/Navbar';
@@ -25,7 +26,7 @@ import {
 import Loading from '../../components/shared/Loading';
 import DatePicker from '../../components/shared/DatePicker';
 import TimePicker from '../../components/shared/TimePicker';
-import LobbyNameField from '../../components/shared/Form_components/LobbyNameField';
+// Removed LobbyNameField import - using simple TextField instead
 
 // utils and services
 import { createScrim } from '../../services/scrims.services';
@@ -33,12 +34,12 @@ import devLog from '../../utils/devLog';
 import withAdminRoute from '../../utils/withAdminRoute';
 
 function ScrimCreate() {
-  const { fetchScrims } = useScrimsActions();
+  const { fetchScrims } = useFetchScrims();
   const { currentUser } = useAuth();
   const { setCurrentAlert } = useAlerts();
 
   const [scrimData, setScrimData] = useState({
-    gameStartTime: new Date().toISOString(),
+    gameStartTime: moment(),
     lobbyHost: 'random',
     region: currentUser?.region,
     createdBy: currentUser,
@@ -75,6 +76,8 @@ function ScrimCreate() {
     try {
       const dataSending = {
         ...scrimData,
+        gameStartTime: moment(scrimData.gameStartTime).toISOString(),
+        createdBy: currentUser?._id || currentUser, // Ensure we send the user or user ID
         adminKey: currentUser?.adminKey ?? '', // to verify if is admin (authorize creation).
         lobbyHost: scrimData.lobbyHost === 'random' ? null : currentUser._id,
         maxCastersAllowedCount: scrimData.isWithCasters
@@ -246,9 +249,9 @@ function ScrimCreate() {
                     label={<span className="text-white">Game Start Date</span>}
                     variant="standard"
                     name="gameStartDate"
+                    value={scrimData.gameStartTime}
                     onChange={handleChangeDate}
                     required
-                    value={scrimData.gameStartTime}
                   />
                 </Grid>
 
@@ -354,11 +357,18 @@ function ScrimCreate() {
                 alignItems="center"
                 sx={{ marginLeft: 'auto', marginRight: 'auto', marginTop: 2 }}
                 xs={12}>
-                <LobbyNameField
-                  value={scrimData.lobbyName || scrimData.title || ''}
-                  onInputChange={handleChange}
-                  setScrimData={setScrimData}
-                />
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    variant="standard"
+                    name="lobbyName"
+                    label="Lobby Name"
+                    value={scrimData.lobbyName || ''}
+                    onChange={handleChange}
+                    placeholder="Enter custom lobby name"
+                    required
+                  />
+                </Grid>
               </Grid>
 
               <Grid item>

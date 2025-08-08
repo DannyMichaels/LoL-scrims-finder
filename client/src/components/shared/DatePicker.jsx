@@ -1,9 +1,9 @@
 import { memo } from 'react';
 import TextField from '@mui/material/TextField';
-import MomentDateAdapter from '@mui/lab/AdapterMoment';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
-import MobileDatePicker from '@mui/lab/MobileDatePicker';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 
 // utils
 import { isMobile } from './../../utils/navigator';
@@ -12,7 +12,7 @@ function DatePicker({ value, onChange, variant, fullWidth, ...rest }) {
   const isMobileDevice = isMobile();
 
   return (
-    <LocalizationProvider dateAdapter={MomentDateAdapter}>
+    <LocalizationProvider dateAdapter={AdapterMoment}>
       {!isMobileDevice ? (
         <DesktopDatePicker
           inputFormat="MM/DD/yyyy"

@@ -87,15 +87,23 @@ const sendFriendRequest = async (req, res) => {
   try {
     const { userSendingId, userReceivingId } = req.params;
 
-    const userSending = await User.findById(userSendingId);
-    const userReceiving = await User.findById(userReceivingId);
-
     const sendingToSelf = String(userSendingId) === String(userReceivingId);
 
     if (sendingToSelf) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: 'Friend request cannot be sent to yourself',
       });
+    }
+
+    const userSending = await User.findById(userSendingId);
+    const userReceiving = await User.findById(userReceivingId);
+
+    if (!userSending) {
+      return res.status(404).json({ error: 'Sending user not found' });
+    }
+
+    if (!userReceiving) {
+      return res.status(404).json({ error: 'Receiving user not found' });
     }
 
     const friendRequestFound = userReceiving.friendRequests.find(
@@ -103,7 +111,7 @@ const sendFriendRequest = async (req, res) => {
     );
 
     if (friendRequestFound) {
-      return res.status(500).json({
+      return res.status(400).json({
         error: `Friend request already sent to: ${userReceiving.name} by ${userSending.name}`,
       });
     }
@@ -111,7 +119,8 @@ const sendFriendRequest = async (req, res) => {
     const newFriendRequest = {
       _user: {
         _id: userSending._id,
-        name: userSending.rank,
+        name: userSending.name,
+        rank: userSending.rank,
         region: userSending.region,
         discord: userSending.discord,
       },
@@ -130,35 +139,27 @@ const sendFriendRequest = async (req, res) => {
       notifications: [...userReceiving.notifications, newNotification],
     };
 
-    await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       userReceivingId,
       reqBody,
-      { new: true },
-      async (error, user) => {
-        if (error) {
-          return res.status(500).json({ error: error.message });
-        }
-
-        if (!user) {
-          return res.status(500).send('User not found');
-        }
-
-        await user.save();
-
-        return res.status(200).json({
-          newFriendRequest: {
-            ...newFriendRequest,
-            _user: userSending._id,
-          },
-
-          newNotification,
-          sentToUser: `${userReceiving.name} (${userReceiving.region})`,
-          sentToUserId: userReceiving._id,
-        });
-      }
+      { new: true }
     );
 
-    return;
+    if (!updatedUser) {
+      return res.status(500).send('Failed to update user');
+    }
+
+    await updatedUser.save();
+
+    return res.status(200).json({
+      newFriendRequest: {
+        ...newFriendRequest,
+        _user: userSending._id,
+      },
+      newNotification,
+      sentToUser: `${userReceiving.name} (${userReceiving.region})`,
+      sentToUserId: userReceiving._id,
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
