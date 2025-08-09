@@ -122,11 +122,6 @@ const buildScrimQuery = (req) => {
     query.status = req.query.scrimStatus;
   }
 
-  // By default, exclude only cancelled scrims (but show abandoned ones for historical data)
-  if (!req.query.scrimStatus && req.query.includeInactive !== 'true') {
-    query.status = { $nin: ['cancelled'] };
-  }
-
   return query;
 };
 
@@ -1457,11 +1452,9 @@ const adminAssignPlayer = async (req, res) => {
     // Validate role
     const validRoles = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
     if (!validRoles.includes(role)) {
-      return res
-        .status(400)
-        .json({
-          error: `Invalid role. Must be one of: ${validRoles.join(', ')}`,
-        });
+      return res.status(400).json({
+        error: `Invalid role. Must be one of: ${validRoles.join(', ')}`,
+      });
     }
 
     // Check if player is already in the scrim

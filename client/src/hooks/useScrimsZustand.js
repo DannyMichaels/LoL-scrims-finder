@@ -52,15 +52,12 @@ export function useScrimsZustand() {
  * Hook for getting filtered scrims (previous, current, upcoming)
  */
 export function useFilteredScrimsZustand() {
-  const { allScrimsArray, scrimsDate } = useScrimStore();
+  const { allScrimsArray } = useScrimStore();
   
   const filteredScrims = useMemo(() => {
-    // Filter scrims by selected date
-    return allScrimsArray.filter(scrim => {
-      const scrimDate = moment(scrim.gameStartTime);
-      return scrimDate.isSame(moment(scrimsDate), 'day'); // Convert string back to moment for comparison
-    });
-  }, [allScrimsArray, scrimsDate]);
+    // Backend already filters by date, so just return all scrims
+    return allScrimsArray;
+  }, [allScrimsArray]);
 
   const currentScrims = useMemo(() => {
     const now = moment();

@@ -37,19 +37,7 @@ export default function Scrims() {
   const theme = useTheme();
   const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
 
-  useEffect(() => {
-    // if scrimsDate < currentTime
-    if (compareDateWithCurrentTime(scrimsDate) > 0) {
-      if (!showUpcomingScrims) return;
-      // if the scrim is in the past compared to filtered scrims date.
-      setShowUpcomingScrims(false);
-    } else {
-      if (showUpcomingScrims) return;
-      setShowUpcomingScrims(true);
-    }
-
-    // eslint-disable-next-line
-  }, [scrimsDate]);
+  // Removed automatic toggling of showUpcomingScrims to allow manual control
 
   if (!scrimsLoaded) {
     return <Loading text="Loading Scrims" />;
