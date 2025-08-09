@@ -29,7 +29,6 @@ const KEYS = require('../config/keys');
 const escape = require('escape-html');
 const createS3 = require('../utils/createS3');
 const uploadToBucket = require('../utils/uploadToBucket');
-const Cache = require('../utils/cache.js');
 
 // for post-game lobby image upload
 let s3Bucket = createS3();
@@ -39,38 +38,38 @@ let s3Bucket = createS3();
  */
 const buildScrimQuery = (req) => {
   const query = {};
-  
+
   // Date filtering
   if (req.query.date) {
     // Parse the date string and set to start/end of day in UTC
     const dateStr = req.query.date; // Expected format: YYYY-MM-DD
     const startDate = new Date(`${dateStr}T00:00:00.000Z`);
     const endDate = new Date(`${dateStr}T23:59:59.999Z`);
-    
+
     query.gameStartTime = {
       $gte: startDate,
-      $lte: endDate
+      $lte: endDate,
     };
   }
-  
+
   // Date range filtering
   if (req.query.startDate && req.query.endDate) {
     query.gameStartTime = {
       $gte: new Date(req.query.startDate),
-      $lte: new Date(req.query.endDate)
+      $lte: new Date(req.query.endDate),
     };
   }
-  
+
   // Region filtering
   if (req.query.region) {
     query.region = req.query.region;
   }
-  
+
   // Privacy filtering (default to public scrims only)
   if (req.query.includePrivate !== 'true') {
     query.isPrivate = { $ne: true };
   }
-  
+
   // Status filtering (current, upcoming, previous)
   const now = new Date();
   if (req.query.status) {
@@ -89,45 +88,45 @@ const buildScrimQuery = (req) => {
         break;
     }
   }
-  
+
   // Team won filtering
   if (req.query.teamWon) {
     query.teamWon = req.query.teamWon;
   }
-  
+
   // Creator filtering
   if (req.query.createdBy) {
     query.createdBy = req.query.createdBy;
   }
-  
+
   // Lobby host filtering
   if (req.query.lobbyHost) {
     query.lobbyHost = req.query.lobbyHost;
   }
-  
+
   // Tournament status filtering
   if (req.query.hasTournament === 'true') {
     query['riotTournament.setupCompleted'] = true;
   }
-  
+
   // Full teams only
   if (req.query.fullTeamsOnly === 'true') {
     query.$and = [
       { $expr: { $eq: [{ $size: '$teamOne' }, 5] } },
-      { $expr: { $eq: [{ $size: '$teamTwo' }, 5] } }
+      { $expr: { $eq: [{ $size: '$teamTwo' }, 5] } },
     ];
   }
-  
+
   // Status filtering (pending, active, completed, cancelled, abandoned)
   if (req.query.scrimStatus) {
     query.status = req.query.scrimStatus;
   }
-  
+
   // By default, exclude cancelled and abandoned scrims unless specifically requested
   if (!req.query.scrimStatus && req.query.includeInactive !== 'true') {
     query.status = { $nin: ['cancelled', 'abandoned'] };
   }
-  
+
   return query;
 };
 
@@ -137,15 +136,15 @@ const buildScrimQuery = (req) => {
 const buildSortOptions = (req) => {
   const sortBy = req.query.sortBy || 'gameStartTime';
   const sortOrder = req.query.sortOrder === 'desc' ? -1 : 1;
-  
+
   const sortOptions = {};
   sortOptions[sortBy] = sortOrder;
-  
+
   // Secondary sort by creation date for stable ordering
   if (sortBy !== 'createdAt') {
     sortOptions.createdAt = -1;
   }
-  
+
   return sortOptions;
 };
 
@@ -156,15 +155,15 @@ const getAllScrims = async (req, res) => {
   try {
     // Build query from request parameters
     const query = buildScrimQuery(req);
-    
+
     // Build sort options
     const sortOptions = buildSortOptions(req);
-    
+
     // Pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 50;
     const skip = (page - 1) * limit;
-    
+
     // Execute query with pagination
     const [scrims, totalCount] = await Promise.all([
       Scrim.find(query)
@@ -179,19 +178,24 @@ const getAllScrims = async (req, res) => {
         .limit(limit)
         .lean()
         .exec(),
-      Scrim.countDocuments(query)
+      Scrim.countDocuments(query),
     ]);
-    
+
     // Calculate pagination metadata
     const totalPages = Math.ceil(totalCount / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
-    
+
     // For backward compatibility, if no specific query params, return simple array
-    if (!req.query.page && !req.query.status && !req.query.date && !req.query.sortBy) {
+    if (
+      !req.query.page &&
+      !req.query.status &&
+      !req.query.date &&
+      !req.query.sortBy
+    ) {
       return res.status(200).json(scrims);
     }
-    
+
     return res.status(200).json({
       success: true,
       data: scrims,
@@ -201,14 +205,14 @@ const getAllScrims = async (req, res) => {
         totalCount,
         limit,
         hasNextPage,
-        hasPrevPage
-      }
+        hasPrevPage,
+      },
     });
   } catch (error) {
     console.error('Error fetching scrims:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      error: error.message 
+      error: error.message,
     });
   }
 };
@@ -221,24 +225,24 @@ const getTodaysScrims = async (req, res) => {
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     const query = {
       gameStartTime: {
         $gte: today,
-        $lt: tomorrow
-      }
+        $lt: tomorrow,
+      },
     };
-    
+
     // Add region filter if provided
     if (req.query.region) {
       query.region = req.query.region;
     }
-    
+
     // Add privacy filter
     if (req.query.includePrivate !== 'true') {
       query.isPrivate = { $ne: true };
     }
-    
+
     const scrims = await Scrim.find(query)
       .select('-editHistory')
       .populate('createdBy', populateUser)
@@ -249,10 +253,10 @@ const getTodaysScrims = async (req, res) => {
       .sort({ gameStartTime: 1 })
       .lean()
       .exec();
-    
+
     return res.status(200).json(scrims);
   } catch (error) {
-    console.error('Error fetching today\'s scrims:', error);
+    console.error("Error fetching today's scrims:", error);
     return res.status(500).json({ error: error.message });
   }
 };
@@ -295,7 +299,7 @@ const createScrim = async (req, res) => {
   try {
     // Safely get the user ID
     const createdById = req.body.createdBy?._id || req.body.createdBy;
-    
+
     if (!createdById) {
       return res.status(400).json({ error: 'Creator user ID is required' });
     }
@@ -323,7 +327,7 @@ const createScrim = async (req, res) => {
     const scrim = new Scrim({
       ...requestBody,
       status: 'pending', // Initialize with pending status
-      statusUpdatedAt: new Date()
+      statusUpdatedAt: new Date(),
     });
 
     // add scrim to new conversation
@@ -402,7 +406,6 @@ const updateScrim = async (req, res) => {
     editHistory,
   };
 
-
   try {
     const scrim = await Scrim.findByIdAndUpdate(id, payload, { new: true })
       .populate('createdBy', populateUser)
@@ -445,16 +448,15 @@ const deleteScrim = async (req, res) => {
     // First update status to cancelled before deleting
     await Scrim.findByIdAndUpdate(id, {
       status: 'cancelled',
-      statusUpdatedAt: new Date()
+      statusUpdatedAt: new Date(),
     });
-    
+
     const deleted = await Scrim.findByIdAndDelete(id);
 
     if (deleted) {
-      
       // Cancel any scheduled tournament initialization
       scrimScheduler.cancelScheduledTournament(id);
-      
+
       return res.status(200).send(`Scrim with id: ${escape(id)} deleted`);
     }
   } catch (error) {
@@ -591,11 +593,9 @@ const insertPlayerInScrim = async (req, res) => {
         return;
       }
 
-      const updatedScrim = await Scrim.findByIdAndUpdate(
-        scrimId,
-        reqBody,
-        { new: true }
-      )
+      const updatedScrim = await Scrim.findByIdAndUpdate(scrimId, reqBody, {
+        new: true,
+      })
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
         .populate('lobbyHost', populateUser)
@@ -611,23 +611,26 @@ const insertPlayerInScrim = async (req, res) => {
       updatedScrim.lobbyHost = lobbyHost;
 
       await updatedScrim.save();
-      
+
       // Check if we should generate tournament code
       // Conditions: teams are full, game time has passed, no tournament code exists yet
       const now = new Date();
       const gameStartTime = new Date(updatedScrim.gameStartTime);
       const gameHasStarted = now >= gameStartTime;
-      const teamsFull = updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
+      const teamsFull =
+        updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
       const noTournamentCode = !updatedScrim.riotTournament?.tournamentCode;
-      
+
       if (gameHasStarted && teamsFull && noTournamentCode) {
         // Teams just became full after countdown reached 0 - generate tournament code
-        console.log(`Teams filled after countdown for scrim ${scrimId}, initializing tournament`);
+        console.log(
+          `Teams filled after countdown for scrim ${scrimId}, initializing tournament`
+        );
         const io = req.app.get('io');
-        
+
         // Use the existing function to initialize tournament
         await scrimScheduler.initializeRiotTournamentForScrim(scrimId, io);
-        
+
         // Fetch the updated scrim with tournament data
         const finalScrim = await Scrim.findById(scrimId)
           .populate('createdBy', populateUser)
@@ -635,17 +638,19 @@ const insertPlayerInScrim = async (req, res) => {
           .populate('lobbyHost', populateUser)
           .populate(populateTeam('teamOne'))
           .populate(populateTeam('teamTwo'));
-          
+
         return res.status(200).json(finalScrim);
       }
-      
+
       return res.status(200).json(updatedScrim);
     });
 
     // end of session
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Error inserting player' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error inserting player' });
   }
 };
 
@@ -713,11 +718,9 @@ const removePlayerFromScrim = async (req, res) => {
       lobbyHost: isLobbyHost ? null : scrim?._doc?.lobbyHost ?? null, // if player leaving is hosting, reset the host to null
     };
 
-    const updatedScrim = await Scrim.findByIdAndUpdate(
-      scrimId,
-      scrimData,
-      { new: true }
-    )
+    const updatedScrim = await Scrim.findByIdAndUpdate(scrimId, scrimData, {
+      new: true,
+    })
       .populate('createdBy', populateUser)
       .populate('casters', populateUser)
       .populate('lobbyHost', populateUser)
@@ -730,7 +733,9 @@ const removePlayerFromScrim = async (req, res) => {
 
     return res.status(200).json(updatedScrim);
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Error removing player' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error removing player' });
   }
 };
 
@@ -900,11 +905,9 @@ const movePlayerInScrim = async (req, res) => {
         return;
       }
 
-      const updatedScrim = await Scrim.findByIdAndUpdate(
-        scrimId,
-        newBody,
-        { new: true }
-      )
+      const updatedScrim = await Scrim.findByIdAndUpdate(scrimId, newBody, {
+        new: true,
+      })
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
         .populate('lobbyHost', populateUser)
@@ -928,7 +931,9 @@ const movePlayerInScrim = async (req, res) => {
     session.endSession();
   } catch (err) {
     console.log('Error moving player in scrim:', err);
-    return res.status(500).json({ error: err.message || 'Error moving player' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error moving player' });
   }
 };
 
@@ -942,11 +947,11 @@ const swapPlayersInScrim = async (req, res) => {
 
       const scrimId = req.params.scrimId;
       let scrim = await Scrim.findOne({ _id: scrimId });
-      
+
       if (!scrim) {
         return res.status(404).json({ error: 'Scrim not found' });
       }
-      
+
       const teams = [...scrim.teamOne, ...scrim.teamTwo];
 
       let updatedTeamOne = [];
@@ -1025,7 +1030,9 @@ const swapPlayersInScrim = async (req, res) => {
     session.endSession();
   } catch (err) {
     console.log('Error swapping players:', err);
-    return res.status(500).json({ error: err.message || 'Error swapping players' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error swapping players' });
   }
 };
 
@@ -1113,11 +1120,9 @@ const insertCasterInScrim = async (req, res) => {
       };
 
       if (scrim._doc.casters.length < 2) {
-        const updatedScrim = await Scrim.findByIdAndUpdate(
-          scrimId,
-          bodyData,
-          { new: true }
-        )
+        const updatedScrim = await Scrim.findByIdAndUpdate(scrimId, bodyData, {
+          new: true,
+        })
           .populate('createdBy', populateUser)
           .populate('casters', populateUser)
           .populate('lobbyHost', populateUser)
@@ -1138,7 +1143,9 @@ const insertCasterInScrim = async (req, res) => {
     });
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Error inserting caster' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error inserting caster' });
   }
 };
 
@@ -1152,7 +1159,6 @@ const removeCasterFromScrim = async (req, res) => {
     await session.withTransaction(async () => {
       const { scrimId, casterId } = req.params; // scrim id
       const currentUser = req.user;
-
 
       const isValid = mongoose.Types.ObjectId.isValid(casterId);
 
@@ -1182,11 +1188,9 @@ const removeCasterFromScrim = async (req, res) => {
         ),
       };
 
-      const scrim = await Scrim.findByIdAndUpdate(
-        scrimId,
-        bodyData,
-        { new: true }
-      )
+      const scrim = await Scrim.findByIdAndUpdate(scrimId, bodyData, {
+        new: true,
+      })
         .populate('createdBy', populateUser)
         .populate('casters', populateUser)
         .populate('lobbyHost', populateUser)
@@ -1202,7 +1206,9 @@ const removeCasterFromScrim = async (req, res) => {
     });
     session.endSession();
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Error removing caster' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error removing caster' });
   }
 };
 
@@ -1254,11 +1260,7 @@ const addImageToScrim = async (req, res) => {
       },
     };
 
-    const scrim = await Scrim.findByIdAndUpdate(
-      id,
-      dataSending,
-      { new: true }
-    )
+    const scrim = await Scrim.findByIdAndUpdate(id, dataSending, { new: true })
       .populate('createdBy', populateUser)
       .populate('casters', populateUser)
       .populate('lobbyHost', populateUser)
@@ -1273,7 +1275,9 @@ const addImageToScrim = async (req, res) => {
     return res.status(200).json(scrim);
   } catch (err) {
     console.log('error uploading image', err);
-    return res.status(500).json({ error: err.message || 'Error uploading image' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error uploading image' });
   }
 };
 
@@ -1307,11 +1311,7 @@ const removeImageFromScrim = async (req, res) => {
     await s3Bucket.deleteObject(params).promise();
 
     // delete it from the scrim object in the mongoose database
-    const scrim = await Scrim.findByIdAndUpdate(
-      id,
-      dataSending,
-      { new: true }
-    )
+    const scrim = await Scrim.findByIdAndUpdate(id, dataSending, { new: true })
       .populate('createdBy', populateUser)
       .populate('casters', populateUser)
       .populate('lobbyHost', populateUser)
@@ -1325,7 +1325,9 @@ const removeImageFromScrim = async (req, res) => {
 
     return res.status(200).json(scrim);
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Error removing image' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error removing image' });
   }
 };
 
@@ -1374,7 +1376,9 @@ const setScrimWinner = async (req, res) => {
 
     return res.status(200).send(populatedScrim);
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Error setting scrim winner' });
+    return res
+      .status(500)
+      .json({ error: err.message || 'Error setting scrim winner' });
   }
 };
 
@@ -1393,9 +1397,9 @@ const cancelScrim = async (req, res) => {
 
     const scrim = await Scrim.findByIdAndUpdate(
       id,
-      { 
+      {
         status: 'cancelled',
-        statusUpdatedAt: new Date()
+        statusUpdatedAt: new Date(),
       },
       { new: true }
     );
@@ -1406,11 +1410,10 @@ const cancelScrim = async (req, res) => {
 
     // Cancel any scheduled tournament initialization
     scrimScheduler.cancelScheduledTournament(id);
-    
 
     // Populate and return the updated scrim
     const populatedScrim = await populateOneScrim(scrim._id);
-    
+
     return res.status(200).json(populatedScrim);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -1428,7 +1431,7 @@ const adminAssignPlayer = async (req, res) => {
     // Validate required fields
     if (!userId || !teamName || !role) {
       return res.status(400).json({
-        error: 'userId, teamName, and role are required'
+        error: 'userId, teamName, and role are required',
       });
     }
 
@@ -1446,13 +1449,19 @@ const adminAssignPlayer = async (req, res) => {
 
     // Validate team name
     if (!['teamOne', 'teamTwo'].includes(teamName)) {
-      return res.status(400).json({ error: 'Invalid team name. Must be teamOne or teamTwo' });
+      return res
+        .status(400)
+        .json({ error: 'Invalid team name. Must be teamOne or teamTwo' });
     }
 
     // Validate role
     const validRoles = ['Top', 'Jungle', 'Mid', 'ADC', 'Support'];
     if (!validRoles.includes(role)) {
-      return res.status(400).json({ error: `Invalid role. Must be one of: ${validRoles.join(', ')}` });
+      return res
+        .status(400)
+        .json({
+          error: `Invalid role. Must be one of: ${validRoles.join(', ')}`,
+        });
     }
 
     // Check if player is already in the scrim
@@ -1467,25 +1476,25 @@ const adminAssignPlayer = async (req, res) => {
 
     if (casterExists) {
       return res.status(400).json({
-        error: 'User is already a caster for this game'
+        error: 'User is already a caster for this game',
       });
     }
 
     // Check if position is already taken
-    const spotTaken = scrim[teamName].find(
-      (player) => player.role === role
-    );
+    const spotTaken = scrim[teamName].find((player) => player.role === role);
 
     if (spotTaken) {
       return res.status(400).json({
-        error: `${role} position in ${teamName} is already taken by ${spotTaken._user?.name || 'another player'}`
+        error: `${role} position in ${teamName} is already taken by ${
+          spotTaken._user?.name || 'another player'
+        }`,
       });
     }
 
     const playerData = {
       role,
       team: { name: teamName },
-      _user: user._id
+      _user: user._id,
     };
 
     let updateQuery = {};
@@ -1496,26 +1505,24 @@ const adminAssignPlayer = async (req, res) => {
       const currentTeamArray = scrim[currentTeam].filter(
         (player) => String(player._user) !== String(user._id)
       );
-      
+
       // Add to new position
       const newTeamArray = [...scrim[teamName], playerData];
-      
+
       updateQuery = {
         [currentTeam]: currentTeamArray,
-        [teamName]: newTeamArray
+        [teamName]: newTeamArray,
       };
     } else {
       // Just add player to the team
       updateQuery = {
-        [teamName]: [...scrim[teamName], playerData]
+        [teamName]: [...scrim[teamName], playerData],
       };
     }
 
-    const updatedScrim = await Scrim.findByIdAndUpdate(
-      scrimId,
-      updateQuery,
-      { new: true }
-    )
+    const updatedScrim = await Scrim.findByIdAndUpdate(scrimId, updateQuery, {
+      new: true,
+    })
       .populate('createdBy', populateUser)
       .populate('casters', populateUser)
       .populate('lobbyHost', populateUser)
@@ -1531,17 +1538,20 @@ const adminAssignPlayer = async (req, res) => {
     const now = new Date();
     const gameStartTime = new Date(updatedScrim.gameStartTime);
     const gameHasStarted = now >= gameStartTime;
-    const teamsFull = updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
+    const teamsFull =
+      updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
     const noTournamentCode = !updatedScrim.riotTournament?.tournamentCode;
-    
+
     if (gameHasStarted && teamsFull && noTournamentCode) {
       // Teams just became full after countdown reached 0 - generate tournament code
-      console.log(`Teams filled after countdown for scrim ${scrimId}, initializing tournament`);
+      console.log(
+        `Teams filled after countdown for scrim ${scrimId}, initializing tournament`
+      );
       const io = req.app.get('io');
-      
+
       // Use the existing function to initialize tournament
       await scrimScheduler.initializeRiotTournamentForScrim(scrimId, io);
-      
+
       // Fetch the updated scrim with tournament data
       const finalScrim = await Scrim.findById(scrimId)
         .populate('createdBy', populateUser)
@@ -1549,7 +1559,7 @@ const adminAssignPlayer = async (req, res) => {
         .populate('lobbyHost', populateUser)
         .populate(populateTeam('teamOne'))
         .populate(populateTeam('teamTwo'));
-      
+
       return res.status(200).json(finalScrim);
     }
 
@@ -1578,16 +1588,20 @@ const adminFillRandomPositions = async (req, res) => {
     const emptyPositions = [];
 
     // Check teamOne
-    const teamOneRoles = scrim.teamOne.map(player => player.role);
-    const teamOneEmpty = allRoles.filter(role => !teamOneRoles.includes(role));
-    teamOneEmpty.forEach(role => {
+    const teamOneRoles = scrim.teamOne.map((player) => player.role);
+    const teamOneEmpty = allRoles.filter(
+      (role) => !teamOneRoles.includes(role)
+    );
+    teamOneEmpty.forEach((role) => {
       emptyPositions.push({ team: 'teamOne', role });
     });
 
     // Check teamTwo
-    const teamTwoRoles = scrim.teamTwo.map(player => player.role);
-    const teamTwoEmpty = allRoles.filter(role => !teamTwoRoles.includes(role));
-    teamTwoEmpty.forEach(role => {
+    const teamTwoRoles = scrim.teamTwo.map((player) => player.role);
+    const teamTwoEmpty = allRoles.filter(
+      (role) => !teamTwoRoles.includes(role)
+    );
+    teamTwoEmpty.forEach((role) => {
       emptyPositions.push({ team: 'teamTwo', role });
     });
 
@@ -1596,15 +1610,15 @@ const adminFillRandomPositions = async (req, res) => {
     }
 
     // Get users already in this scrim
-    const currentPlayers = [...scrim.teamOne, ...scrim.teamTwo].map(
-      player => String(player._user)
+    const currentPlayers = [...scrim.teamOne, ...scrim.teamTwo].map((player) =>
+      String(player._user)
     );
-    const currentCasters = scrim.casters.map(caster => String(caster._id));
+    const currentCasters = scrim.casters.map((caster) => String(caster._id));
     const excludeUsers = [...currentPlayers, ...currentCasters];
 
     // Build query to find available users
     const userQuery = {
-      _id: { $nin: excludeUsers }
+      _id: { $nin: excludeUsers },
     };
 
     // Add region filter if provided
@@ -1623,7 +1637,7 @@ const adminFillRandomPositions = async (req, res) => {
 
     if (availableUsers.length < emptyPositions.length) {
       return res.status(400).json({
-        error: `Not enough available users. Found ${availableUsers.length}, need ${emptyPositions.length}`
+        error: `Not enough available users. Found ${availableUsers.length}, need ${emptyPositions.length}`,
       });
     }
 
@@ -1639,7 +1653,7 @@ const adminFillRandomPositions = async (req, res) => {
       const playerData = {
         role: position.role,
         team: { name: position.team },
-        _user: user._id
+        _user: user._id,
       };
 
       if (position.team === 'teamOne') {
@@ -1653,7 +1667,7 @@ const adminFillRandomPositions = async (req, res) => {
       scrimId,
       {
         teamOne: updatedTeamOne,
-        teamTwo: updatedTeamTwo
+        teamTwo: updatedTeamTwo,
       },
       { new: true }
     )
@@ -1672,17 +1686,20 @@ const adminFillRandomPositions = async (req, res) => {
     const now = new Date();
     const gameStartTime = new Date(updatedScrim.gameStartTime);
     const gameHasStarted = now >= gameStartTime;
-    const teamsFull = updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
+    const teamsFull =
+      updatedScrim.teamOne.length === 5 && updatedScrim.teamTwo.length === 5;
     const noTournamentCode = !updatedScrim.riotTournament?.tournamentCode;
-    
+
     if (gameHasStarted && teamsFull && noTournamentCode) {
       // Teams just became full after countdown reached 0 - generate tournament code
-      console.log(`Teams filled after countdown for scrim ${scrimId}, initializing tournament`);
+      console.log(
+        `Teams filled after countdown for scrim ${scrimId}, initializing tournament`
+      );
       const io = req.app.get('io');
-      
+
       // Use the existing function to initialize tournament
       await scrimScheduler.initializeRiotTournamentForScrim(scrimId, io);
-      
+
       // Fetch the updated scrim with tournament data
       const finalScrim = await Scrim.findById(scrimId)
         .populate('createdBy', populateUser)
@@ -1690,24 +1707,28 @@ const adminFillRandomPositions = async (req, res) => {
         .populate('lobbyHost', populateUser)
         .populate(populateTeam('teamOne'))
         .populate(populateTeam('teamTwo'));
-      
+
       return res.status(200).json({
         scrim: finalScrim,
         filledPositions: emptyPositions.length,
-        assignedUsers: shuffledUsers.slice(0, emptyPositions.length).map(user => ({
-          name: user.name,
-          region: user.region
-        }))
+        assignedUsers: shuffledUsers
+          .slice(0, emptyPositions.length)
+          .map((user) => ({
+            name: user.name,
+            region: user.region,
+          })),
       });
     }
 
     return res.status(200).json({
       scrim: updatedScrim,
       filledPositions: emptyPositions.length,
-      assignedUsers: shuffledUsers.slice(0, emptyPositions.length).map(user => ({
-        name: user.name,
-        region: user.region
-      }))
+      assignedUsers: shuffledUsers
+        .slice(0, emptyPositions.length)
+        .map((user) => ({
+          name: user.name,
+          region: user.region,
+        })),
     });
   } catch (error) {
     console.error('Error in admin fill random positions:', error);
