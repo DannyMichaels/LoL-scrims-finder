@@ -57,12 +57,17 @@ export default function ScrimSectionMiddleAreaBox({
 
   const teamOneDifference = useMemo(() => 5 - teamOne.length, [teamOne]);
   const teamTwoDifference = useMemo(() => 5 - teamTwo.length, [teamTwo]);
-  
+
   // Add a transitioning state for when game just started
   const [isTransitioning, setIsTransitioning] = useState(false);
-  
+
   useEffect(() => {
-    if (gameStarted && !scrim.riotTournament?.tournamentCode && scrim.teamOne.length === 5 && scrim.teamTwo.length === 5) {
+    if (
+      gameStarted &&
+      !scrim.riotTournament?.tournamentCode &&
+      scrim.teamOne.length === 5 &&
+      scrim.teamTwo.length === 5
+    ) {
       // Game just started, teams are full, waiting for tournament code
       setIsTransitioning(true);
       // Clear transitioning state after 5 seconds if no tournament code received
@@ -73,7 +78,12 @@ export default function ScrimSectionMiddleAreaBox({
     } else {
       setIsTransitioning(false);
     }
-  }, [gameStarted, scrim.riotTournament?.tournamentCode, scrim.teamOne.length, scrim.teamTwo.length]);
+  }, [
+    gameStarted,
+    scrim.riotTournament?.tournamentCode,
+    scrim.teamOne.length,
+    scrim.teamTwo.length,
+  ]);
 
   return (
     <Grid
@@ -102,9 +112,17 @@ export default function ScrimSectionMiddleAreaBox({
                     <>
                       {/* Show loading state when transitioning */}
                       {isTransitioning ? (
-                        <Grid item container direction="column" alignItems="center" spacing={2}>
+                        <Grid
+                          item
+                          container
+                          direction="column"
+                          alignItems="center"
+                          spacing={2}>
                           <Grid item>
-                            <CircularProgress size={40} style={{ color: '#4CAF50' }} />
+                            <CircularProgress
+                              size={40}
+                              style={{ color: '#4CAF50' }}
+                            />
                           </Grid>
                           <Grid item>
                             <Typography variant="h2">
@@ -112,21 +130,21 @@ export default function ScrimSectionMiddleAreaBox({
                             </Typography>
                           </Grid>
                           <Grid item>
-                            <Typography variant="body1" style={{ fontStyle: 'italic', color: '#ccc' }}>
-                              Please wait while we set up your tournament lobby
+                            <Typography
+                              variant="body1"
+                              style={{ fontStyle: 'italic', color: '#ccc' }}>
+                              Please wait while we set up your lobby
                             </Typography>
                           </Grid>
                         </Grid>
                       ) : scrim.riotTournament?.tournamentCode ? (
                         <>
                           <Grid item container direction="column" spacing={2}>
-                            <Grid item>
-                              <Typography variant="h2" style={{ color: '#4CAF50' }}>
-                                🎮 Tournament Lobby Ready!
-                              </Typography>
-                            </Grid>
-                            
-                            <Grid item container direction="row" alignItems="center">
+                            <Grid
+                              item
+                              container
+                              direction="row"
+                              alignItems="center">
                               <Typography variant="h3">
                                 Tournament Code:
                               </Typography>
@@ -134,18 +152,21 @@ export default function ScrimSectionMiddleAreaBox({
                                 <Tooltip title="Click to copy tournament code">
                                   <Button
                                     variant="contained"
-                                    style={{ 
+                                    style={{
                                       backgroundColor: '#4CAF50',
                                       color: 'white',
                                       fontWeight: 'bold',
                                       fontSize: '1.1em',
-                                      padding: '10px 20px'
+                                      padding: '10px 20px',
                                     }}
                                     onClick={() => {
-                                      copyTextToClipboard(scrim.riotTournament.tournamentCode);
+                                      copyTextToClipboard(
+                                        scrim.riotTournament.tournamentCode
+                                      );
                                       setCurrentAlert({
                                         type: 'Success',
-                                        message: 'Tournament code copied! Paste it in the League client to join.',
+                                        message:
+                                          'Tournament code copied! Paste it in the League client to join.',
                                       });
                                     }}>
                                     {scrim.riotTournament.tournamentCode}
@@ -153,29 +174,50 @@ export default function ScrimSectionMiddleAreaBox({
                                 </Tooltip>
                               </Box>
                             </Grid>
-                            
+
                             <Grid item>
-                              <Typography variant="body1" style={{ fontStyle: 'italic' }}>
+                              <Typography
+                                variant="body1"
+                                style={{ fontStyle: 'italic' }}>
                                 📋 <strong>How to join:</strong>
                               </Typography>
-                              <Typography variant="body2" style={{ marginLeft: '20px' }}>
-                                1. Open League of Legends client<br/>
-                                2. Click "Play" → "Create Custom" → "Tournament Code"<br/>
-                                3. Paste the code above and click "Join"<br/>
-                                4. The lobby is automatically configured with:<br/>
-                                {'\u00A0\u00A0\u00A0\u00A0'}• Tournament Draft mode (competitive pick/ban)<br/>
-                                {'\u00A0\u00A0\u00A0\u00A0'}• Private access (only those with the code can join)<br/>
-                                {'\u00A0\u00A0\u00A0\u00A0'}• Automatic game recording for results
+                              <Typography
+                                variant="body2"
+                                style={{ marginLeft: '20px' }}>
+                                1. Open League of Legends client
+                                <br />
+                                2. Click "Play" → "Tournament Code" (trophy icon
+                                on top right)
+                                <br />
+                                3. Paste the code above and click "Join"
+                                <br />
+                                4. The lobby is automatically configured with:
+                                <br />
+                                {'\u00A0\u00A0\u00A0\u00A0'}• Tournament Draft
+                                mode (competitive pick/ban)
+                                <br />
+                                {'\u00A0\u00A0\u00A0\u00A0'}• Private access
+                                (only those with the code can join)
+                                <br />
+                                {'\u00A0\u00A0\u00A0\u00A0'}• Automatic game
+                                recording for results
                               </Typography>
                             </Grid>
-                            
-                            <Grid item container direction="row" alignItems="center">
+
+                            <Grid
+                              item
+                              container
+                              direction="row"
+                              alignItems="center">
                               <Typography variant="body2">
-                                <strong>Lobby Captain:</strong> {scrim.lobbyHost?.name || 'Auto-assigned'}
+                                <strong>Lobby Captain:</strong>{' '}
+                                {scrim.lobbyHost?.name || 'Auto-assigned'}
                               </Typography>
                               <Box marginLeft={1}>
                                 <Tooltip title="The lobby captain is responsible for reporting the winner after the game">
-                                  <InfoIcon style={{ cursor: 'help', fontSize: '18px' }} />
+                                  <InfoIcon
+                                    style={{ cursor: 'help', fontSize: '18px' }}
+                                  />
                                 </Tooltip>
                               </Box>
                             </Grid>
@@ -184,30 +226,38 @@ export default function ScrimSectionMiddleAreaBox({
                       ) : (
                         <>
                           {/* Fallback to manual lobby creation if tournament code fails */}
-                          <Grid item container direction="row" alignItems="center">
+                          <Grid
+                            item
+                            container
+                            direction="row"
+                            alignItems="center">
                             <Typography variant="h2">
                               Lobby host / captain: {scrim.lobbyHost?.name}
                             </Typography>
                             <Box marginRight={2} />
-                            <Tooltip
-                              title="The lobby captain must create the custom lobby manually and select who won after the game">
+                            <Tooltip title="The lobby captain must create the custom lobby manually and select who won after the game">
                               <InfoIcon
                                 style={{ cursor: 'help' }}
                                 fontSize="large"
                               />
                             </Tooltip>
                           </Grid>
-                          
+
                           <Typography variant="h3" style={{ color: '#ff9800' }}>
                             ⚠️ Manual Lobby Creation Required
                           </Typography>
-                          <Typography variant="body2" style={{ marginBottom: '10px', fontStyle: 'italic' }}>
-                            Tournament code generation failed. Please create the lobby manually:
+                          <Typography
+                            variant="body2"
+                            style={{
+                              marginBottom: '10px',
+                              fontStyle: 'italic',
+                            }}>
+                            Tournament code generation failed. Please create the
+                            lobby manually:
                           </Typography>
-                          
+
                           <Typography variant="h3">
-                            Lobby name: <br />
-                            {' '}
+                            Lobby name: <br />{' '}
                             <Tooltip title="Copy lobby name to clipboard">
                               <span
                                 className="link"
@@ -224,7 +274,7 @@ export default function ScrimSectionMiddleAreaBox({
                             </Tooltip>
                           </Typography>
                           <Typography variant="h3">
-                            Password: {' '}
+                            Password:{' '}
                             <Tooltip title="Copy password to clipboard">
                               <span
                                 className="link"
@@ -362,27 +412,25 @@ export default function ScrimSectionMiddleAreaBox({
           ) : (
             <>
               <Typography variant="h2">
-                Not enough players:{' '}
-                {`${teamOne.length + teamTwo.length}/10`}
+                Not enough players: {`${teamOne.length + teamTwo.length}/10`}
               </Typography>
               <Typography variant="h5" component="p" className="text-white">
                 Please get
                 {/* if teamOne still needs players show this else don't show */}
                 {teamOneDifference > 0 ? (
                   <>
-                    {' '}{teamOneDifference}{' '}
+                    {' '}
+                    {teamOneDifference}{' '}
                     {/* spell check singular and plural with pluralize */}
-                    {pluralize('players', teamOneDifference)} in Team 1{' '}
-                    <br />
+                    {pluralize('players', teamOneDifference)} in Team 1 <br />
                   </>
                 ) : null}
                 {/* if teamTwo needs players, show this text. */}
                 {teamTwoDifference > 0 ? (
                   <>
                     {/* if team one needs players, show 'and', else don't show 'and' */}
-                    {teamOneDifference > 0 ? 'and' : ''}{' '}
-                    {teamTwoDifference}
-                    {' '}{pluralize('players', teamTwoDifference)} in Team 2
+                    {teamOneDifference > 0 ? 'and' : ''} {teamTwoDifference}{' '}
+                    {pluralize('players', teamTwoDifference)} in Team 2
                     <br />
                   </>
                 ) : null}

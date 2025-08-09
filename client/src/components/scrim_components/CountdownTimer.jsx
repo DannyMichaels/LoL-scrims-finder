@@ -49,10 +49,10 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
 
     // Check if tournament is ready
     if (scrim.riotTournament?.tournamentCode) {
-      return 'TOURNAMENT LOBBY READY';
+      return '🎮 GAME READY';
     }
-    
-    return 'GAME IN PROGRESS';
+
+    return '🎮 GAME READY';
   }, [scrim.teamWon, teamsFilled, scrim.riotTournament]);
 
   if (!isTimerStarted) {
