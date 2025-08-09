@@ -122,9 +122,9 @@ const buildScrimQuery = (req) => {
     query.status = req.query.scrimStatus;
   }
 
-  // By default, exclude cancelled and abandoned scrims unless specifically requested
+  // By default, exclude only cancelled scrims (but show abandoned ones for historical data)
   if (!req.query.scrimStatus && req.query.includeInactive !== 'true') {
-    query.status = { $nin: ['cancelled', 'abandoned'] };
+    query.status = { $nin: ['cancelled'] };
   }
 
   return query;
