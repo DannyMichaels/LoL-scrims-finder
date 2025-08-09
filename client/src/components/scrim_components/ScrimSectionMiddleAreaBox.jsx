@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import useAuth from './../../hooks/useAuth';
 import useAlerts from './../../hooks/useAlerts';
 import useScrimStore from '../../stores/scrimStore';
@@ -13,6 +13,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 //icons
 import InfoIcon from '@mui/icons-material/Info';
@@ -56,6 +57,23 @@ export default function ScrimSectionMiddleAreaBox({
 
   const teamOneDifference = useMemo(() => 5 - teamOne.length, [teamOne]);
   const teamTwoDifference = useMemo(() => 5 - teamTwo.length, [teamTwo]);
+  
+  // Add a transitioning state for when game just started
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  useEffect(() => {
+    if (gameStarted && !scrim.riotTournament?.tournamentCode && scrim.teamOne.length === 5 && scrim.teamTwo.length === 5) {
+      // Game just started, teams are full, waiting for tournament code
+      setIsTransitioning(true);
+      // Clear transitioning state after 5 seconds if no tournament code received
+      const timeout = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 5000);
+      return () => clearTimeout(timeout);
+    } else {
+      setIsTransitioning(false);
+    }
+  }, [gameStarted, scrim.riotTournament?.tournamentCode, scrim.teamOne.length, scrim.teamTwo.length]);
 
   return (
     <Grid
@@ -82,8 +100,24 @@ export default function ScrimSectionMiddleAreaBox({
                   {/* show lobby info only to players in lobby or admins */}
                   {playerEntered || casterEntered || isCurrentUserAdmin ? (
                     <>
-                      {/* Check if we have a Riot tournament code */}
-                      {scrim.riotTournament?.tournamentCode ? (
+                      {/* Show loading state when transitioning */}
+                      {isTransitioning ? (
+                        <Grid item container direction="column" alignItems="center" spacing={2}>
+                          <Grid item>
+                            <CircularProgress size={40} style={{ color: '#4CAF50' }} />
+                          </Grid>
+                          <Grid item>
+                            <Typography variant="h2">
+                              Generating Tournament Code...
+                            </Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography variant="body1" style={{ fontStyle: 'italic', color: '#ccc' }}>
+                              Please wait while we set up your tournament lobby
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      ) : scrim.riotTournament?.tournamentCode ? (
                         <>
                           <Grid item container direction="column" spacing={2}>
                             <Grid item>
