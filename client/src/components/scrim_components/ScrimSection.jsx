@@ -31,10 +31,8 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   
   // Zustand store
   const {
-    getScrim,
     setScrim,
     fetchScrim,
-    isScrimExpanded,
     toggleScrimExpanded,
     joinScrimRoom,
     leaveScrimRoom,
@@ -45,9 +43,10 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     deleteScrim: deleteScrimAction
   } = useScrimStore();
   
-  // Get or initialize scrim data
+  // Get or initialize scrim data - subscribe to store for reactivity
   const scrimId = scrimData?._id;
-  const scrim = getScrim(scrimId) || scrimData;
+  const scrim = useScrimStore((state) => state.scrims[scrimId]) || scrimData;
+  const isScrimExpandedInStore = useScrimStore((state) => state.expandedScrims.has(scrimId));
   
   // Local state
   const [playerEntered, setPlayerEntered] = useState(false);
@@ -63,7 +62,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   const scrimBoxRef = useRef(null);
   
   // Control expansion - use store for regular view, always expanded in detail view
-  const isBoxExpanded = isInDetail ? true : isScrimExpanded(scrimId);
+  const isBoxExpanded = isInDetail ? true : isScrimExpandedInStore;
   
   const setIsBoxExpanded = (value) => {
     if (!isInDetail) {

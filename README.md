@@ -98,18 +98,24 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - userAgent data now gets saved in the DB when logging in, that is for security purposes.
 
 ### 4/30/2023
+
 - socket is now hosted with the server, instead of a different hierarchy
 - conversations on the messenger dropdown are now sorted by unseen messages, then by online status
 
 ### 5/16/2023
+
 - rewrite some queries
 - change scrollbar in user profile page
 
-
 ## 8/9/2025
+
 - user profile page created scrims and participated scrims are now collapsible glass accordions.
 - refactored the backend controllers.
-- added riot api support
+- added riot api support, game lobby now automatically creates tournament code that can be copy and pasted, no more manual lobby creation needed.
+- added bug fixes and optimizations.
+- added new notifcation sent when scrim started for participating user
+- notifications now send on the computer if accepted, not just in-app.
+
 ---
 
 <br />

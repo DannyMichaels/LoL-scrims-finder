@@ -38,7 +38,7 @@ function ScrimCreate() {
   const { setCurrentAlert } = useAlerts();
 
   const [scrimData, setScrimData] = useState({
-    gameStartTime: moment(),
+    gameStartTime: moment().add(30, 'minutes'), // Default to 30 minutes from now
     lobbyHost: 'random',
     region: currentUser?.region,
     createdBy: currentUser,

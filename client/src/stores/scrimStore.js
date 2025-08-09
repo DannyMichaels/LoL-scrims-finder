@@ -97,29 +97,43 @@ const useScrimStore = create(
       
       // Update specific scrim fields
       updateScrim: (scrimId, updates) => {
-        set((state) => ({
-          scrims: {
-            ...state.scrims,
-            [scrimId]: {
-              ...state.scrims[scrimId],
-              ...updates
-            }
-          }
-        }));
+        set((state) => {
+          const updatedScrim = {
+            ...state.scrims[scrimId],
+            ...updates
+          };
+          
+          return {
+            scrims: {
+              ...state.scrims,
+              [scrimId]: updatedScrim
+            },
+            allScrimsArray: state.allScrimsArray.map(s => 
+              s._id === scrimId ? updatedScrim : s
+            )
+          };
+        });
       },
       
       // Update tournament data for a scrim
       updateScrimTournament: (scrimId, tournamentData) => {
-        set((state) => ({
-          scrims: {
-            ...state.scrims,
-            [scrimId]: {
-              ...state.scrims[scrimId],
-              riotTournament: tournamentData,
-              lobbyName: tournamentData.tournamentCode || state.scrims[scrimId]?.lobbyName
-            }
-          }
-        }));
+        set((state) => {
+          const updatedScrim = {
+            ...state.scrims[scrimId],
+            riotTournament: tournamentData,
+            lobbyName: tournamentData.tournamentCode || state.scrims[scrimId]?.lobbyName
+          };
+          
+          return {
+            scrims: {
+              ...state.scrims,
+              [scrimId]: updatedScrim
+            },
+            allScrimsArray: state.allScrimsArray.map(s => 
+              s._id === scrimId ? updatedScrim : s
+            )
+          };
+        });
       },
       
       // Get a specific scrim
