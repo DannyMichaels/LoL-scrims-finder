@@ -1,6 +1,6 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
-import { useSelector, useDispatch } from 'react-redux';
+import useScrimStore from '../../../stores/scrimStore';
 
 // components
 import Grid from '@mui/material/Grid';
@@ -13,18 +13,29 @@ import RefreshScrimsButton from '../../scrim_components/RefreshScrimsButton';
 /* Show scrims (current, previous, upcoming) buttons */
 
 export default function NavbarCheckboxes() {
-  const dispatch = useDispatch();
-
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
 
-  const { showPreviousScrims, showCurrentScrims, showUpcomingScrims } =
-    useSelector(({ scrims }) => scrims);
+  const { 
+    showPreviousScrims, 
+    showCurrentScrims, 
+    showUpcomingScrims,
+    setShowPreviousScrims,
+    setShowCurrentScrims,
+    setShowUpcomingScrims
+  } = useScrimStore();
 
   const toggleShowScrims = (e) => {
-    dispatch({ type: 'scrims/toggleHideScrims', payload: e.target.name });
+    const { name, checked } = e.target;
+    if (name === 'showPreviousScrims') {
+      setShowPreviousScrims(checked);
+    } else if (name === 'showCurrentScrims') {
+      setShowCurrentScrims(checked);
+    } else if (name === 'showUpcomingScrims') {
+      setShowUpcomingScrims(checked);
+    }
   };
 
   return (

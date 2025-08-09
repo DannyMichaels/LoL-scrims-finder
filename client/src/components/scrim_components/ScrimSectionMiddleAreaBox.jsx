@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import useAuth from './../../hooks/useAuth';
 import useAlerts from './../../hooks/useAlerts';
+import useScrimStore from '../../stores/scrimStore';
 
 // components
 import CountdownTimer from './CountdownTimer';
@@ -22,8 +23,7 @@ import { copyTextToClipboard } from './../../utils/copyToClipboard';
 import pluralize from 'pluralize';
 import { COLORS } from './../../appTheme';
 
-// services
-import { setScrimWinner } from '../../services/scrims.services';
+// Removed direct service import - using store instead
 
 const useStyles = makeStyles({
   infoBoxRoot: {
@@ -48,6 +48,7 @@ export default function ScrimSectionMiddleAreaBox({
 }) {
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
+  const { setWinner } = useScrimStore();
 
   const classes = useStyles();
 
@@ -257,18 +258,15 @@ export default function ScrimSectionMiddleAreaBox({
 
                                   if (!yes) return;
 
-                                  const updatedScrim = await setScrimWinner(
+                                  const updatedScrim = await setWinner(
                                     scrim._id,
                                     teamName,
                                     setCurrentAlert
                                   );
 
-                                  if (updatedScrim?.createdBy) {
+                                  if (updatedScrim) {
                                     setScrim(updatedScrim);
-                                    socket?.emit(
-                                      'sendScrimTransaction',
-                                      updatedScrim
-                                    );
+                                    // Socket emission is handled in the store
                                   }
                                 }}>
                                 {teamAliases[teamName]}

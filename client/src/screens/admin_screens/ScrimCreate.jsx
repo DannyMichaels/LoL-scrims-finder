@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useFetchScrims } from '../../hooks/useScrims';
+import { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
+import useScrimStore from '../../stores/scrimStore';
 import useAlerts from '../../hooks/useAlerts';
 import useAuth from '../../hooks/useAuth';
 import moment from 'moment';
@@ -17,7 +18,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Hidden from '@mui/material/Hidden';
 import Tooltip from '../../components/shared/Tooltip';
-import { Redirect } from 'react-router-dom';
 import {
   InnerColumn,
   PageContent,
@@ -26,15 +26,14 @@ import {
 import Loading from '../../components/shared/Loading';
 import DatePicker from '../../components/shared/DatePicker';
 import TimePicker from '../../components/shared/TimePicker';
-// Removed LobbyNameField import - using simple TextField instead
 
-// utils and services
-import { createScrim } from '../../services/scrims.services';
+// utils
 import devLog from '../../utils/devLog';
 import withAdminRoute from '../../utils/withAdminRoute';
 
 function ScrimCreate() {
-  const { fetchScrims } = useFetchScrims();
+  const history = useHistory();
+  const { createScrim } = useScrimStore();
   const { currentUser } = useAuth();
   const { setCurrentAlert } = useAlerts();
 
@@ -75,11 +74,12 @@ function ScrimCreate() {
     if (newTimeValue && moment.isMoment(newTimeValue)) {
       setScrimData((prevState) => {
         // Keep the current date but update the time
-        const currentDate = moment.isMoment(prevState.gameStartTime) 
-          ? prevState.gameStartTime 
+        const currentDate = moment.isMoment(prevState.gameStartTime)
+          ? prevState.gameStartTime
           : moment();
-        
-        const updatedDateTime = currentDate.clone()
+
+        const updatedDateTime = currentDate
+          .clone()
           .hour(newTimeValue.hour())
           .minute(newTimeValue.minute())
           .second(0)
@@ -111,23 +111,24 @@ function ScrimCreate() {
 
       const newlyCreatedScrim = await createScrim(dataSending, setCurrentAlert);
 
-      await fetchScrims();
+      if (newlyCreatedScrim) {
+        devLog('created new scrim!', newlyCreatedScrim);
+        setCreatedScrim(newlyCreatedScrim);
 
-      devLog('created new scrim!', newlyCreatedScrim);
-      setCreatedScrim(newlyCreatedScrim);
-
-      if (newlyCreatedScrim.isPrivate) {
-        setCurrentAlert({
-          type: 'Success',
-          message:
-            'Private scrim created, only users with the share link can access it',
-        });
-      } else {
-        setCurrentAlert({
-          type: 'Success',
-          message: 'scrim created successfully!',
-        });
+        if (newlyCreatedScrim.isPrivate) {
+          setCurrentAlert({
+            type: 'Success',
+            message:
+              'Private scrim created, only users with the share link can access it',
+          });
+        } else {
+          setCurrentAlert({
+            type: 'Success',
+            message: 'scrim created successfully!',
+          });
+        }
       }
+
       setIsSubmitting(false);
     } catch (error) {
       const errorMsg = error?.response?.data?.error ?? 'error creating scrim';
@@ -137,16 +138,15 @@ function ScrimCreate() {
     }
   };
 
-  if (createdScrim) {
-    return (
-      <Redirect
-        to={
-          // if private push to scrim detail, else push to home
-          createdScrim?.isPrivate ? `/scrims/${createdScrim?._id}` : '/scrims'
-        }
-      />
-    );
-  }
+  useEffect(() => {
+    if (createdScrim) {
+      history.push(`/scrims/${createdScrim._id}`);
+    }
+
+    return () => {
+      setCreatedScrim(null);
+    };
+  }, [createdScrim, history]);
 
   if (isSubmitting) {
     return <Loading text="Creating new scrim" />;

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import useScrims from './../hooks/useScrims';
+import useScrimStore from './../stores/scrimStore';
 import { useParams, useHistory } from 'react-router-dom';
 import ScrimSection from '../components/scrim_components/ScrimSection';
 import Navbar from '../components/shared/Navbar/Navbar';
@@ -12,7 +12,7 @@ import useAlerts from './../hooks/useAlerts';
 export default function ScrimDetail() {
   const { id } = useParams();
   const [scrim, setScrim] = useState(null);
-  const { scrims } = useScrims();
+  const { allScrimsArray } = useScrimStore();
   const history = useHistory();
   const { setCurrentAlert } = useAlerts();
 
@@ -20,10 +20,10 @@ export default function ScrimDetail() {
     const fetchScrimData = async () => {
       try {
         // Check if scrim exists in the global scrims array (updated when scrim is deleted)
-        const scrimExistsInList = scrims.some(s => s._id === id);
+        const scrimExistsInList = allScrimsArray.some(s => s._id === id);
         
         // If scrim doesn't exist in the list, it was likely deleted - redirect silently
-        if (scrims.length > 0 && !scrimExistsInList) {
+        if (allScrimsArray.length > 0 && !scrimExistsInList) {
           history.push('/scrims');
           return;
         }
@@ -44,8 +44,8 @@ export default function ScrimDetail() {
         // Check if this error is due to scrim being deleted (404 error)
         if (error?.response?.status === 404 || error?.response?.status === 500) {
           // Check if scrim was deleted from the list
-          const scrimExistsInList = scrims.some(s => s._id === id);
-          if (!scrimExistsInList && scrims.length > 0) {
+          const scrimExistsInList = allScrimsArray.some(s => s._id === id);
+          if (!scrimExistsInList && allScrimsArray.length > 0) {
             // Scrim was deleted - redirect silently without error message
             history.push('/scrims');
             return;
@@ -64,7 +64,7 @@ export default function ScrimDetail() {
     // run this on mount and everytime scrims change.
 
     // eslint-disable-next-line
-  }, [id, scrims, history]);
+  }, [id, allScrimsArray, history]);
 
   if (!scrim) return <Loading text="Loading Scrim Data" />;
 

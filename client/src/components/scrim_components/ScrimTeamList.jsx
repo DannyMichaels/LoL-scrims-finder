@@ -29,13 +29,6 @@ import { truncate } from '../../utils/truncate';
 import { copyTextToClipboard } from '../../utils/copyToClipboard';
 import { encode } from 'html-entities';
 
-// services
-import {
-  insertPlayerInScrim,
-  removePlayerFromScrim,
-  movePlayerInScrim,
-} from '../../services/scrims.services';
-
 // utils
 import { getTeamBackgroundColor } from '../../utils/scrimMisc';
 import { getRankImage } from './../../utils/getRankImage';
@@ -61,6 +54,7 @@ export default function ScrimTeamList({
   joinGame: joinGameProp,
   leaveGame: leaveGameProp,
   handleMovePlayer: handleMovePlayerProp,
+  kickPlayer: kickPlayerProp,
 }) {
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
@@ -73,110 +67,13 @@ export default function ScrimTeamList({
 
   const { teamRoles, teamName, teamTitleName, teamArray } = teamData;
 
-  const joinGame = joinGameProp || async (teamJoiningName, role) => {
-    setButtonsDisabled(true);
+  const joinGame = joinGameProp;
 
-    if (casterEntered) {
-      setCurrentAlert({
-        type: 'Error',
-        message: (
-          <span>
-            cannot join team:&nbsp;
-            <strong>You're already a caster for this game!</strong>
-          </span>
-        ),
-      });
+  const handleMovePlayer = handleMovePlayerProp;
 
-      setButtonsDisabled(false);
-      return;
-    }
+  const leaveGame = leaveGameProp;
 
-    const updatedScrim = await insertPlayerInScrim({
-      scrimId: scrim._id,
-      userId: currentUser._id,
-
-      // sending the role joining and the team name in the req.body.
-      playerData: {
-        role,
-        team: { name: teamJoiningName },
-      },
-      setAlert: setCurrentAlert,
-      setButtonsDisabled,
-      setScrim,
-    });
-
-    // using .createdBy because on error it wont return populated scrim, so we don't set the scrim
-    if (updatedScrim?.createdBy) {
-      setScrim(updatedScrim);
-
-      socket?.emit('sendScrimTransaction', updatedScrim);
-    }
-
-    setButtonsDisabled(false);
-  };
-
-  const handleMovePlayer = handleMovePlayerProp || async (teamName, role) => {
-    // toggleDisableButtons();
-    setButtonsDisabled(true);
-
-    const updatedScrim = await movePlayerInScrim({
-      scrimId: scrim._id,
-      userId: currentUser._id,
-      playerData: {
-        role,
-        team: { name: teamName },
-      },
-      setAlert: setCurrentAlert,
-      setButtonsDisabled,
-      setScrim,
-    });
-
-    if (updatedScrim?.createdBy) {
-      setScrim(updatedScrim);
-
-      socket?.emit('sendScrimTransaction', updatedScrim);
-    }
-
-    setButtonsDisabled(false);
-  };
-
-  const leaveGame = leaveGameProp || async () => {
-    setButtonsDisabled(true);
-
-    const updatedScrim = await removePlayerFromScrim({
-      scrimId: scrim._id,
-      userId: playerEntered?._user?._id,
-      setAlert: setCurrentAlert,
-      setButtonsDisabled,
-      setScrim,
-    });
-
-    if (updatedScrim?.createdBy) {
-      socket?.emit('sendScrimTransaction', updatedScrim);
-    }
-
-    setButtonsDisabled(false);
-  };
-
-  const kickPlayerFromGame = async (playerToKick) => {
-    // if person kicking isn't an admin, return.
-    if (!isCurrentUserAdmin) return;
-    setButtonsDisabled(true);
-
-    const updatedScrim = await removePlayerFromScrim({
-      scrimId: scrim._id,
-      userId: playerToKick?._user?._id,
-      setAlert: setCurrentAlert,
-      setButtonsDisabled,
-      setScrim,
-    });
-
-    if (updatedScrim?.createdBy) {
-      socket?.emit('sendScrimTransaction', updatedScrim);
-    }
-
-    setButtonsDisabled(false);
-  };
+  const kickPlayerFromGame = kickPlayerProp;
 
   const onDrag = (e) => {
     const userId = e.target.closest('li').dataset?._user;

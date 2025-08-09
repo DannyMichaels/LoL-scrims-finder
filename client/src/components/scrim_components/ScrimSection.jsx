@@ -1,252 +1,344 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
-import useAuth from '../../hooks/useAuth';
-import useAlerts from './../../hooks/useAlerts';
-import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
-import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import useScrimStore from '../../stores/scrimStore';
+import useAuth from './../../hooks/useAuth';
+import useAlerts from './../../hooks/useAlerts';
 import useSocket from './../../hooks/useSocket';
-import { useScrimSocket } from './../../hooks/useScrims';
 
-//  components
-import ScrimTeamList from './ScrimTeamList';
-import ScrimSectionMiddleAreaBox from './ScrimSectionMiddleAreaBox';
+// components
 import ScrimSectionHeader from './ScrimSectionHeader';
-import { PageSection } from '../shared/PageComponents';
+import ScrimSectionMiddleAreaBox from './ScrimSectionMiddleAreaBox';
+import ScrimTeamList from './ScrimTeamList';
 import ScrimSectionExpander from './ScrimSectionExpander';
-import AdminPlayerControls from './AdminPlayerControls';
+import { PageSection } from '../shared/PageComponents';
+import devLog from '../../utils/devLog';
+
+// utils
+import { useScrimSectionStyles } from '../../styles/ScrimSection.styles';
+import { compareDates } from '../../utils/compareDates';
 
 // services
 import {
-  deleteScrim,
-  getScrimById,
+  insertCasterInScrim,
   removeCasterFromScrim,
-  swapPlayersInScrim,
 } from '../../services/scrims.services';
-import { insertCasterInScrim } from '../../services/scrims.services';
-
-// utils
-import { compareDates } from '../../utils/compareDates';
-import devLog from './../../utils/devLog';
-
-const MAX_CASTER_AMOUNT = 2;
 
 export default function ScrimSection({ scrimData, isInDetail }) {
-  const { currentUser } = useAuth();
+  const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
-
-  // the expand controls at bottom (dont show if we have the isInDetail prop, aka only one scrim page)
-  const [isBoxExpanded, setIsBoxExpanded] = useState(() => {
-    return isInDetail ? scrimData?._id : false;
-  });
-
   const { socket } = useSocket();
-
+  const history = useHistory();
+  
+  // Zustand store
+  const {
+    getScrim,
+    setScrim,
+    fetchScrim,
+    isScrimExpanded,
+    toggleScrimExpanded,
+    joinScrimRoom,
+    leaveScrimRoom,
+    joinTeam,
+    leaveTeam,
+    movePlayer,
+    swapPlayers: swapPlayersAction,
+    deleteScrim: deleteScrimAction
+  } = useScrimStore();
+  
+  // Get or initialize scrim data
+  const scrimId = scrimData?._id;
+  const scrim = getScrim(scrimId) || scrimData;
+  
+  // Local state
   const [playerEntered, setPlayerEntered] = useState(false);
   const [casterEntered, setCasterEntered] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [imageUploaded, setImageUploaded] = useState(false);
-  const [buttonsDisabled, setButtonsDisabled] = useState(false); // for when players spam joining or leaving.
-
-  const [scrim, setScrim] = useScrimSocket(scrimData, isBoxExpanded);
+  const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const [swapPlayers, setSwapPlayers] = useState({
     playerOne: null,
     playerTwo: null,
   });
-
-  const scrimBoxRef = useRef(null); // element container
-
-  const dispatch = useDispatch();
-
-  // if the scrim has a winning team, it means it has ended.
-  const gameEnded = useMemo(() => scrim?.teamWon, [scrim?.teamWon]);
-
+  
+  const scrimBoxRef = useRef(null);
+  
+  // Control expansion - use store for regular view, always expanded in detail view
+  const isBoxExpanded = isInDetail ? true : isScrimExpanded(scrimId);
+  
+  const setIsBoxExpanded = (value) => {
+    if (!isInDetail) {
+      toggleScrimExpanded(scrimId, value);
+    }
+  };
+  
   const classes = useScrimSectionStyles({ scrim, isBoxExpanded });
-
-  const history = useHistory();
-
-  const { teamOne, teamTwo, casters } = scrim;
-
-  // when the user first expands this scrim and this isn't on detail page, refetch data.
+  
+  // Initialize scrim in store
   useEffect(() => {
-    const fetchOneScrim = async () => {
-      if (isBoxExpanded && !isInDetail) {
+    if (scrimData && scrimId) {
+      setScrim(scrimId, scrimData);
+    }
+  }, [scrimData, scrimId, setScrim]);
+  
+  // Join/leave scrim room for socket updates
+  useEffect(() => {
+    if (isBoxExpanded && scrimId) {
+      joinScrimRoom(scrimId);
+      
+      // Fetch fresh data when expanding (not in detail view)
+      if (!isInDetail) {
         devLog(`scrim box expanded ${isBoxExpanded}, fetching data`);
-
-        const oneScrim = await getScrimById(scrimData?._id);
-        // for when it's deleted
-        if (oneScrim?.createdBy) {
-          setScrim(oneScrim);
-        } else {
-          setScrim(null);
-        }
+        fetchScrim(scrimId);
       }
-    };
-
-    fetchOneScrim();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBoxExpanded, isInDetail, scrimData?._id]);
-
+      
+      return () => {
+        if (!isInDetail) {
+          leaveScrimRoom(scrimId);
+        }
+      };
+    }
+  }, [isBoxExpanded, scrimId, isInDetail, joinScrimRoom, leaveScrimRoom, fetchScrim]);
+  
+  // Check game start status
   useEffect(() => {
-    let gameHasStarted = compareDates(scrim) > 0;
-
-    if (gameHasStarted) {
-      setGameStarted(scrim._id);
+    if (scrim) {
+      const gameHasStarted = compareDates(scrim) > 0;
+      if (gameHasStarted) {
+        setGameStarted(scrim._id);
+      }
     }
   }, [scrim]);
-
+  
+  // Check player/caster status
   useEffect(() => {
+    if (!scrim || !currentUser) return;
+    
+    const { teamOne = [], teamTwo = [], casters = [] } = scrim;
     const teams = [...teamOne, ...teamTwo];
-
-    let foundPlayer = teams.find(
-      (player) => player?._user?._id === currentUser?._id
+    
+    const playerInGame = teams.find(
+      (player) => player?._user?._id === currentUser._id
     );
-
-    let foundCaster = scrim.casters.find(
-      (caster) => caster?._id === currentUser?._id
+    setPlayerEntered(playerInGame);
+    
+    const casterInGame = casters.find(
+      (caster) => caster?._id === currentUser._id
     );
-
-    if (foundCaster) {
-      setCasterEntered(foundCaster);
-    } else {
-      setCasterEntered(false);
-    }
-
-    if (foundPlayer) {
-      setPlayerEntered(foundPlayer);
-    } else {
-      setPlayerEntered(false);
-    }
-  }, [scrim, currentUser?._id, teamOne, teamTwo]);
-
+    setCasterEntered(casterInGame);
+  }, [scrim, currentUser]);
+  
+  // Check for uploaded images
   useEffect(() => {
-    if (scrim.postGameImage) {
-      setImageUploaded(scrim._id);
-    } else {
-      setImageUploaded(false);
-    }
+    if (!scrim) return;
+    
+    const teamImages = [...(scrim.teamOneImages || []), ...(scrim.teamTwoImages || [])];
+    setImageUploaded(teamImages.length > 0);
   }, [scrim]);
-
+  
+  // Handle player swapping
   useEffect(() => {
-    const checkSwap = async () => {
-      if (swapPlayers?.playerOne?.role && swapPlayers?.playerTwo?.role) {
-        if (swapPlayers?.playerOne?._user === swapPlayers?.playerTwo?._user) {
-          setSwapPlayers({ playerOne: null, playerTwo: null });
-          return;
-        }
-
-        const updatedScrim = await swapPlayersInScrim({
-          scrimId: scrim._id,
-          swapPlayers,
-          setButtonsDisabled,
-          setAlert: setCurrentAlert,
-          setScrim,
-        });
-
-        socket?.emit('sendScrimTransaction', updatedScrim);
-
+    const performSwap = async () => {
+      if (!swapPlayers?.playerOne?.role || !swapPlayers?.playerTwo?.role || !scrimId) return;
+      
+      // Don't swap if it's the same player
+      if (swapPlayers.playerOne._user === swapPlayers.playerTwo._user) {
         setSwapPlayers({ playerOne: null, playerTwo: null });
+        return;
       }
+      
+      setButtonsDisabled(true);
+      await swapPlayersAction(
+        scrimId,
+        swapPlayers,
+        setCurrentAlert,
+        setButtonsDisabled
+      );
+      
+      // Reset swap state
+      setSwapPlayers({ playerOne: null, playerTwo: null });
+      setButtonsDisabled(false);
     };
-    checkSwap();
-
-    // eslint-disable-next-line
-  }, [swapPlayers, scrim?._id]);
-
+    
+    performSwap();
+  }, [swapPlayers, scrimId, swapPlayersAction, setCurrentAlert]);
+  
+  const gameEnded = useMemo(() => scrim?.teamWon, [scrim?.teamWon]);
+  
+  // Team data
+  const { teamOne = [], teamTwo = [], casters = [] } = scrim || {};
+  
+  // Join game handler
+  const joinGame = async (teamJoiningName, role) => {
+    if (!currentUser || !scrimId) return;
+    
+    setButtonsDisabled(true);
+    
+    if (casterEntered) {
+      setCurrentAlert({
+        type: 'Error',
+        message: (
+          <span>
+            cannot join team:&nbsp;
+            <strong>You're already a caster for this game!</strong>
+          </span>
+        ),
+      });
+      setButtonsDisabled(false);
+      return;
+    }
+    
+    await joinTeam(
+      scrimId,
+      currentUser._id,
+      teamJoiningName,
+      role,
+      setCurrentAlert,
+      setButtonsDisabled
+    );
+    
+    setButtonsDisabled(false);
+  };
+  
+  // Leave game handler
+  const leaveGame = async () => {
+    if (!playerEntered || !scrimId) return;
+    
+    setButtonsDisabled(true);
+    await leaveTeam(
+      scrimId,
+      playerEntered._user._id,
+      setCurrentAlert,
+      setButtonsDisabled
+    );
+    setButtonsDisabled(false);
+  };
+  
+  // Move player handler
+  const handleMovePlayer = async (teamName, role) => {
+    if (!currentUser || !scrimId) return;
+    
+    setButtonsDisabled(true);
+    await movePlayer(
+      scrimId,
+      currentUser._id,
+      teamName,
+      role,
+      setCurrentAlert,
+      setButtonsDisabled
+    );
+    setButtonsDisabled(false);
+  };
+  
+  // Admin kick player handler
+  const kickPlayer = async (playerToKick) => {
+    if (!isCurrentUserAdmin || !scrimId) return;
+    
+    setButtonsDisabled(true);
+    const result = await leaveTeam(
+      scrimId,
+      playerToKick?._user?._id,
+      setCurrentAlert,
+      setButtonsDisabled
+    );
+    
+    if (result) {
+      setCurrentAlert({
+        type: 'Success',
+        message: `Successfully kicked ${playerToKick?._user?.name || 'player'} from the game`
+      });
+    }
+    
+    setButtonsDisabled(false);
+  };
+  
+  // Caster actions
   const joinCast = async () => {
+    if (!currentUser || !scrimId) return;
+    
+    setButtonsDisabled(true);
+    
     if (playerEntered) {
       setCurrentAlert({
         type: 'Error',
         message: (
           <span>
             cannot join cast:&nbsp;
-            <strong>You're already in a team!</strong>
+            <strong>You're already a player in this game!</strong>
           </span>
         ),
       });
+      setButtonsDisabled(false);
       return;
     }
-
-    if (casterEntered) return;
-    if (casters.length === MAX_CASTER_AMOUNT) return;
-
-    setButtonsDisabled(true);
-
+    
     const updatedScrim = await insertCasterInScrim({
-      scrimId: scrim._id,
-      userId: currentUser?._id,
+      scrimId,
+      casterId: currentUser._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
-      setScrim,
+      setScrim: (scrim) => setScrim(scrimId, scrim),
     });
-
-    // using .createdBy because on error it wont return populated scrim, so we don't set the scrim
+    
     if (updatedScrim?.createdBy) {
-      setScrim(updatedScrim);
       socket?.emit('sendScrimTransaction', updatedScrim);
     }
-
+    
     setButtonsDisabled(false);
   };
-
-  const leaveCast = async () => {
-    setButtonsDisabled(true);
-
-    const updatedScrim = await removeCasterFromScrim({
-      scrimId: scrim._id,
-      userId: casterEntered?._id,
-      setAlert: setCurrentAlert,
-      setButtonsDisabled,
-    });
-
-    if (updatedScrim?.createdBy) {
-      setScrim(updatedScrim);
-      socket?.emit('sendScrimTransaction', updatedScrim);
-    }
-
-    setButtonsDisabled(false);
-  };
-
-  const handleDeleteScrim = async () => {
-    try {
-      let yes = window.confirm('Are you sure you want to close this scrim?');
-      if (!yes) return;
-
-      let deletedScrim = await deleteScrim(scrim._id);
-
-      if (deletedScrim) {
-        dispatch({ type: 'scrims/deleteScrim', payload: scrim });
-
-        if (isInDetail) {
-          history.push('/');
-        }
-
-        setCurrentAlert({
-          type: 'Success',
-          message: 'Scrim removed successfully',
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      const errorMsg = err?.response?.data?.error ?? 'error removing scrim';
-
-      setCurrentAlert({ type: 'Error', message: errorMsg });
-    }
-  };
-
-  // Don't return null immediately - use original scrimData as fallback
-  // This prevents the component from unmounting during updates
-  const displayScrim = scrim || scrimData;
   
-  if (!displayScrim) return null;
-
-  // the "Scrim Box"
+  const leaveCast = async () => {
+    if (!casterEntered || !scrimId) return;
+    
+    setButtonsDisabled(true);
+    
+    const updatedScrim = await removeCasterFromScrim({
+      scrimId,
+      casterId: casterEntered._id,
+      setAlert: setCurrentAlert,
+      setButtonsDisabled,
+      setScrim: (scrim) => setScrim(scrimId, scrim),
+    });
+    
+    if (updatedScrim?.createdBy) {
+      socket?.emit('sendScrimTransaction', updatedScrim);
+    }
+    
+    setButtonsDisabled(false);
+  };
+  
+  // Delete scrim handler
+  const handleDeleteScrim = async () => {
+    if (!scrimId) return;
+    
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this scrim?'
+    );
+    
+    if (!confirmDelete) return;
+    
+    const success = await deleteScrimAction(scrimId, setCurrentAlert);
+    
+    if (success) {
+      setCurrentAlert({
+        type: 'Success',
+        message: 'Scrim removed successfully',
+      });
+      
+      if (isInDetail) {
+        history.push('/');
+      }
+    }
+  };
+  
+  // Don't render if no scrim data
+  if (!scrim) return null;
+  
   return (
     <PageSection aria-label="scrim section">
       <div className={classes.scrimBox} ref={scrimBoxRef}>
         <ScrimSectionHeader
-          scrim={displayScrim}
-          setScrim={setScrim}
+          scrim={scrim}
+          setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
           socket={socket}
           joinCast={joinCast}
           leaveCast={leaveCast}
@@ -257,74 +349,76 @@ export default function ScrimSection({ scrimData, isInDetail }) {
           isBoxExpanded={isBoxExpanded}
           isInDetail={isInDetail}
         />
-
+        
         {isBoxExpanded && (
-          /* don't render teams and countdown timer if not expanded,
-           that avoids unnecessary rerenders from the CountDownTimer and Teams List */
-          // this will default to true if in ScrimDetail page, which is the expected behaviour.
           <div className={classes.teamsContainer}>
-            {/* teamOne */}
             <ScrimTeamList
               teamData={{
                 teamRoles: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
                 teamName: 'teamOne',
-                teamTitleName: 'Team 1 (Blue Side)',
+                teamTitleName: 'Team One (Blue Side)',
                 teamArray: teamOne,
               }}
-              setScrim={setScrim}
-              scrim={displayScrim}
+              scrim={scrim}
+              setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
+              socket={socket}
               playerEntered={playerEntered}
               casterEntered={casterEntered}
               gameStarted={gameStarted === scrim._id}
               buttonsDisabled={buttonsDisabled}
               setButtonsDisabled={setButtonsDisabled}
-              socket={socket}
               setSwapPlayers={setSwapPlayers}
+              joinGame={joinGame}
+              leaveGame={leaveGame}
+              handleMovePlayer={handleMovePlayer}
+              kickPlayer={kickPlayer}
             />
-
-            {/* the middle box that contains the countdown timer and other details. */}
+            
             <ScrimSectionMiddleAreaBox
-              imageUploaded={imageUploaded === scrim._id}
-              scrim={displayScrim}
-              setScrim={setScrim}
+              imageUploaded={imageUploaded}
+              scrim={scrim}
+              setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
               gameStarted={gameStarted === scrim._id}
               setGameStarted={setGameStarted}
               gameEnded={gameEnded}
               playerEntered={playerEntered}
-              socket={socket}
               casterEntered={casterEntered}
+              socket={socket}
             />
-
-            {/* teamTwo */}
+            
             <ScrimTeamList
               teamData={{
                 teamRoles: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
                 teamName: 'teamTwo',
-                teamTitleName: 'Team 2 (Red Side)',
+                teamTitleName: 'Team Two (Red Side)',
                 teamArray: teamTwo,
               }}
-              scrim={displayScrim}
-              setScrim={setScrim}
+              scrim={scrim}
+              setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
+              socket={socket}
               playerEntered={playerEntered}
               casterEntered={casterEntered}
               gameStarted={gameStarted === scrim._id}
               buttonsDisabled={buttonsDisabled}
               setButtonsDisabled={setButtonsDisabled}
-              socket={socket}
               setSwapPlayers={setSwapPlayers}
+              joinGame={joinGame}
+              leaveGame={leaveGame}
+              handleMovePlayer={handleMovePlayer}
+              kickPlayer={kickPlayer}
             />
           </div>
         )}
+        
+        {!isInDetail && (
+          <ScrimSectionExpander
+            scrimBoxRef={scrimBoxRef}
+            isBoxExpanded={isBoxExpanded}
+            setIsBoxExpanded={setIsBoxExpanded}
+            scrimId={scrim._id}
+          />
+        )}
       </div>
-
-      {!isInDetail && (
-        <ScrimSectionExpander
-          scrimBoxRef={scrimBoxRef}
-          isBoxExpanded={isBoxExpanded}
-          setIsBoxExpanded={setIsBoxExpanded}
-          scrimId={displayScrim._id}
-        />
-      )}
     </PageSection>
   );
 }

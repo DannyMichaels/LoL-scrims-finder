@@ -19,14 +19,11 @@ import {
   Shuffle as ShuffleIcon,
 } from '@mui/icons-material';
 
-// Services
-import {
-  adminAssignPlayer,
-  adminFillRandomPositions,
-} from '../../services/scrims.services';
-import useUsers from '../../hooks/useUsers';
+// Store
+import useScrimStore from '../../stores/scrimStore';
 
 // Hooks
+import useUsers from '../../hooks/useUsers';
 import useAuth from '../../hooks/useAuth';
 import useAlerts from '../../hooks/useAlerts';
 
@@ -49,6 +46,7 @@ export default function AdminPlayerControls({
   const { isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
   const { allUsers } = useUsers();
+  const { adminAssignPlayer, adminFillRandom } = useScrimStore();
 
   // State for manual assignment dialog
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
@@ -86,18 +84,15 @@ export default function AdminPlayerControls({
     setAssignLoading(true);
 
     try {
-      const updatedScrim = await adminAssignPlayer({
-        scrimId: scrim._id,
-        userId: selectedUser._id,
-        teamName: selectedTeam,
-        role: selectedRole,
-        setAlert: setCurrentAlert,
-        setButtonsDisabled: () => {},
-        setScrim,
-      });
+      const updatedScrim = await adminAssignPlayer(
+        scrim._id,
+        selectedUser._id,
+        selectedTeam,
+        selectedRole,
+        setCurrentAlert
+      );
 
       if (updatedScrim) {
-        socket?.emit('sendScrimTransaction', updatedScrim);
         handleCloseAssignDialog();
       }
     } catch (error) {
@@ -125,19 +120,13 @@ export default function AdminPlayerControls({
     setFillLoading(true);
 
     try {
-      const result = await adminFillRandomPositions({
-        scrimId: scrim._id,
-        region: scrim.region,
-        setAlert: setCurrentAlert,
-        setButtonsDisabled: () => {},
-        setScrim,
-      });
+      await adminFillRandom(
+        scrim._id,
+        scrim.region,
+        setCurrentAlert
+      );
 
-      if (result && result.scrim) {
-        // Make sure to update the local state with the returned scrim
-        setScrim(result.scrim);
-        socket?.emit('sendScrimTransaction', result.scrim);
-      }
+      // The store handles the socket emission and state update
     } catch (error) {
       console.error('Error filling random positions:', error);
     } finally {

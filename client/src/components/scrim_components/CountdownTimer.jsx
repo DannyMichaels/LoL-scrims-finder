@@ -30,7 +30,7 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
     if (!teamsFilled) {
       // Check if we have a tournament code but teams aren't full
       if (scrim.riotTournament?.tournamentCode) {
-        return 'TOURNAMENT CODE NOT GENERATED - TEAMS NOT FULL';
+        return 'TEAMS NOT FULL';
       }
       return 'WAITING FOR PLAYERS';
     }

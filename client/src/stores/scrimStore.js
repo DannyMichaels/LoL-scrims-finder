@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import moment from 'moment';
 import { 
   getScrimById,
   insertPlayerInScrim,
@@ -8,9 +9,13 @@ import {
   insertCasterInScrim,
   removeCasterFromScrim,
   deleteScrim,
+  createScrim,
+  updateScrim,
   adminAssignPlayer,
   adminFillRandomPositions,
-  setScrimWinner
+  setScrimWinner,
+  swapPlayersInScrim,
+  getAllScrims
 } from '../services/scrims.services';
 
 const useScrimStore = create(
@@ -18,9 +23,18 @@ const useScrimStore = create(
     (set, get) => ({
       // State
       scrims: {},  // Object with scrimId as key for O(1) lookups
+      allScrimsArray: [], // Array of all scrims for filtering
+      scrimsLoaded: false,
       expandedScrims: new Set(), // Track which scrims are expanded
       activeScrimRooms: new Set(), // Track which scrim rooms we've joined
       socketRef: null,
+      
+      // Filter state
+      scrimsDate: moment().format('YYYY-MM-DD'), // Store as string to prevent re-renders
+      scrimsRegion: 'NA',
+      showPreviousScrims: true,
+      showCurrentScrims: true,
+      showUpcomingScrims: true,
       
       // Actions
       setSocket: (socket) => {
@@ -329,12 +343,127 @@ const useScrimStore = create(
         return null;
       },
       
+      setWinner: async (scrimId, winnerTeamName, setAlert) => {
+        try {
+          const updatedScrim = await setScrimWinner(scrimId, winnerTeamName, setAlert);
+          
+          if (updatedScrim) {
+            // Update in store
+            set((state) => {
+              const newScrims = { ...state.scrims };
+              newScrims[scrimId] = updatedScrim;
+              
+              const newScrimsArray = state.allScrimsArray.map(s => 
+                s._id === scrimId ? updatedScrim : s
+              );
+              
+              return {
+                scrims: newScrims,
+                allScrimsArray: newScrimsArray
+              };
+            });
+            
+            get().socketRef?.emit('sendScrimTransaction', updatedScrim);
+            return updatedScrim;
+          }
+        } catch (error) {
+          console.error('Error setting scrim winner:', error);
+        }
+        return null;
+      },
+      
+      swapPlayers: async (scrimId, swapPlayers, setAlert, setButtonsDisabled) => {
+        try {
+          const updatedScrim = await swapPlayersInScrim({
+            scrimId,
+            swapPlayers,
+            setButtonsDisabled,
+            setAlert,
+            setScrim: (scrim) => get().setScrim(scrimId, scrim)
+          });
+          
+          if (updatedScrim) {
+            get().setScrim(scrimId, updatedScrim);
+            get().socketRef?.emit('sendScrimTransaction', updatedScrim);
+            return updatedScrim;
+          }
+        } catch (error) {
+          console.error('Error swapping players:', error);
+        }
+        return null;
+      },
+      
+      createScrim: async (scrimData, setAlert) => {
+        try {
+          const newScrim = await createScrim(scrimData, setAlert);
+          
+          if (newScrim) {
+            // Add to store
+            set((state) => ({
+              scrims: { ...state.scrims, [newScrim._id]: newScrim },
+              allScrimsArray: [...state.allScrimsArray, newScrim]
+            }));
+            
+            // Set the date filter to match the new scrim
+            const scrimDate = moment(newScrim.gameStartTime).format('YYYY-MM-DD');
+            set({ 
+              scrimsDate: scrimDate,
+              scrimsRegion: newScrim.region 
+            });
+            
+            return newScrim;
+          }
+        } catch (error) {
+          console.error('Error creating scrim:', error);
+          const errorMsg = error?.response?.data?.error || 'Failed to create scrim';
+          if (setAlert) {
+            setAlert({
+              type: 'Error',
+              message: errorMsg
+            });
+          }
+        }
+        return null;
+      },
+      
+      updateScrimFromAPI: async (scrimId, scrimData, setAlert) => {
+        try {
+          const updatedScrim = await updateScrim(scrimId, scrimData);
+          
+          if (updatedScrim) {
+            // Update in store
+            set((state) => {
+              const newScrims = { ...state.scrims };
+              newScrims[scrimId] = updatedScrim;
+              
+              const newScrimsArray = state.allScrimsArray.map(s => 
+                s._id === scrimId ? updatedScrim : s
+              );
+              
+              return {
+                scrims: newScrims,
+                allScrimsArray: newScrimsArray
+              };
+            });
+            
+            return updatedScrim;
+          }
+        } catch (error) {
+          console.error('Error updating scrim:', error);
+          const errorMsg = error?.response?.data?.error || 'Failed to update scrim';
+          if (setAlert) {
+            setAlert({
+              type: 'Error',
+              message: errorMsg
+            });
+          }
+        }
+        return null;
+      },
+      
       deleteScrim: async (scrimId, setAlert) => {
         try {
-          await deleteScrim({
-            scrimId,
-            setAlert
-          });
+          await deleteScrim(scrimId);
           
           // Remove from store
           set((state) => {
@@ -344,8 +473,12 @@ const useScrimStore = create(
             const newExpanded = new Set(state.expandedScrims);
             newExpanded.delete(scrimId);
             
+            // Also remove from the array
+            const newScrimsArray = state.allScrimsArray.filter(s => s._id !== scrimId);
+            
             return { 
               scrims: newScrims,
+              allScrimsArray: newScrimsArray,
               expandedScrims: newExpanded
             };
           });
@@ -353,14 +486,61 @@ const useScrimStore = create(
           return true;
         } catch (error) {
           console.error('Error deleting scrim:', error);
+          const errorMsg = error?.response?.data?.error || 'Failed to delete scrim';
+          if (setAlert) {
+            setAlert({
+              type: 'Error',
+              message: errorMsg
+            });
+          }
           return false;
         }
       },
+      
+      // Fetch all scrims for a region and date
+      fetchAllScrims: async (region, date) => {
+        try {
+          const params = {};
+          if (region) params.region = region;
+          if (date) params.date = date;
+          
+          const scrims = await getAllScrims(params);
+          
+          // Convert array to object for O(1) lookups
+          const scrimsObj = {};
+          scrims.forEach(scrim => {
+            scrimsObj[scrim._id] = scrim;
+          });
+          
+          set({ 
+            scrims: scrimsObj,
+            allScrimsArray: scrims,
+            scrimsLoaded: true,
+            scrimsRegion: region || get().scrimsRegion,
+            scrimsDate: date || get().scrimsDate // date is already a string
+          });
+          
+          return scrims;
+        } catch (error) {
+          console.error('Error fetching scrims:', error);
+          set({ scrimsLoaded: true }); // Set loaded even on error
+          return [];
+        }
+      },
+      
+      // Filter setters
+      setScrimsDate: (date) => set({ scrimsDate: moment(date).format('YYYY-MM-DD') }),
+      setScrimsRegion: (region) => set({ scrimsRegion: region }),
+      setShowPreviousScrims: (show) => set({ showPreviousScrims: show }),
+      setShowCurrentScrims: (show) => set({ showCurrentScrims: show }),
+      setShowUpcomingScrims: (show) => set({ showUpcomingScrims: show }),
       
       // Clear store
       clearStore: () => {
         set({
           scrims: {},
+          allScrimsArray: [],
+          scrimsLoaded: false,
           expandedScrims: new Set(),
           activeScrimRooms: new Set()
         });

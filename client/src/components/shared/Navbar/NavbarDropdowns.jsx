@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import useScrimStore from '../../../stores/scrimStore';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import moment from 'moment';
@@ -18,15 +19,12 @@ import DatePicker from './../DatePicker';
 
 // the region and date filters
 export default function NavbarDropdowns() {
-  const [{ currentUser }, { scrimsDate, scrimsRegion }] = useSelector(
-    ({ auth, scrims }) => [auth, scrims]
-  );
+  const { currentUser } = useSelector(({ auth }) => auth);
+  const { scrimsDate, scrimsRegion, setScrimsDate, setScrimsRegion } = useScrimStore();
 
   const theme = useTheme();
 
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const dispatch = useDispatch();
 
   let allRegions = ['NA', 'EUW', 'EUNE', 'LAN', 'OCE'];
 
@@ -36,19 +34,15 @@ export default function NavbarDropdowns() {
   ];
 
   const onSelectRegion = (e) => {
-    // this would trigger scrims/setFilteredScrims in the store (check useFilteredScrims inside useScrims.js)
     const region = e.target.value;
-    dispatch({ type: 'scrims/setScrimsRegion', payload: region });
+    setScrimsRegion(region);
   };
 
   const onSelectDate = useCallback(
     (newDateValue) => {
-      // this would trigger scrims/setFilteredScrims in the store (check useFilteredScrims inside useScrims.js)
-      dispatch({ type: 'scrims/setScrimsDate', payload: newDateValue });
-      // right now we're filtering through all existing scrims, maybe it would be better to just
-      // use a debounce and make an api call to get the scrims for this specific date (same thing for region)
+      setScrimsDate(newDateValue);
     },
-    [dispatch]
+    [] // setScrimsDate is stable from zustand
   );
 
   return (
@@ -72,7 +66,7 @@ export default function NavbarDropdowns() {
             style: { color: '#fff' },
           }}
           variant="standard"
-          value={moment.isMoment(scrimsDate) ? scrimsDate : moment()}
+          value={moment(scrimsDate)}
           onChange={onSelectDate}
         />
         <FormHelperText className="text-white">

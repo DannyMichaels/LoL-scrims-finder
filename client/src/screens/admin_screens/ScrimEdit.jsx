@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useFetchScrims } from '../../hooks/useScrims';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
+import useScrimStore from '../../stores/scrimStore';
 import useAlerts from '../../hooks/useAlerts';
 import useAuth from '../../hooks/useAuth';
 import moment from 'moment';
@@ -26,9 +26,9 @@ import DatePicker from '../../components/shared/DatePicker';
 import TimePicker from '../../components/shared/TimePicker';
 // Removed LobbyNameFieldOld - using simple TextField instead
 
-// utils // services
+// utils
 import devLog from '../../utils/devLog';
-import { updateScrim, getScrimById } from '../../services/scrims.services';
+import { getScrimById } from '../../services/scrims.services';
 import { sample } from '../../utils/sample';
 import withAdminRoute from './../../utils/withAdminRoute';
 
@@ -36,8 +36,8 @@ const RANDOM_HOST_CODE = '_$random'; // because input doesn't want value to be n
 
 function ScrimEdit() {
   const { currentUser } = useAuth();
-  const { fetchScrims } = useFetchScrims();
   const { setCurrentAlert } = useAlerts();
+  const { updateScrimFromAPI } = useScrimStore();
 
   const [scrimData, setScrimData] = useState({
     teamWon: '',
@@ -261,10 +261,9 @@ function ScrimEdit() {
           : 0,
       };
 
-      const updatedScrim = await updateScrim(id, dataSending);
+      const updatedScrim = await updateScrimFromAPI(id, dataSending, setCurrentAlert);
 
       if (updatedScrim) {
-        await fetchScrims();
         setCurrentAlert({
           type: 'Success',
           message: 'Scrim updated successfully!',

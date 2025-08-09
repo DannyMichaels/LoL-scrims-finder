@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
-import useScrims, { useFilteredScrims } from './../hooks/useScrims';
-import { useDispatch } from 'react-redux';
+import useScrims, { useFilteredScrimsZustand } from './../hooks/useScrimsZustand';
 
 // components
 import Typography from '@mui/material/Typography';
@@ -22,7 +21,6 @@ import HelpIcon from '@mui/icons-material/Help';
 import MenuIcon from '@mui/icons-material/Menu';
 
 export default function Scrims() {
-  const scrimsState = useScrims();
   const {
     scrimsLoaded,
     scrimsDate,
@@ -30,12 +28,11 @@ export default function Scrims() {
     showPreviousScrims,
     showCurrentScrims,
     showUpcomingScrims,
-  } = scrimsState;
+    setShowUpcomingScrims
+  } = useScrims();
 
   const { filteredScrims, currentScrims, previousScrims, upcomingScrims } =
-    useFilteredScrims();
-
-  const dispatch = useDispatch();
+    useFilteredScrimsZustand();
 
   const theme = useTheme();
   const matchesLg = useMediaQuery(theme.breakpoints.down('lg'));
@@ -45,10 +42,10 @@ export default function Scrims() {
     if (compareDateWithCurrentTime(scrimsDate) > 0) {
       if (!showUpcomingScrims) return;
       // if the scrim is in the past compared to filtered scrims date.
-      dispatch({ type: 'scrims/setShowScrims', showUpcoming: false });
+      setShowUpcomingScrims(false);
     } else {
       if (showUpcomingScrims) return;
-      dispatch({ type: 'scrims/setShowScrims', showUpcoming: true });
+      setShowUpcomingScrims(true);
     }
 
     // eslint-disable-next-line

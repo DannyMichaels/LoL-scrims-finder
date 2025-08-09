@@ -9,9 +9,9 @@ export const getAllScrims = async (params = {}) => {
     // Build query string from params
     const queryString = new URLSearchParams(params).toString();
     const url = queryString ? `/scrims?${queryString}` : '/scrims';
-    
+
     const response = await api.get(url);
-    
+
     // Handle both old format (array) and new format (object with data and pagination)
     if (response.data && response.data.data) {
       return response.data.data; // Return just the scrims array for backward compatibility
@@ -53,7 +53,9 @@ export const getScrimById = async (id) => {
 export const getScrimsOptimized = async (params = {}) => {
   try {
     const queryString = new URLSearchParams(params).toString();
-    const response = await api.get(`/scrims${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get(
+      `/scrims${queryString ? `?${queryString}` : ''}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching scrims:', error);
@@ -69,10 +71,12 @@ export const getTodaysScrimsOptimized = async (region) => {
   try {
     const params = region ? { region } : {};
     const queryString = new URLSearchParams(params).toString();
-    const response = await api.get(`/scrims/today${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get(
+      `/scrims/today${queryString ? `?${queryString}` : ''}`
+    );
     return response.data;
   } catch (error) {
-    console.error('Error fetching today\'s scrims:', error);
+    console.error("Error fetching today's scrims:", error);
     throw error;
   }
 };
@@ -84,7 +88,9 @@ export const getTodaysScrimsOptimized = async (region) => {
 export const getUpcomingScrimsOptimized = async (params = {}) => {
   try {
     const queryString = new URLSearchParams(params).toString();
-    const response = await api.get(`/scrims/upcoming${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get(
+      `/scrims/upcoming${queryString ? `?${queryString}` : ''}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching upcoming scrims:', error);
@@ -99,7 +105,9 @@ export const getUpcomingScrimsOptimized = async (params = {}) => {
 export const getCurrentScrimsOptimized = async (params = {}) => {
   try {
     const queryString = new URLSearchParams(params).toString();
-    const response = await api.get(`/scrims/current${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get(
+      `/scrims/current${queryString ? `?${queryString}` : ''}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching current scrims:', error);
@@ -113,7 +121,9 @@ export const getCurrentScrimsOptimized = async (params = {}) => {
  */
 export const searchScrimsOptimized = async (query) => {
   try {
-    const response = await api.get(`/scrims/search?q=${encodeURIComponent(query)}`);
+    const response = await api.get(
+      `/scrims/search?q=${encodeURIComponent(query)}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error searching scrims:', error);
@@ -130,7 +140,9 @@ export const getUserScrimsOptimized = async (userId, role) => {
   try {
     const params = role ? { role } : {};
     const queryString = new URLSearchParams(params).toString();
-    const response = await api.get(`/scrims/user/${userId}${queryString ? `?${queryString}` : ''}`);
+    const response = await api.get(
+      `/scrims/user/${userId}${queryString ? `?${queryString}` : ''}`
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching user scrims:', error);
@@ -154,6 +166,7 @@ export const getScrimStatsOptimized = async () => {
 export const createScrim = async (scrim, setCurrentAlert) => {
   try {
     const response = await api.post('/scrims', scrim);
+    console.log('new scrim: ', response.data);
     return response.data;
   } catch (error) {
     if (setCurrentAlert) {
@@ -189,12 +202,12 @@ export const insertPlayerInScrim = async ({
       `/scrims/${scrimId}/insert-player/${userId}`,
       { playerData }
     );
-    
+
     // Update the local state with the response data
     if (setScrim && response.data) {
       setScrim(response.data);
     }
-    
+
     return response.data;
   } catch (error) {
     const errorMsg =
@@ -231,12 +244,12 @@ export const removePlayerFromScrim = async ({
     const response = await api.patch(
       `/scrims/${scrimId}/remove-player/${userId}`
     );
-    
+
     // Update the local state with the response data
     if (setScrim && response.data) {
       setScrim(response.data);
     }
-    
+
     return response.data;
   } catch (error) {
     const errorMsg = error.response.data?.error ?? error;
@@ -410,12 +423,12 @@ export const swapPlayersInScrim = async ({
       swapPlayers
     );
     setAlert({ type: 'Success', message: 'Players swapped!' });
-    
+
     // Update the local state with the response data
     if (setScrim && response.data) {
       setScrim(response.data);
     }
-    
+
     return response.data;
   } catch (error) {
     const errorMsg =
@@ -448,14 +461,15 @@ export const adminAssignPlayer = async ({
   setScrim,
 }) => {
   try {
-    const response = await api.patch(
-      `/scrims/${scrimId}/admin-assign-player`,
-      { userId, teamName, role }
-    );
+    const response = await api.patch(`/scrims/${scrimId}/admin-assign-player`, {
+      userId,
+      teamName,
+      role,
+    });
 
-    setAlert({ 
-      type: 'Success', 
-      message: 'Player assigned successfully!' 
+    setAlert({
+      type: 'Success',
+      message: 'Player assigned successfully!',
     });
 
     // Update the local state with the response data
@@ -486,16 +500,15 @@ export const adminFillRandomPositions = async ({
   setScrim,
 }) => {
   try {
-    const response = await api.patch(
-      `/scrims/${scrimId}/admin-fill-random`,
-      { region }
-    );
+    const response = await api.patch(`/scrims/${scrimId}/admin-fill-random`, {
+      region,
+    });
 
-    const { filledPositions, assignedUsers, scrim } = response.data;
-    
-    setAlert({ 
-      type: 'Success', 
-      message: `Successfully filled ${filledPositions} positions with random players!` 
+    const { filledPositions, scrim } = response.data;
+
+    setAlert({
+      type: 'Success',
+      message: `Successfully filled ${filledPositions} positions with random players!`,
     });
 
     // Update the local state with the response data

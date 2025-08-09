@@ -3,7 +3,7 @@ import './App.css';
 // hooks
 import useAppBackground from './hooks/useAppBackground';
 import useAuth, { useAuthVerify } from './hooks/useAuth';
-import { useFetchScrims, useSetScrimsRegion } from './hooks/useScrims';
+import { useFetchScrims, useSetScrimsRegion } from './hooks/useScrimsZustand';
 import { useFetchUsers } from './hooks/useUsers';
 import useMessenger from './hooks/useMessenger';
 import useNotifications from './hooks/useNotifications';
