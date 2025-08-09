@@ -20,7 +20,8 @@ import DatePicker from './../DatePicker';
 // the region and date filters
 export default function NavbarDropdowns() {
   const { currentUser } = useSelector(({ auth }) => auth);
-  const { scrimsDate, scrimsRegion, setScrimsDate, setScrimsRegion } = useScrimStore();
+  const { scrimsDate, scrimsRegion, setScrimsDate, setScrimsRegion } =
+    useScrimStore();
 
   const theme = useTheme();
 
@@ -42,7 +43,9 @@ export default function NavbarDropdowns() {
     (newDateValue) => {
       setScrimsDate(newDateValue);
     },
-    [] // setScrimsDate is stable from zustand
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   return (

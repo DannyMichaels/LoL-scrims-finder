@@ -120,24 +120,24 @@ const DraggablePaper = React.forwardRef((props, ref) => {
     e.preventDefault();
   };
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    
-    setPosition({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y,
-    });
-  };
-
   const handleMouseUp = () => {
     setIsDragging(false);
   };
 
   React.useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    };
+
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      
+
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);

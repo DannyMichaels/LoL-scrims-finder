@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
-import useScrims, { useFilteredScrimsZustand } from './../hooks/useScrimsZustand';
+import useScrims, {
+  useFilteredScrimsZustand,
+} from './../hooks/useScrimsZustand';
 
 // components
 import Typography from '@mui/material/Typography';
@@ -12,9 +13,6 @@ import Loading from '../components/shared/Loading';
 import Navbar from '../components/shared/Navbar/Navbar';
 import Tooltip from '../components/shared/Tooltip';
 import ScrimsColumn from '../components/scrim_components/ScrimsColumn';
-
-// utils
-import { compareDateWithCurrentTime } from './../utils/compareDateWithCurrentTime';
 
 // icons
 import HelpIcon from '@mui/icons-material/Help';
@@ -28,7 +26,6 @@ export default function Scrims() {
     showPreviousScrims,
     showCurrentScrims,
     showUpcomingScrims,
-    setShowUpcomingScrims
   } = useScrims();
 
   const { filteredScrims, currentScrims, previousScrims, upcomingScrims } =
