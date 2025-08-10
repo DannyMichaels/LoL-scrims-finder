@@ -169,12 +169,12 @@ const getUserParticipatedScrims = async (req, res) => {
 
     const userParticipatedScrims = await Scrim.find({
       $and: [{ teamWon: { $exists: true } }, { teamWon: { $ne: null } }],
-      // find the player in the teamOne or teamTwo
+      // find the player in the teamOne or teamTwo or casters array
 
       $or: [
         { teamOne: { $elemMatch: { _user: user._id } } },
         { teamTwo: { $elemMatch: { _user: user._id } } },
-        { casters: { $elemMatch: { _user: user._id } } },
+        { casters: user._id }, // casters is an array of user IDs
       ],
     });
 

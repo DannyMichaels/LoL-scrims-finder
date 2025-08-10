@@ -116,6 +116,12 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - added new notifcation sent when scrim started for participating user
 - notifications now send on the computer if accepted, not just in-app.
 
+## 8/10/2025
+
+- user stats now get calculated from back-end instead in profile page
+- user exp in user profile is now a progress bar instead of a static number
+- user profile page now uses charts.
+
 ---
 
 <br />

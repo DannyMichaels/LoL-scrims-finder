@@ -26,6 +26,7 @@ import UserParticipatedScrims from './../components/UserProfile_components/UserP
 import SendFriendRequest from './../components/UserProfile_components/SendFriendRequest';
 import BanUser from '../components/UserProfile_components/BanUser';
 import ProfileImage from '../components/UserProfile_components/ProfileImage';
+import UserStatsCharts from '../components/UserProfile_components/UserStatsCharts';
 
 // services
 import {
@@ -251,6 +252,15 @@ export default function UserProfile() {
           userParticipatedScrims={userParticipatedScrims}
           stats={userStats}
         />
+
+        {/* User Statistics Charts */}
+        {userStats && (
+          <UserStatsCharts
+            stats={userStats}
+            userParticipatedScrims={userParticipatedScrims}
+            user={userData}
+          />
+        )}
 
         {/* My Scrims (will only render if is current user or is admin) */}
         <MyCreatedScrims

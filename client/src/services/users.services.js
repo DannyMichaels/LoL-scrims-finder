@@ -69,7 +69,7 @@ export const getUserById = async (userId) => {
 export const getOPGGData = async (summonerName, region = 'na') => {
   try {
     const response = await axios.get(
-      `https://lol-api-summoner.op.gg/api/${region}/complete/summoners?keyword=${summonerName}`
+      `https://lol-api-summoner.op.gg/api/${region}/complete/summoners?keyword=${summonerName}#NA1`
     );
 
     // returns an array, but because we pass the exact region and name, we return the first result.
@@ -78,4 +78,3 @@ export const getOPGGData = async (summonerName, region = 'na') => {
     throw error;
   }
 };
-

@@ -76,7 +76,7 @@ const calculateUserStats = (userParticipatedScrims, userId) => {
   const nextLevelExp = userLevel * 10;
   const expProgress = expResult - currentLevelExp;
   const expNeeded = 10;
-  const expProgressPercent = Math.floor((expProgress / expNeeded) * 100);
+  const expProgressPercent = expResult === 0 ? 0 : Math.floor((expProgress / expNeeded) * 100);
 
   return {
     userExp: expResult,
