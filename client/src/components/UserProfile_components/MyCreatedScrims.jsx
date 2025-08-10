@@ -19,6 +19,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import GlassPanel from '../shared/GlassPanel';
 
 // utils
 import {
@@ -71,11 +72,13 @@ export default function MyCreatedScrims({
     <>
       <SectionDivider />
 
-      <Accordion defaultExpanded sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
+      <GlassPanel sx={{ marginTop: 2, padding: 0 }}>
+        <Accordion defaultExpanded sx={{ backgroundColor: 'transparent', boxShadow: 'none', backgroundImage: 'none' }}>
+          <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ fontSize: '2rem' }} />}
           aria-controls="created-scrims-content"
-          id="created-scrims-header">
+          id="created-scrims-header"
+          sx={{ padding: '0 16px' }}>
           <Grid
             container
             alignItems="center"
@@ -97,7 +100,7 @@ export default function MyCreatedScrims({
                 </Typography>
               </CustomTooltip>
             </Grid>
-            <Grid item onClick={(e) => e.stopPropagation()}>
+            <Grid item onClick={(e) => e.stopPropagation()} sx={{ marginRight: 2 }}>
               <FormGroup row>
           <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
@@ -159,8 +162,9 @@ export default function MyCreatedScrims({
                 </Typography>
               )}
           </ul>
-        </AccordionDetails>
-      </Accordion>
+          </AccordionDetails>
+        </Accordion>
+      </GlassPanel>
     </>
   );
 }

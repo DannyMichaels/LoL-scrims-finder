@@ -30,6 +30,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import GlassPanel from '../shared/GlassPanel';
 
 // scrims passed in props from UserProfile.jsx (userParticipatedScrims)
 export default function UserParticipatedScrims({ scrims, user }) {
@@ -94,10 +95,12 @@ export default function UserParticipatedScrims({ scrims, user }) {
     <>
       <SectionDivider />
 
-      <Accordion defaultExpanded sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
+      <GlassPanel sx={{ marginTop: 2, padding: 0 }}>
+        <Accordion defaultExpanded sx={{ backgroundColor: 'transparent', boxShadow: 'none', backgroundImage: 'none' }}>
+          <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ fontSize: '2rem' }} />}
           aria-controls="participated-scrims-content"
+          sx={{ padding: '0 16px' }}
           id="participated-scrims-header">
           <Grid
             container
@@ -115,7 +118,7 @@ export default function UserParticipatedScrims({ scrims, user }) {
                 </Typography>
               </CustomTooltip>
             </Grid>
-            <Grid item onClick={(e) => e.stopPropagation()}>
+            <Grid item onClick={(e) => e.stopPropagation()} sx={{ marginRight: 2 }}>
               <FormGroup row>
           <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
@@ -179,8 +182,9 @@ export default function UserParticipatedScrims({ scrims, user }) {
           </Typography>
         )}
           </ul>
-        </AccordionDetails>
-      </Accordion>
+          </AccordionDetails>
+        </Accordion>
+      </GlassPanel>
     </>
   );
 }
