@@ -12,7 +12,8 @@
       "Bash(git commit:*)",
       "Bash(mv:*)",
       "Bash(git checkout:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }
