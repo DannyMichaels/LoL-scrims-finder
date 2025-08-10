@@ -15,6 +15,8 @@ import {
   RadialBar,
   LineChart,
   Line,
+  Area,
+  AreaChart,
 } from 'recharts';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -459,49 +461,63 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
             </Grid>
           </Grid>
           <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={monthlyActivityData}>
+            <AreaChart data={monthlyActivityData}>
+              <defs>
+                <linearGradient id="colorPlayed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0.1}/>
+                </linearGradient>
+                <linearGradient id="colorCasted" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0.1}/>
+                </linearGradient>
+                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={COLORS.accent} stopOpacity={0.6}/>
+                  <stop offset="95%" stopColor={COLORS.accent} stopOpacity={0.05}/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="month" stroke="#999" />
               <YAxis stroke="#999" />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
               {(activityFilter === 'all' || activityFilter === 'played') && (
-                <Line
+                <Area
                   type="monotone"
                   dataKey="played"
                   stroke={COLORS.primary}
                   strokeWidth={2}
-                  dot={{ fill: COLORS.primary, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  fill="url(#colorPlayed)"
+                  fillOpacity={1}
                   name="Games Played"
                   hide={activityFilter === 'casted'}
                 />
               )}
               {(activityFilter === 'all' || activityFilter === 'casted') && (
-                <Line
+                <Area
                   type="monotone"
                   dataKey="casted"
                   stroke={COLORS.secondary}
                   strokeWidth={2}
-                  dot={{ fill: COLORS.secondary, r: 4 }}
-                  activeDot={{ r: 6 }}
+                  fill="url(#colorCasted)"
+                  fillOpacity={1}
                   name="Games Casted"
                   hide={activityFilter === 'played'}
                 />
               )}
               {activityFilter === 'all' && (
-                <Line
+                <Area
                   type="monotone"
                   dataKey="total"
                   stroke={COLORS.accent}
                   strokeWidth={2}
                   strokeDasharray="5 5"
-                  dot={{ fill: COLORS.accent, r: 3 }}
-                  activeDot={{ r: 5 }}
+                  fill="url(#colorTotal)"
+                  fillOpacity={1}
                   name="Total"
                 />
               )}
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         </GlassPanel>
       </Grid>
