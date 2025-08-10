@@ -17,14 +17,9 @@ export default function ProfileAccountDetails({
   user,
   setUser,
   userParticipatedScrims,
+  stats,
 }) {
-  const {
-    userExp,
-    userLevel,
-    userWinrate,
-    userGamesPlayedCount,
-    userGamesCastedCount,
-  } = useProfileAccountDetails(userParticipatedScrims, user);
+  const userStats = useProfileAccountDetails(userParticipatedScrims, user, stats);
 
   const [openModal, setOpenModal] = useState(null);
 
@@ -60,11 +55,41 @@ export default function ProfileAccountDetails({
             <strong>Name:</strong>&nbsp;{user.name}
           </Grid>
           <Grid item>
-            | <strong>Level:</strong>&nbsp;{userLevel}
-          </Grid>
-
-          <Grid item>
-            | <strong>EXP:</strong>&nbsp;{userExp}
+            | <strong>Level:</strong>&nbsp;{userStats.userLevel}
+            {userStats.expProgressPercent !== undefined && (
+              <>
+                &nbsp;|&nbsp;
+                <span style={{ fontSize: '0.9em', color: '#888' }}>
+                  {userStats.expProgressPercent}%
+                </span>
+                <span 
+                  style={{
+                    display: 'inline-block',
+                    width: '100px',
+                    height: '8px',
+                    backgroundColor: '#333',
+                    borderRadius: '4px',
+                    position: 'relative',
+                    marginLeft: '8px',
+                    verticalAlign: 'middle'
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      width: `${userStats.expProgressPercent}%`,
+                      height: '100%',
+                      backgroundColor: '#4CAF50',
+                      borderRadius: '4px',
+                      transition: 'width 0.3s ease'
+                    }}
+                  />
+                </span>
+                <span style={{ marginLeft: '8px', fontSize: '0.9em', color: '#888' }}>
+                  100%
+                </span>
+              </>
+            )}
           </Grid>
         </Grid>
 
@@ -86,17 +111,17 @@ export default function ProfileAccountDetails({
 
         <Grid item spacing={1} container component="li" alignItems="center">
           <Grid item>
-            <strong>Games Played:</strong>&nbsp;{userGamesPlayedCount}
+            <strong>Games Played:</strong>&nbsp;{userStats.userGamesPlayedCount}
           </Grid>
 
           <Grid item>
-            | <strong>Win Ratio:</strong>&nbsp;{userWinrate}%
+            | <strong>Win Ratio:</strong>&nbsp;{userStats.userWinrate}%
           </Grid>
         </Grid>
 
-        {userGamesCastedCount > 0 ? (
+        {userStats.userGamesCastedCount > 0 ? (
           <Grid item container component="li" alignItems="center">
-            <strong>Games Casted:</strong>&nbsp;{userGamesCastedCount}
+            <strong>Games Casted:</strong>&nbsp;{userStats.userGamesCastedCount}
           </Grid>
         ) : null}
 

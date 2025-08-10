@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const escape = require('escape-html'); // sanitize request params
 const { REGIONS } = require('../utils/constants');
 const KEYS = require('../config/keys');
+const { calculateUserStats } = require('../utils/userStatsCalculator');
 
 // @route   GET /api/users
 // @desc    get all users for the app
@@ -177,7 +178,13 @@ const getUserParticipatedScrims = async (req, res) => {
       ],
     });
 
-    return res.status(200).json(userParticipatedScrims);
+    // Calculate user stats
+    const stats = calculateUserStats(userParticipatedScrims, user._id);
+
+    return res.status(200).json({
+      scrims: userParticipatedScrims,
+      stats,
+    });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

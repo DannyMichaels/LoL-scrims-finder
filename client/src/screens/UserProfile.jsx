@@ -48,6 +48,7 @@ export default function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [userCreatedScrims, setUserCreatedScrims] = useState([]);
   const [userParticipatedScrims, setUserParticipatedScrims] = useState([]);
+  const [userStats, setUserStats] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [userBg, setUserBg] = useState({
     img: null,
@@ -96,8 +97,17 @@ export default function UserProfile() {
           setUserCreatedScrims(userCreatedScrims);
         }
 
-        const userScrims = await getUserParticipatedScrims(userId);
-        setUserParticipatedScrims(userScrims);
+        const userScrimsResponse = await getUserParticipatedScrims(userId);
+        
+        // Check if response has the new structure with stats
+        if (userScrimsResponse.scrims && userScrimsResponse.stats) {
+          setUserParticipatedScrims(userScrimsResponse.scrims);
+          setUserStats(userScrimsResponse.stats);
+        } else {
+          // Fallback for old API response structure
+          setUserParticipatedScrims(userScrimsResponse);
+          setUserStats(null);
+        }
 
         setIsLoaded(true);
       } catch (error) {
@@ -239,6 +249,7 @@ export default function UserProfile() {
           user={userData}
           setUser={setUserData}
           userParticipatedScrims={userParticipatedScrims}
+          stats={userStats}
         />
 
         {/* My Scrims (will only render if is current user or is admin) */}
