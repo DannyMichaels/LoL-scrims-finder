@@ -12,6 +12,7 @@ import bronzeImg from '../assets/images/ranks/bronze.png';
 import silverImg from '../assets/images/ranks/silver.png';
 import goldImg from '../assets/images/ranks/gold.png';
 import platImg from '../assets/images/ranks/platinum.png';
+import emeraldImg from '../assets/images/ranks/emerald.png';
 import diamondImg from '../assets/images/ranks/diamond.png';
 import masterImg from '../assets/images/ranks/master.png';
 import grandmasterImg from '../assets/images/ranks/grandmaster.png';
@@ -40,6 +41,7 @@ export const RANK_IMAGES = {
   Silver: silverImg,
   Gold: goldImg,
   Platinum: platImg,
+  Emerald: emeraldImg,
   Diamond: diamondImg,
   Master: masterImg,
   Grandmaster: grandmasterImg,

@@ -5,6 +5,7 @@ const validateRank = async ({ rank, req, res }) => {
     'Silver',
     'Gold',
     'Platinum',
+    'Emerald',
     'Diamond',
   ];
 
@@ -15,6 +16,7 @@ const validateRank = async ({ rank, req, res }) => {
     'Silver',
     'Gold',
     'Platinum',
+    'Emerald',
     'Diamond',
     'Master',
     'Grandmaster',

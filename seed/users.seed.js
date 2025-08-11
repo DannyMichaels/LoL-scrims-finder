@@ -12,6 +12,8 @@ const main = async () => {
     'Diamond 2',
     'Platinum 1',
     'Platinum 4',
+    'Emerald 1',
+    'Emerald 3',
     'Grandmaster',
     'Challenger',
     'Gold 3',

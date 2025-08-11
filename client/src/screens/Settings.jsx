@@ -82,6 +82,7 @@ export default function Settings() {
     'Silver',
     'Gold',
     'Platinum',
+    'Emerald',
     'Diamond',
   ];
 
@@ -384,6 +385,7 @@ export default function Settings() {
                       'Silver',
                       'Gold',
                       'Platinum',
+                      'Emerald',
                       'Diamond',
                       'Master',
                       'Grandmaster',

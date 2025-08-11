@@ -179,6 +179,7 @@ function createRankFromRankData(rankData) {
     'Silver',
     'Gold',
     'Platinum',
+    'Emerald',
     'Diamond',
   ];
 

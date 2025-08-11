@@ -10,6 +10,7 @@ const divisionsWithNumbers = [
   'Silver',
   'Gold',
   'Platinum',
+  'Emerald',
   'Diamond',
 ];
 
@@ -43,6 +44,7 @@ export default function UserRankFields({ rankData, setRankData }) {
             'Silver',
             'Gold',
             'Platinum',
+            'Emerald',
             'Diamond',
             'Master',
             'Grandmaster',

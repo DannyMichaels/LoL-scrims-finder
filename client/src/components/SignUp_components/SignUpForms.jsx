@@ -123,6 +123,7 @@ export default function SignUpForms({
             'Silver',
             'Gold',
             'Platinum',
+            'Emerald',
             'Diamond',
             'Master',
             'Grandmaster',
