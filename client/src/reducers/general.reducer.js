@@ -10,8 +10,6 @@ const initialState = {
 
   messengerOpen: false,
 
-  moreOptionsModalOpen: false,
-
   chatRoomOpen: { conversation: null, isOpen: false, extraTitle: '' }, // for friend chat room
 
   scrimChatRoomOpen: {
@@ -95,20 +93,6 @@ export default function generalReducer(state = initialState, action) {
       return {
         ...state,
         friendsModalOpen: false,
-      };
-    }
-
-    case 'general/openOtherOptionsModal': {
-      return {
-        ...state,
-        moreOptionsModalOpen: true,
-      };
-    }
-
-    case 'general/closeOtherOptionsModal': {
-      return {
-        ...state,
-        moreOptionsModalOpen: false,
       };
     }
 

@@ -263,15 +263,6 @@ export const appTheme = createTheme({
       },
     },
 
-    MuiTooltip: {
-      styleOverrides: {
-        tooltip: {
-          backgroundColor: COLORS.DARK_ELEVATED,
-          border: '1px solid rgba(33, 150, 243, 0.2)',
-          color: COLORS.TEXT_PRIMARY,
-        },
-      },
-    },
 
     MuiDialog: {
       styleOverrides: {

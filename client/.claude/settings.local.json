@@ -6,7 +6,8 @@
       "Bash(pnpm install:*)",
       "Bash(npm start)",
       "Bash(npm run build:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npx kill-port:*)"
     ],
     "deny": []
   }

@@ -7,7 +7,6 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import ReactComment from './components/shared/ReactComment';
 import { creditsComment } from './creditsComment';
-import Favicon from 'react-favicon';
 
 //  store
 import { Provider } from 'react-redux';

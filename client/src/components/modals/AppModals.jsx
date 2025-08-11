@@ -4,7 +4,6 @@ import useAuth from './../../hooks/useAuth';
 import FriendRequestsModal from './FriendRequestsModal';
 import NotificationsModal from './NotificationsModal';
 import UserFriendsModal from './UserFriendsModal';
-import OtherOptionsModal from './OtherOptionsModal';
 import ChatRoomModal from './ChatRoomModal';
 import ScrimChatRoomModal from './ScrimChatRoomModal';
 import ConversationCreateModal from './ConversationCreateModal';
@@ -16,7 +15,6 @@ export default function AppModals() {
     scrimChatRoomOpen,
     conversationCreateModalOpen,
     friendRequestsOpen,
-    moreOptionsModalOpen,
   } = useSelector(({ general }) => general);
 
   if (!currentUser?._id) return null;
@@ -28,7 +26,6 @@ export default function AppModals() {
       {/* actually, we can just use memo on them, we can also use connect instead of useSelector (with React.memo) */}
       <NotificationsModal />
       <UserFriendsModal />
-      {moreOptionsModalOpen && <OtherOptionsModal />}
       {chatRoomOpen?.isOpen && <ChatRoomModal />}
       {scrimChatRoomOpen?.isOpen && <ScrimChatRoomModal />}
       {conversationCreateModalOpen?.isOpen && <ConversationCreateModal />}

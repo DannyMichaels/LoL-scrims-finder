@@ -130,6 +130,8 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - fixed bug of user profile not showing avatar image after riot switched to tagliens
 - added the option for admins to toggle between generating a tournament code or using a manual custom lobby during scrim creation/editing
 - added emerald as a possible rank.
+- updated scrim edit/create page to be more user friendly.
+- updated the sidebar with collapsible sections and user image
 
 ---
 

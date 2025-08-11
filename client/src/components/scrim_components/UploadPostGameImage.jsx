@@ -7,7 +7,6 @@ import AdminArea from '../shared/AdminArea';
 import Tooltip from '../shared/Tooltip';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
 
 // utils
