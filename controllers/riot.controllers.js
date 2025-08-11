@@ -1,5 +1,7 @@
 const Scrim = require('../models/scrim.model');
 const riotServices = require('../services/riot.services');
+const axios = require('axios');
+const { RIOT_API_KEY } = require('../utils/constants');
 
 /**
  * Initialize Riot tournament for a scrim when countdown reaches 0
@@ -313,10 +315,169 @@ const getLobbyEvents = async (req, res) => {
   }
 };
 
+/**
+ * Get summoner data using Riot ID (gameName + tagLine)
+ * This is a two-step process:
+ * 1. Get PUUID from Account-v1 API using Riot ID
+ * 2. Get summoner data from Summoner-v4 API using PUUID
+ */
+const getSummonerByRiotId = async (req, res) => {
+  try {
+    const { gameName, tagLine, region } = req.query;
+
+    if (!gameName || !tagLine || !region) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required parameters: gameName, tagLine, and region'
+      });
+    }
+
+    // Validate tagLine doesn't contain #
+    if (tagLine.includes('#')) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tagline should not include # symbol'
+      });
+    }
+
+    // Regional routing for Account API
+    const regionalRouting = {
+      NA: 'americas',
+      BR: 'americas',
+      LAN: 'americas',
+      LAS: 'americas',
+      OCE: 'sea',
+      KR: 'asia',
+      JP: 'asia',
+      EUW: 'europe',
+      EUNE: 'europe',
+      TR: 'europe',
+      RU: 'europe',
+    };
+
+    // Platform routing for Summoner API
+    const platformRouting = {
+      NA: 'na1',
+      BR: 'br1',
+      LAN: 'la1',
+      LAS: 'la2',
+      OCE: 'oc1',
+      KR: 'kr',
+      JP: 'jp1',
+      EUW: 'euw1',
+      EUNE: 'eun1',
+      TR: 'tr1',
+      RU: 'ru',
+    };
+
+    const regionalEndpoint = regionalRouting[region.toUpperCase()] || 'americas';
+    const platformEndpoint = platformRouting[region.toUpperCase()] || 'na1';
+
+    // Step 1: Get PUUID from Riot ID
+    console.log(`Fetching PUUID for ${gameName}#${tagLine} in region ${region}`);
+    
+    const accountUrl = `https://${regionalEndpoint}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
+    
+    const accountResponse = await axios.get(accountUrl, {
+      headers: { 'X-Riot-Token': RIOT_API_KEY }
+    });
+
+    const { puuid } = accountResponse.data;
+
+    if (!puuid) {
+      return res.status(404).json({
+        success: false,
+        message: 'Account not found'
+      });
+    }
+
+    // Step 2: Get summoner data using PUUID
+    console.log(`Fetching summoner data for PUUID: ${puuid}`);
+    
+    const summonerUrl = `https://${platformEndpoint}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`;
+    
+    const summonerResponse = await axios.get(summonerUrl, {
+      headers: { 'X-Riot-Token': RIOT_API_KEY }
+    });
+
+    const summonerData = summonerResponse.data;
+
+    // Optional: Get ranked data
+    let rankedData = null;
+    try {
+      const rankedUrl = `https://${platformEndpoint}.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerData.id}`;
+      const rankedResponse = await axios.get(rankedUrl, {
+        headers: { 'X-Riot-Token': RIOT_API_KEY }
+      });
+      rankedData = rankedResponse.data;
+    } catch (rankedError) {
+      console.error('Error fetching ranked data:', rankedError.message);
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        ...summonerData,
+        gameName: accountResponse.data.gameName,
+        tagLine: accountResponse.data.tagLine,
+        rankedData,
+        region
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching summoner data:', error.response?.data || error.message);
+    
+    if (error.response?.status === 404) {
+      return res.status(404).json({
+        success: false,
+        message: 'Summoner not found'
+      });
+    }
+    
+    if (error.response?.status === 429) {
+      return res.status(429).json({
+        success: false,
+        message: 'Rate limit exceeded. Please try again later.'
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch summoner data',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Get the latest Data Dragon version for CDN URLs
+ */
+const getDataDragonVersion = async (req, res) => {
+  try {
+    const response = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
+    const latestVersion = response.data[0];
+
+    return res.status(200).json({
+      success: true,
+      version: latestVersion
+    });
+  } catch (error) {
+    console.error('Error fetching Data Dragon version:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch Data Dragon version',
+      version: '14.24.1' // Fallback version
+    });
+  }
+};
+
 module.exports = {
   initializeRiotTournament,
   getTournamentCode,
   handleRiotCallback,
   updateTournamentParticipants,
-  getLobbyEvents
+  getLobbyEvents,
+  getSummonerByRiotId,
+  getDataDragonVersion
 };

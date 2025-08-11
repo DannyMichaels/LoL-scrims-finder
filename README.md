@@ -126,6 +126,8 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 ## 8/11/2025
 
 - UI redesign/update with new color scheme and glassmorphic UI, rebranded to reluminate.gg
+- added summoner tag line
+- fixed bug of user profile not showing avatar image after riot switched to tagliens
 
 ---
 

@@ -38,4 +38,10 @@ router.get(
 // Riot API callback endpoint (no auth required as it's called by Riot)
 router.post('/riot/callback', controllers.handleRiotCallback);
 
+// Get summoner data by Riot ID (gameName + tagLine)
+router.get('/riot/summoner', controllers.getSummonerByRiotId);
+
+// Get Data Dragon version for CDN URLs
+router.get('/riot/ddragon-version', controllers.getDataDragonVersion);
+
 module.exports = router;
