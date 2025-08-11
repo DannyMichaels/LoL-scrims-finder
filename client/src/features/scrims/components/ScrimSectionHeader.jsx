@@ -13,9 +13,11 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
+import Box from '@mui/material/Box';
 import AdminArea from '@/features/admin/components/AdminArea';
 import MessengerButton from '@/features/messenger/components/MessengerButton';
 import AdminPlayerControls from './AdminPlayerControls';
+import GlassPanel from '@/components/shared/GlassPanel';
 
 // utils
 import 'moment-timezone';
@@ -26,6 +28,9 @@ import { getTeamBackgroundColor } from '@/utils/scrimMisc';
 // icons
 import ShareIcon from '@mui/icons-material/Share';
 import SettingsIcon from '@mui/icons-material/Settings';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { ROLE_IMAGES } from '@/utils/imageMaps';
 import { FaGlobeEurope, FaGlobeAmericas, FaGlobeAsia } from 'react-icons/fa';
 import { GiEarthAsiaOceania } from 'react-icons/gi';
@@ -279,10 +284,115 @@ export default function ScrimSectionHeader({
 
       <Grid container direction="row" justifyContent="space-between">
         <Grid item xs={6}>
-          <Typography variant="h2">
-            Game Start:&nbsp;
-            <Moment format="MM/DD/yyyy | hh:mm A">{scrim.gameStartTime}</Moment>
-          </Typography>
+          <Box
+            sx={{
+              position: 'relative',
+              background:
+                'linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(100, 181, 246, 0.08) 100%)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+              border: '1px solid rgba(33, 150, 243, 0.2)',
+              p: 2,
+              mb: 1,
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 25px rgba(33, 150, 243, 0.2)',
+                border: '1px solid rgba(33, 150, 243, 0.4)',
+              },
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background:
+                  'linear-gradient(45deg, transparent 0%, rgba(255, 255, 255, 0.03) 50%, transparent 100%)',
+                animation: 'shimmer 3s ease-in-out infinite',
+              },
+              '@keyframes shimmer': {
+                '0%': { transform: 'translateX(-100%)' },
+                '100%': { transform: 'translateX(100%)' },
+              },
+            }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                position: 'relative',
+                zIndex: 1,
+              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background:
+                    'linear-gradient(135deg, #2196F3 0%, #64B5F6 100%)',
+                  boxShadow: '0 4px 15px rgba(33, 150, 243, 0.4)',
+                }}>
+                <ScheduleIcon sx={{ color: '#fff', fontSize: '1.5rem' }} />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    mb: 0.5,
+                  }}>
+                  Game Start Time
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: '1.1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}>
+                  <CalendarTodayIcon
+                    sx={{ fontSize: '1rem', color: '#64B5F6' }}
+                  />
+                  <Moment format="MMM DD, YYYY">{scrim.gameStartTime}</Moment>
+                  <Box
+                    sx={{
+                      width: '4px',
+                      height: '4px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                    }}
+                  />
+                  <AccessTimeIcon sx={{ fontSize: '1rem', color: '#64B5F6' }} />
+                  <Moment format="h:mm A">{scrim.gameStartTime}</Moment>
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    fontSize: '0.75rem',
+                    fontWeight: 400,
+                    mt: 0.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                  }}>
+                  <Moment fromNow>{scrim.gameStartTime}</Moment>
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
         </Grid>
 
         {!isBoxExpanded && showPlayers && (
