@@ -16,6 +16,11 @@ import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { Helmet } from 'react-helmet';
 
 // Charts
@@ -107,24 +112,45 @@ const RecentActivityTable = ({ activities, history }) => {
   const hasActivities = activities && activities.length > 0;
 
   return (
-    <GlassPanel sx={{ p: 2 }}>
+    <GlassPanel sx={{ p: 2, height: '400px', display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h6" gutterBottom>
         Recent Activity
       </Typography>
-      <Divider sx={{ my: 2 }} />
-      <Grid container direction="column" spacing={2}>
-        {!hasActivities ? (
-          <Grid item>
-            <Typography
-              variant="body2"
-              color="textSecondary"
-              align="center"
-              sx={{ py: 4 }}>
-              No recent activities found
-            </Typography>
-          </Grid>
-        ) : (
-          activities.slice(0, 10).map((activity, index) => {
+      <Divider sx={{ mb: 2 }} />
+      <Box
+        sx={{ 
+          flexGrow: 1, 
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          maxHeight: 'calc(400px - 80px)',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '4px',
+            '&:hover': {
+              background: 'rgba(255, 255, 255, 0.3)',
+            },
+          },
+        }}>
+        <Grid container direction="column" spacing={2}>
+          {!hasActivities ? (
+            <Grid item>
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                align="center"
+                sx={{ py: 4 }}>
+                No recent activities found
+              </Typography>
+            </Grid>
+          ) : (
+            activities.map((activity, index) => {
             const getClickHandler = () => {
               if (activity.type === 'scrim' && activity.details?.scrimId) {
                 history.push(`/scrims/${activity.details.scrimId}`);
@@ -234,7 +260,8 @@ const RecentActivityTable = ({ activities, history }) => {
             );
           })
         )}
-      </Grid>
+        </Grid>
+      </Box>
     </GlassPanel>
   );
 };
@@ -249,6 +276,11 @@ export default function AdminDashboard() {
   const [serverStatus, setServerStatus] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [userGrowthRange, setUserGrowthRange] = useState('6M');
+  const [customDateRange, setCustomDateRange] = useState({
+    start: null,
+    end: null
+  });
+  const [useCustomRange, setUseCustomRange] = useState(false);
 
   useEffect(() => {
     if (!isCurrentUserAdmin) {
@@ -316,20 +348,6 @@ export default function AdminDashboard() {
         'Dec',
       ];
 
-      // Find the most recent date with data
-      const sortedData = [...dashboardData.monthlyUserGrowth].sort((a, b) => {
-        if (a.year !== b.year) return b.year - a.year;
-        return b.month - a.month;
-      });
-
-      const mostRecentData = sortedData[0];
-      const endMonth = mostRecentData.month - 1; // Convert to 0-indexed
-      const endYear = mostRecentData.year;
-
-      let monthsToShow = 6;
-      if (userGrowthRange === '3M') monthsToShow = 3;
-      if (userGrowthRange === '1Y') monthsToShow = 12;
-
       const dataMap = new Map(
         dashboardData.monthlyUserGrowth.map((item) => [
           `${item.year}-${item.month}`,
@@ -338,22 +356,62 @@ export default function AdminDashboard() {
       );
 
       const data = [];
-      let cumulativeUsers = 0;
 
-      for (let i = monthsToShow - 1; i >= 0; i--) {
-        const monthIndex = (endMonth - i + 12) % 12;
-        const year = endMonth - i < 0 ? endYear - 1 : endYear;
-        const monthName = months[monthIndex];
-        const key = `${year}-${monthIndex + 1}`;
-
-        const monthlyCount = dataMap.get(key) || 0;
-        cumulativeUsers += monthlyCount;
-
-        data.push({
-          month: `${monthName} ${year}`,
-          users: cumulativeUsers,
-          fullDate: `${monthName} ${year}`,
+      if (useCustomRange && customDateRange.start && customDateRange.end) {
+        // Use custom date range
+        const startDate = new Date(customDateRange.start);
+        const endDate = new Date(customDateRange.end);
+        
+        // Generate months between start and end dates
+        let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+        const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+        
+        while (currentDate <= endMonth) {
+          const monthIndex = currentDate.getMonth();
+          const year = currentDate.getFullYear();
+          const monthName = months[monthIndex];
+          const key = `${year}-${monthIndex + 1}`;
+          
+          const monthlyCount = dataMap.get(key) || 0;
+          
+          data.push({
+            month: `${monthName} ${year}`,
+            users: monthlyCount,
+            fullDate: `${monthName} ${year}`,
+          });
+          
+          // Move to next month
+          currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+      } else {
+        // Use preset ranges
+        const sortedData = [...dashboardData.monthlyUserGrowth].sort((a, b) => {
+          if (a.year !== b.year) return b.year - a.year;
+          return b.month - a.month;
         });
+
+        const mostRecentData = sortedData[0];
+        const endMonth = mostRecentData.month - 1; // Convert to 0-indexed
+        const endYear = mostRecentData.year;
+
+        let monthsToShow = 6;
+        if (userGrowthRange === '3M') monthsToShow = 3;
+        if (userGrowthRange === '1Y') monthsToShow = 12;
+
+        for (let i = monthsToShow - 1; i >= 0; i--) {
+          const monthIndex = (endMonth - i + 12) % 12;
+          const year = endMonth - i < 0 ? endYear - 1 : endYear;
+          const monthName = months[monthIndex];
+          const key = `${year}-${monthIndex + 1}`;
+
+          const monthlyCount = dataMap.get(key) || 0;
+
+          data.push({
+            month: `${monthName} ${year}`,
+            users: monthlyCount,
+            fullDate: `${monthName} ${year}`,
+          });
+        }
       }
 
       return data;
@@ -558,23 +616,89 @@ export default function AdminDashboard() {
                 alignItems="center"
                 sx={{ mb: 2 }}>
                 <Grid item>
-                  <Typography variant="h6">User Growth</Typography>
+                  <Typography variant="h6">New User Registrations</Typography>
                 </Grid>
-                <Grid item>
-                  <Grid container spacing={1}>
-                    {['3M', '6M', '1Y'].map((range) => (
-                      <Grid item key={range}>
+                <Grid item sx={{ flexGrow: 1 }}>
+                  <Grid container spacing={1} alignItems="center" justifyContent="flex-end">
+                    <Grid item sx={{ marginRight: 'auto' }}>
+                      <Grid container spacing={1}>
+                        {['3M', '6M', '1Y'].map((range) => (
+                          <Grid item key={range}>
+                            <Button
+                              size="small"
+                              variant={
+                                !useCustomRange && userGrowthRange === range ? 'contained' : 'outlined'
+                              }
+                              onClick={() => {
+                                setUserGrowthRange(range);
+                                setUseCustomRange(false);
+                              }}
+                              sx={{ minWidth: 40 }}>
+                              {range}
+                            </Button>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Grid>
+                    <Grid item>
+                      <Divider orientation="vertical" sx={{ mx: 1, height: 24 }} />
+                    </Grid>
+                    <Grid item>
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DatePicker
+                          label="From"
+                          views={['year', 'month']}
+                          value={customDateRange.start}
+                          onChange={(newValue) => {
+                            setCustomDateRange(prev => ({ ...prev, start: newValue }));
+                            if (newValue && customDateRange.end) {
+                              setUseCustomRange(true);
+                            }
+                          }}
+                          slotProps={{
+                            textField: {
+                              size: 'small',
+                              sx: { width: 140 }
+                            }
+                          }}
+                        />
+                      </LocalizationProvider>
+                    </Grid>
+                    <Grid item>
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DatePicker
+                          label="To"
+                          views={['year', 'month']}
+                          value={customDateRange.end}
+                          onChange={(newValue) => {
+                            setCustomDateRange(prev => ({ ...prev, end: newValue }));
+                            if (customDateRange.start && newValue) {
+                              setUseCustomRange(true);
+                            }
+                          }}
+                          minDate={customDateRange.start}
+                          slotProps={{
+                            textField: {
+                              size: 'small',
+                              sx: { width: 140 }
+                            }
+                          }}
+                        />
+                      </LocalizationProvider>
+                    </Grid>
+                    {useCustomRange && (
+                      <Grid item>
                         <Button
                           size="small"
-                          variant={
-                            userGrowthRange === range ? 'contained' : 'outlined'
-                          }
-                          onClick={() => setUserGrowthRange(range)}
-                          sx={{ minWidth: 40 }}>
-                          {range}
+                          onClick={() => {
+                            setCustomDateRange({ start: null, end: null });
+                            setUseCustomRange(false);
+                            setUserGrowthRange('6M');
+                          }}>
+                          Clear
                         </Button>
                       </Grid>
-                    ))}
+                    )}
                   </Grid>
                 </Grid>
               </Grid>
@@ -602,8 +726,8 @@ export default function AdminDashboard() {
                       backgroundColor: 'rgba(0,0,0,0.8)',
                       border: 'none',
                     }}
-                    formatter={(value) => [`${value} users`, 'Total Users']}
-                    labelFormatter={(label) => `Period: ${label}`}
+                    formatter={(value) => [`${value} new users`, 'New Registrations']}
+                    labelFormatter={(label) => `Month: ${label}`}
                   />
                   <Area
                     type="monotone"
@@ -888,7 +1012,7 @@ export default function AdminDashboard() {
         </Grid>
 
         {/* Tables Row */}
-        <Grid container spacing={3} alignItems="stretch">
+        <Grid container spacing={3}>
           {/* Recent Activity */}
           <Grid item xs={12} md={6}>
             <RecentActivityTable
@@ -899,12 +1023,34 @@ export default function AdminDashboard() {
 
           {/* System Status */}
           <Grid item xs={12} md={6}>
-            <GlassPanel sx={{ p: 2, height: '100%' }}>
+            <GlassPanel sx={{ p: 2, height: '400px', display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h6" gutterBottom>
                 System Status
               </Typography>
-              <Divider sx={{ my: 2 }} />
-              <Grid container direction="column" spacing={2}>
+              <Divider sx={{ mb: 2 }} />
+              <Grid 
+                container 
+                direction="column" 
+                spacing={2}
+                sx={{ 
+                  flexGrow: 1, 
+                  overflowY: 'auto',
+                  overflowX: 'hidden',
+                  '&::-webkit-scrollbar': {
+                    width: '8px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    borderRadius: '4px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '4px',
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.3)',
+                    },
+                  },
+                }}>
                 {serverStatus?.services ? (
                   <>
                     <Grid item>
