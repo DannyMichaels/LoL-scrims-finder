@@ -3,6 +3,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useScrimStore from '@/features/scrims/stores/scrimStore';
 import moment from 'moment';
+import { isPastDate as isDateInPast } from '@/utils/timezone';
 
 // components
 import Grid from '@mui/material/Grid';
@@ -33,11 +34,9 @@ export default function NavbarCheckboxes({ compact = false }) {
     scrimsDate,
   } = useScrimStore();
 
-  // Check if the selected date is in the past
+  // Check if the selected date is in the past (using timezone-aware logic)
   const isPastDate = useMemo(() => {
-    const today = moment().startOf('day');
-    const selectedDate = moment(scrimsDate).startOf('day');
-    return selectedDate.isBefore(today);
+    return isDateInPast(scrimsDate);
   }, [scrimsDate]);
 
   // Auto-toggle upcoming scrims based on date

@@ -16,7 +16,8 @@
       "Bash(for file in ConversationCreateModal.jsx BanUserModal.jsx EditUserModal.jsx ScrimChatRoomModal.jsx CanSendEmailsModal.jsx)",
       "Bash(do sed -i 's|from ''''../shared/ModalComponents''''|from ''''@/components/shared/ModalComponents''''|g' \"$file\")",
       "Bash(done)",
-      "Bash(/dev/null)"
+      "Bash(/dev/null)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

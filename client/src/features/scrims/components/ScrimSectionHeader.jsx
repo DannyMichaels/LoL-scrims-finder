@@ -24,6 +24,7 @@ import 'moment-timezone';
 import { copyTextToClipboard } from '@/utils/copyToClipboard';
 import { truncate } from '@/utils/truncate';
 import { getTeamBackgroundColor } from '@/utils/scrimMisc';
+import { dateFromUTC, getUserTimezoneAbbr } from '@/utils/timezone';
 
 // icons
 import ShareIcon from '@mui/icons-material/Share';
@@ -365,7 +366,7 @@ export default function ScrimSectionHeader({
                   <CalendarTodayIcon
                     sx={{ fontSize: '1rem', color: '#64B5F6' }}
                   />
-                  <Moment format="MMM DD, YYYY">{scrim.gameStartTime}</Moment>
+                  {dateFromUTC(scrim.gameStartTime).format('MMM DD, YYYY')}
                   <Box
                     sx={{
                       width: '4px',
@@ -375,7 +376,7 @@ export default function ScrimSectionHeader({
                     }}
                   />
                   <AccessTimeIcon sx={{ fontSize: '1rem', color: '#64B5F6' }} />
-                  <Moment format="h:mm A">{scrim.gameStartTime}</Moment>
+                  {dateFromUTC(scrim.gameStartTime).format('h:mm A')}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -388,7 +389,16 @@ export default function ScrimSectionHeader({
                     alignItems: 'center',
                     gap: 0.5,
                   }}>
-                  <Moment fromNow>{scrim.gameStartTime}</Moment>
+                  {getUserTimezoneAbbr()}
+                  <Box
+                    sx={{
+                      width: '2px',
+                      height: '2px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                    }}
+                  />
+                  {dateFromUTC(scrim.gameStartTime).fromNow()}
                 </Typography>
               </Box>
             </Box>

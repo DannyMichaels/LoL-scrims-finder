@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import moment from 'moment';
+import { formatDateForAPI, getUserTimezone } from '@/utils/timezone';
 import { 
   getScrimById,
   insertPlayerInScrim,
@@ -516,7 +517,12 @@ const useScrimStore = create(
         try {
           const params = {};
           if (region) params.region = region;
-          if (date) params.date = date;
+          if (date) {
+            // Convert user's date to UTC date range for proper filtering
+            const { startDate, endDate } = formatDateForAPI(date);
+            params.startDate = startDate;
+            params.endDate = endDate;
+          }
           
           const scrims = await getAllScrims(params);
           
@@ -543,7 +549,12 @@ const useScrimStore = create(
       },
       
       // Filter setters
-      setScrimsDate: (date) => set({ scrimsDate: moment(date).format('YYYY-MM-DD') }),
+      setScrimsDate: (date) => {
+        // Store the date string but ensure it's in user's timezone context
+        const userTz = getUserTimezone();
+        const dateString = moment.tz(date, userTz).format('YYYY-MM-DD');
+        set({ scrimsDate: dateString });
+      },
       setScrimsRegion: (region) => set({ scrimsRegion: region }),
       setShowPreviousScrims: (show) => set({ showPreviousScrims: show }),
       setShowCurrentScrims: (show) => set({ showCurrentScrims: show }),

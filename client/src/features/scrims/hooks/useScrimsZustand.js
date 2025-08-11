@@ -3,6 +3,7 @@ import useScrimStore from '@/features/scrims/stores/scrimStore';
 import useAuth from '@/features/auth/hooks/useAuth';
 import { compareDates } from '@/utils/compareDates';
 import moment from 'moment';
+import { getUserTimezone } from '@/utils/timezone';
 
 /**
  * Main hook for using scrims from Zustand store
@@ -35,7 +36,7 @@ export function useScrimsZustand() {
   return {
     scrims: allScrimsArray,
     scrimsLoaded,
-    scrimsDate: moment(scrimsDate), // Convert back to moment for components that expect it
+    scrimsDate: moment.tz(scrimsDate, getUserTimezone()), // Convert back to moment in user's timezone
     scrimsRegion,
     showPreviousScrims,
     showCurrentScrims,
@@ -138,7 +139,8 @@ export function useFetchScrims() {
   const { fetchAllScrims, scrimsRegion, scrimsDate } = useScrimStore();
 
   const fetchScrims = useCallback(async () => {
-    const dateToUse = scrimsDate || moment().format('YYYY-MM-DD');
+    const userTz = getUserTimezone();
+    const dateToUse = scrimsDate || moment.tz(userTz).format('YYYY-MM-DD');
     await fetchAllScrims(scrimsRegion, dateToUse);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrimsRegion, scrimsDate]); // fetchAllScrims is stable from zustand
