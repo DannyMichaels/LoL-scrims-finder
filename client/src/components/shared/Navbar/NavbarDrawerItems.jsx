@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import useAuth, { useAuthActions } from '../../../hooks/useAuth';
+import useAuth, { useAuthActions } from '@/features/auth/hooks/useAuth';
 import { useHistory } from 'react-router-dom';
-import useSummonerProfile from '../../../hooks/useSummonerProfile';
-import { RANK_IMAGES } from '../../../utils/imageMaps';
+import useSummonerProfile from '@/features/users/hooks/useSummonerProfile';
+import { RANK_IMAGES } from '@/utils/imageMaps';
 
 // components
 import List from '@mui/material/List';

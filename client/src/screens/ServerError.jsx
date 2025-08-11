@@ -1,5 +1,5 @@
-import { PageContent } from '../components/shared/PageComponents';
-import Navbar from './../components/shared/Navbar/Navbar';
+import { PageContent } from '@/components/shared/PageComponents';
+import Navbar from '@/components/shared/Navbar/Navbar';
 import Typography from '@mui/material/Typography';
 
 export default function ServerError() {

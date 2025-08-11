@@ -1,4 +1,4 @@
-import Navbar from '../components/shared/Navbar/Navbar';
+import Navbar from '@/components/shared/Navbar/Navbar';
 import { Helmet } from 'react-helmet';
 
 const SIMPLIFIED_URL =

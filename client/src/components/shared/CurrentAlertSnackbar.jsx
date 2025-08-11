@@ -1,6 +1,6 @@
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import useAlerts from '../../hooks/useAlerts';
+import useAlerts from '@/hooks/useAlerts';
 
 function CurrentAlertSnackbar() {
   const { currentAlert, closeAlert } = useAlerts();

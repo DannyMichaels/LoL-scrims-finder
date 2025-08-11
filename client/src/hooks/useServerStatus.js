@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import api from '../services/apiConfig';
+import api from '@/services/apiConfig';
 import { useHistory, useLocation } from 'react-router-dom';
 
 // pings server and checks if it's healthy

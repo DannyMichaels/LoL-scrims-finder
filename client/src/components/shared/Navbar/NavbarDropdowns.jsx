@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import useScrimStore from '../../../stores/scrimStore';
+import useScrimStore from '@/features/scrims/stores/scrimStore';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import moment from 'moment';

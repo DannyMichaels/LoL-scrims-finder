@@ -132,6 +132,7 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - added emerald as a possible rank.
 - updated scrim edit/create page to be more user friendly.
 - updated the sidebar with collapsible sections and user image
+- refactored front-end code to use the features folder style and import aliases
 
 ---
 

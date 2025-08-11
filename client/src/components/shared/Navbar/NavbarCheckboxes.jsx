@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
-import useScrimStore from '../../../stores/scrimStore';
+import useScrimStore from '@/features/scrims/stores/scrimStore';
 import moment from 'moment';
 
 // components
@@ -9,8 +9,8 @@ import Grid from '@mui/material/Grid';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Tooltip from '../Tooltip';
-import RefreshScrimsButton from '../../scrim_components/RefreshScrimsButton';
+import Tooltip from '@/components/shared/Tooltip';
+import RefreshScrimsButton from '@/features/scrims/components/RefreshScrimsButton';
 
 /* Show scrims (current, previous, upcoming) buttons */
 

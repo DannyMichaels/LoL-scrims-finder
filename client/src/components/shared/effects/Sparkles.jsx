@@ -2,8 +2,8 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 
-import useRandomInterval from '../../../hooks/useRandomInterval';
-import usePrefersReducedMotion from '../../../hooks/usePrefersReducedMotion';
+import useRandomInterval from '@/hooks/useRandomInterval';
+import usePrefersReducedMotion from '@/hooks/usePrefersReducedMotion';
 
 // thanks to https://www.joshwcomeau.com/react/animated-sparkles-in-react/
 

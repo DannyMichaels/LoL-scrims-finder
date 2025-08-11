@@ -1,26 +1,29 @@
 import './App.css';
 
 // hooks
-import useAppBackground from './hooks/useAppBackground';
-import useAuth, { useAuthVerify } from './hooks/useAuth';
-import { useFetchScrims, useSetScrimsRegion } from './hooks/useScrimsZustand';
-import { useFetchUsers } from './hooks/useUsers';
-import useMessenger from './hooks/useMessenger';
-import useNotifications from './hooks/useNotifications';
-import useServerStatus from './hooks/useServerStatus';
-import { useCreateSocket } from './hooks/useSocket';
-import useScrimSocket from './hooks/useScrimSocket';
+import useAppBackground from '@/hooks/useAppBackground';
+import useAuth, { useAuthVerify } from '@/features/auth/hooks/useAuth';
+import {
+  useFetchScrims,
+  useSetScrimsRegion,
+} from '@/features/scrims/hooks/useScrimsZustand';
+import { useFetchUsers } from '@/features/users/hooks/useUsers';
+import useMessenger from '@/features/messenger/hooks/useMessenger';
+import useNotifications from '@/hooks/useNotifications';
+import useServerStatus from '@/hooks/useServerStatus';
+import { useCreateSocket } from '@/hooks/useSocket';
+import useScrimSocket from '@/features/scrims/hooks/useScrimSocket';
 
 // styles
-import { useAppStyles } from './styles/App.styles';
+import { useAppStyles } from '@/styles/App.styles';
 
 // components
 import AppRouter from './navigation/AppRouter';
 import CssBaseline from '@mui/material/CssBaseline';
-import Loading from './components/shared/Loading';
-import Footer from './components/shared/Footer';
-import AppModals from './components/modals/AppModals';
-import CurrentAlertSnackbar from './components/shared/CurrentAlertSnackbar';
+import Loading from '@/components/shared/Loading';
+import Footer from '@/components/shared/Footer';
+import AppModals from '@/components/modals/AppModals';
+import CurrentAlertSnackbar from '@/components/shared/CurrentAlertSnackbar';
 import { Helmet } from 'react-helmet';
 
 function App() {

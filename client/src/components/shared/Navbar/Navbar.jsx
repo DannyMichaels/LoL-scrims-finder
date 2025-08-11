@@ -1,9 +1,9 @@
 // hooks
 import { useState, useCallback } from 'react';
-import useAuth, { useAuthActions } from './../../../hooks/useAuth';
+import useAuth, { useAuthActions } from '@/features/auth/hooks/useAuth';
 import { makeStyles, useTheme } from '@mui/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import useUsers from './../../../hooks/useUsers';
+import useUsers from '@/features/users/hooks/useUsers';
 import { useDispatch } from 'react-redux';
 
 // Mui components
@@ -20,14 +20,14 @@ import ClickAwayListener from '@mui/material/ClickAwayListener';
 // components
 import { Link } from 'react-router-dom';
 import NavbarDrawer from './NavbarDrawer';
-import HideOnScroll from '../HideOnScroll';
-import { InnerColumn } from '../PageComponents';
-import Tooltip from '../Tooltip';
+import HideOnScroll from '@/components/shared/HideOnScroll';
+import { InnerColumn } from '@/components/shared/PageComponents';
+import Tooltip from '@/components/shared/Tooltip';
 import NavbarCheckboxes from './NavbarCheckboxes';
 import NavbarDropdowns from './NavbarDropdowns';
 import UserSearchBar from './UserSearchBar';
 import NotificationsButton from './NotificationsButton';
-import MessengerButton from '../../Messenger_components/MessengerButton';
+import MessengerButton from '@/features/messenger/components/MessengerButton';
 
 // icons
 import KeyIcon from '@mui/icons-material/VpnKey';

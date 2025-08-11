@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
-import useAuth from '../../../hooks/useAuth';
+import useAuth from '@/features/auth/hooks/useAuth';
 
 // components
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
-import Tooltip from './../Tooltip';
+import Tooltip from '@/components/shared/Tooltip';
 
 // icons
 import NotificationsIcon from '@mui/icons-material/Notifications';

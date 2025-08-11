@@ -7,7 +7,16 @@
       "Bash(npm start)",
       "Bash(npm run build:*)",
       "Bash(sed:*)",
-      "Bash(npx kill-port:*)"
+      "Bash(npx kill-port:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)",
+      "Bash(rm:*)",
+      "Bash(npx eslint:*)",
+      "Bash(for file in ConversationCreateModal.jsx BanUserModal.jsx EditUserModal.jsx ScrimChatRoomModal.jsx CanSendEmailsModal.jsx)",
+      "Bash(do sed -i 's|from ''''../shared/ModalComponents''''|from ''''@/components/shared/ModalComponents''''|g' \"$file\")",
+      "Bash(done)",
+      "Bash(/dev/null)"
     ],
     "deny": []
   }

@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIcon from '@mui/icons-material/ArrowBackIos';
-import { COLORS } from './../../../appTheme';
+import { COLORS } from '@/appTheme';
 
 export default function MobileTableNavigation({
   currentPage,

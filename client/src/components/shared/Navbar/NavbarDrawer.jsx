@@ -1,11 +1,11 @@
 // hooks
 import { useMemo } from 'react';
-import useOnKeyDown from './../../../hooks/useOnKeyDown';
+import useOnKeyDown from '@/hooks/useOnKeyDown';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 
 // components
-import { InnerColumn } from '../PageComponents';
+import { InnerColumn } from '@/components/shared/PageComponents';
 import Grid from '@mui/material/Grid';
 import Drawer from '@mui/material/Drawer';
 import Hidden from '@mui/material/Hidden';
@@ -15,7 +15,7 @@ import NavbarDrawerItems from './NavbarDrawerItems';
 
 // utils
 import clsx from 'clsx';
-import { KEYCODES } from '../../../utils/keycodes';
+import { KEYCODES } from '@/utils/keycodes';
 import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({

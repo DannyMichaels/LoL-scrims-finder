@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import useUsers from './../../../hooks/useUsers';
+import useUsers from '@/features/users/hooks/useUsers';
 import { Link, useLocation } from 'react-router-dom';
 
 // utils
 import styled from '@emotion/styled';
-import { levenshteinDistance } from '../../../utils/levenshteinDistance';
-import { getRankImage } from './../../../utils/getRankImage';
+import { levenshteinDistance } from '@/utils/levenshteinDistance';
+import { getRankImage } from '@/utils/getRankImage';
 
 // components
 import Input from '@mui/material/Input';
@@ -29,25 +29,35 @@ export default function UserSearchBar({ isSearchOpen }) {
     return allUsers
       .filter((user) => {
         if (!userInput) return false;
-        
+
         // Check if input contains # for Riot ID search
         if (userInput.includes('#')) {
           const [searchName, searchTagline] = userInput.split('#');
-          const nameMatch = user.name.toLowerCase().includes(searchName.toLowerCase());
-          const taglineMatch = searchTagline 
-            ? user.summonerTagline?.toLowerCase().includes(searchTagline.toLowerCase())
+          const nameMatch = user.name
+            .toLowerCase()
+            .includes(searchName.toLowerCase());
+          const taglineMatch = searchTagline
+            ? user.summonerTagline
+                ?.toLowerCase()
+                .includes(searchTagline.toLowerCase())
             : true;
           return nameMatch && taglineMatch;
         }
-        
+
         // Otherwise search by name or tagline separately
-        const nameMatch = user.name.toLowerCase().includes(userInput.toLowerCase());
-        const taglineMatch = user.summonerTagline?.toLowerCase().includes(userInput.toLowerCase());
+        const nameMatch = user.name
+          .toLowerCase()
+          .includes(userInput.toLowerCase());
+        const taglineMatch = user.summonerTagline
+          ?.toLowerCase()
+          .includes(userInput.toLowerCase());
         return nameMatch || taglineMatch;
       })
       .sort((a, b) => {
         // sort by levenshteinDistance
-        const searchString = userInput.includes('#') ? userInput.split('#')[0] : userInput;
+        const searchString = userInput.includes('#')
+          ? userInput.split('#')[0]
+          : userInput;
         const levA = levenshteinDistance(a.name, searchString);
         const levB = levenshteinDistance(b.name, searchString);
 
@@ -106,29 +116,37 @@ export default function UserSearchBar({ isSearchOpen }) {
             <ul className="nav__dropdown-items">
               {filteredUsers.slice(0, 8).map((user) => {
                 const rankImage = getRankImage(user);
-                
+
                 // Handle highlighting for both name and tagline
                 let displayName = user.name;
-                let displayTagline = user.summonerTagline ? `#${user.summonerTagline}` : '';
-                
+                let displayTagline = user.summonerTagline
+                  ? `#${user.summonerTagline}`
+                  : '';
+
                 if (userInput.includes('#')) {
                   const [searchName, searchTagline] = userInput.split('#');
                   const nameRegex = new RegExp('(' + searchName + ')', 'i');
                   displayName = user.name.replace(nameRegex, '<b>$1</b>');
                   if (searchTagline && user.summonerTagline) {
-                    const taglineRegex = new RegExp('(' + searchTagline + ')', 'i');
-                    displayTagline = '#' + user.summonerTagline.replace(taglineRegex, '<b>$1</b>');
+                    const taglineRegex = new RegExp(
+                      '(' + searchTagline + ')',
+                      'i'
+                    );
+                    displayTagline =
+                      '#' +
+                      user.summonerTagline.replace(taglineRegex, '<b>$1</b>');
                   }
                 } else {
                   const regex = new RegExp('(' + userInput + ')', 'i');
                   displayName = user.name.replace(regex, '<b>$1</b>');
                   if (user.summonerTagline) {
-                    displayTagline = '#' + user.summonerTagline.replace(regex, '<b>$1</b>');
+                    displayTagline =
+                      '#' + user.summonerTagline.replace(regex, '<b>$1</b>');
                   }
                 }
 
                 // Build the profile URL with tagline if available
-                const profileUrl = user.summonerTagline 
+                const profileUrl = user.summonerTagline
                   ? `/users/${user.name}?region=${user.region}&tagline=${user.summonerTagline}`
                   : `/users/${user.name}?region=${user.region}`;
 
@@ -147,12 +165,17 @@ export default function UserSearchBar({ isSearchOpen }) {
                     />
                     <span className="truncate">
                       <span dangerouslySetInnerHTML={{ __html: displayName }} />
-                      <span 
+                      <span
                         style={{ color: '#999', fontSize: '0.9em' }}
                         dangerouslySetInnerHTML={{ __html: displayTagline }}
                       />
                     </span>
-                    <span style={{ marginLeft: '5px', color: '#666', fontSize: '0.9em' }}>
+                    <span
+                      style={{
+                        marginLeft: '5px',
+                        color: '#666',
+                        fontSize: '0.9em',
+                      }}>
                       ({user.region})
                     </span>
                   </Link>

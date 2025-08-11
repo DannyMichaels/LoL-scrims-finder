@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import useAlerts from '../hooks/useAlerts';
-import useAuth, { useAuthActions } from './../hooks/useAuth';
-import useUsers from './../hooks/useUsers';
+import useAlerts from '@/hooks/useAlerts';
+import useAuth, { useAuthActions } from '@/features/auth/hooks/useAuth';
+import useUsers from '@/features/users/hooks/useUsers';
 
 // components
 import Grid from '@mui/material/Grid';
@@ -15,11 +15,11 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Typography from '@mui/material/Typography';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Navbar from '../components/shared/Navbar/Navbar';
+import Navbar from '@/components/shared/Navbar/Navbar';
 import {
   InnerColumn,
   PageContent,
-} from './../components/shared/PageComponents';
+} from '@/components/shared/PageComponents';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
@@ -29,8 +29,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 // services & utils
 import { makeStyles } from '@mui/styles';
-import { updateUser } from '../services/auth.services';
-import { setAuthToken } from '../services/auth.services';
+import { updateUser } from '@/features/auth/services/auth.services';
+import { setAuthToken } from '@/features/auth/services/auth.services';
 
 // remove spaces from # in discord name
 const removeSpaces = (str) => {

@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
-import Navbar from '../components/shared/Navbar/Navbar';
-import { PageContent } from '../components/shared/PageComponents';
+import Navbar from '@/components/shared/Navbar/Navbar';
+import { PageContent } from '@/components/shared/PageComponents';
 import Typography from '@mui/material/Typography';
 
 export default function NotFound() {

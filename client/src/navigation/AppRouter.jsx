@@ -3,18 +3,18 @@ import PrivateRoute from './PrivateRoute';
 import AdminRoute from './AdminRoute';
 
 // screens
-import SignUp from '../screens/SignUp';
-import Scrims from '../screens/Scrims';
-import ScrimCreate from '../screens/admin_screens/ScrimCreate';
-import ScrimDetail from '../screens/ScrimDetail';
-import NotFound from '../screens/NotFound';
-import ScrimEdit from '../screens/admin_screens/ScrimEdit';
-import Settings from '../screens/Settings';
-import UserProfile from '../screens/UserProfile';
-import ServerError from '../screens/ServerError';
-import Guide from '../screens/Guide';
-import BanHistory from '../screens/admin_screens/BanHistory';
-import AdminDashboard from '../screens/admin_screens/AdminDashboard';
+import SignUp from '@/features/auth/screens/SignUp';
+import Scrims from '@/features/scrims/screens/Scrims';
+import ScrimCreate from '@/features/scrims/screens/ScrimCreate';
+import ScrimDetail from '@/features/scrims/screens/ScrimDetail';
+import NotFound from '@/screens/NotFound';
+import ScrimEdit from '@/features/scrims/screens/ScrimEdit';
+import Settings from '@/screens/Settings';
+import UserProfile from '@/features/users/screens/UserProfile';
+import ServerError from '@/screens/ServerError';
+import Guide from '@/screens/Guide';
+import BanHistory from '@/features/admin/screens/BanHistory';
+import AdminDashboard from '@/features/admin/screens/AdminDashboard';
 
 const AppRouter = () => (
   <Switch>

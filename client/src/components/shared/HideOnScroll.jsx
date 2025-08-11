@@ -1,4 +1,4 @@
-import useEffectExceptOnMount from './../../hooks/useEffectExceptOnMount';
+import useEffectExceptOnMount from '@/hooks/useEffectExceptOnMount';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Slide from '@mui/material/Slide';
 import { useDispatch } from 'react-redux';

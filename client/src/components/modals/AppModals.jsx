@@ -1,12 +1,12 @@
 import { useSelector } from 'react-redux';
 
-import useAuth from './../../hooks/useAuth';
-import FriendRequestsModal from './FriendRequestsModal';
+import useAuth from '@/features/auth/hooks/useAuth';
+import FriendRequestsModal from '@/features/users/modals/FriendRequestsModal';
 import NotificationsModal from './NotificationsModal';
-import UserFriendsModal from './UserFriendsModal';
-import ChatRoomModal from './ChatRoomModal';
-import ScrimChatRoomModal from './ScrimChatRoomModal';
-import ConversationCreateModal from './ConversationCreateModal';
+import UserFriendsModal from '@/features/users/modals/UserFriendsModal';
+import ChatRoomModal from '@/features/messenger/modals/ChatRoomModal';
+import ScrimChatRoomModal from '@/features/messenger/modals/ScrimChatRoomModal';
+import ConversationCreateModal from '@/features/messenger/modals/ConversationCreateModal';
 
 export default function AppModals() {
   const { currentUser } = useAuth();

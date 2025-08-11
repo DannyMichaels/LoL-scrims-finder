@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef, useMemo } from 'react';
-import useInterval from '../../hooks/useInterval';
+import useInterval from '@/hooks/useInterval';
 
 // components
 import Typography from '@mui/material/Typography';
-import LoadingGif from '../../assets/images/loading.gif';
+import LoadingGif from '@/assets/images/loading.gif';
 import { PageContent } from './PageComponents';
 
 export default function Loading({ text }) {

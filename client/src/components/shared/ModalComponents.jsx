@@ -11,7 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 // utils
-import { isMobile } from './../../utils/navigator';
+import { isMobile } from '@/utils/navigator';
 import Tooltip from './Tooltip';
 
 export const styles = (theme) => ({

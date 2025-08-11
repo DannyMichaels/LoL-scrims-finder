@@ -1,4 +1,4 @@
-import api from './apiConfig';
+import api from '@/services/apiConfig';
 
 export const getUserNotifications = async () => {
   try {

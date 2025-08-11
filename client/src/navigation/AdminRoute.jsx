@@ -1,6 +1,6 @@
 import { Route, Redirect } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
-import Loading from '../components/shared/Loading';
+import useAuth from '@/features/auth/hooks/useAuth';
+import Loading from '@/components/shared/Loading';
 
 const AdminRoute = ({ component: Component, ...rest }) => {
   const { currentUser, isCurrentUserAdmin, isLoading } = useAuth();
