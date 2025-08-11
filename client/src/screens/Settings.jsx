@@ -258,11 +258,19 @@ export default function Settings() {
                     variant="filled"
                     value={userData.summonerTagline || ''}
                     onKeyPress={(e) => {
-                      // only allow alphanumeric characters
+                      // only allow alphanumeric characters (no # symbol)
                       if (!/^[0-9a-zA-Z\b]+$/.test(e.key)) e.preventDefault();
                     }}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      // Remove # if user tries to paste it
+                      const value = e.target.value.replace('#', '');
+                      handleChange({
+                        ...e,
+                        target: { ...e.target, value }
+                      });
+                    }}
                     label="Tagline"
+                    helperText="Without #"
                     inputProps={{ maxLength: 5 }}
                     required
                   />

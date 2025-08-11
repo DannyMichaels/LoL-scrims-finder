@@ -50,13 +50,20 @@ export default function SignUpForms({
           type="text"
           name="summonerTagline"
           value={userData.summonerTagline}
-          onChange={(e) => handleChange(e, setUserData)}
+          onChange={(e) => {
+            // Remove # if user tries to paste it
+            const value = e.target.value.replace('#', '');
+            handleChange({
+              ...e,
+              target: { ...e.target, name: 'summonerTagline', value }
+            }, setUserData);
+          }}
           onKeyPress={(e) => {
-            // only allow alphanumeric characters
+            // only allow alphanumeric characters (no # symbol)
             if (!/^[0-9a-zA-Z\b]+$/.test(e.key)) e.preventDefault();
           }}
           label="Tagline"
-          helperText="e.g. NA1, 2737"
+          helperText="Without # (e.g. NA1)"
           inputProps={{ maxLength: 5 }}
           required
         />

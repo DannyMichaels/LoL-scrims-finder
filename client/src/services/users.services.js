@@ -10,11 +10,16 @@ export const getAllUsers = async () => {
   }
 };
 
-export const getOneUser = async (name, region = null) => {
+export const getOneUser = async (name, region = null, tagline = null) => {
   try {
-    // if user enters name of user without region, don't include it in query
+    // Build query params
+    const params = new URLSearchParams();
+    if (region) params.append('region', region);
+    if (tagline) params.append('tagline', tagline);
+    
+    const queryString = params.toString();
     const response = await api.get(
-      `/users/${name}${region ? `?region=${region}` : ''}`
+      `/users/${name}${queryString ? `?${queryString}` : ''}`
     );
     return response.data;
   } catch (error) {

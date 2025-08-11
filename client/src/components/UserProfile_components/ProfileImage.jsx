@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
-import { getOPGGData } from '../../services/users.services';
+import { 
+  getRiotSummonerData, 
+  getProfileIconUrl,
+  getRankedBorderImage 
+} from '../../services/riotSummoner.services';
 import styled from '@emotion/styled';
 import CircularProgress from '@mui/material/CircularProgress';
 import FallbackImage from '../../assets/images/user/fallback-user.png';
 
-export default function ProfileImage({ summonerName, region }) {
+export default function ProfileImage({ summonerName, summonerTagline, region }) {
   const [isLoaded, setLoaded] = useState(false);
   const [image, setImage] = useState('');
   const [border, setBorder] = useState('');
@@ -12,17 +16,50 @@ export default function ProfileImage({ summonerName, region }) {
 
   useEffect(() => {
     const fetchImage = async () => {
-      const opggData = await getOPGGData(summonerName, region);
-
-      setImage(opggData?.profile_image_url || FallbackImage);
-      setBorder(opggData?.solo_tier_info?.border_image_url || '');
-      setLevel(opggData?.level || 0);
-
-      setLoaded(true);
+      try {
+        // If we have a tagline, use the new Riot API
+        if (summonerTagline) {
+          const summonerData = await getRiotSummonerData(
+            summonerName, 
+            summonerTagline, 
+            region
+          );
+          
+          // Get profile icon URL from profileIconId
+          const iconUrl = await getProfileIconUrl(summonerData.profileIconId);
+          setImage(iconUrl);
+          
+          // Set summoner level
+          setLevel(summonerData.summonerLevel || 0);
+          
+          // Get ranked border if available
+          if (summonerData.rankedData && summonerData.rankedData.length > 0) {
+            // Find solo queue rank
+            const soloQueue = summonerData.rankedData.find(
+              queue => queue.queueType === 'RANKED_SOLO_5x5'
+            );
+            
+            if (soloQueue) {
+              const borderUrl = getRankedBorderImage(soloQueue.tier, soloQueue.rank);
+              setBorder(borderUrl);
+            }
+          }
+        } else {
+          // Fallback to default image if no tagline
+          setImage(FallbackImage);
+          setLevel(0);
+        }
+      } catch (error) {
+        console.error('Error fetching summoner data:', error);
+        setImage(FallbackImage);
+        setLevel(0);
+      } finally {
+        setLoaded(true);
+      }
     };
 
     fetchImage();
-  }, [summonerName, region]);
+  }, [summonerName, summonerTagline, region]);
 
   if (!isLoaded) {
     return (
@@ -32,10 +69,15 @@ export default function ProfileImage({ summonerName, region }) {
     );
   }
 
+  // Construct OP.GG URL with Riot ID if tagline is available
+  const opggUrl = summonerTagline 
+    ? `https://www.op.gg/summoners/${region.toLowerCase()}/${encodeURIComponent(summonerName)}-${encodeURIComponent(summonerTagline)}`
+    : `https://${region}.op.gg/summoner/userName=${summonerName}`;
+
   return (
     <Face
       className="profile-image__face"
-      href={`https://${region}.op.gg/summoner/userName=${summonerName}`}
+      href={opggUrl}
       target="_blank"
       rel="noopener noreferrer">
       <ProfileIconContainer className="profile-image__container">

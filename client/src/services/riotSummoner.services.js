@@ -1,51 +1,11 @@
 import api from './apiConfig';
 
-// Regional routing for Account API
-const REGIONAL_ROUTING = {
-  NA: 'americas',
-  BR: 'americas',
-  LAN: 'americas',
-  LAS: 'americas',
-  OCE: 'sea',
-  KR: 'asia',
-  JP: 'asia',
-  EUW: 'europe',
-  EUNE: 'europe',
-  TR: 'europe',
-  RU: 'europe',
-  PH: 'sea',
-  SG: 'sea',
-  TH: 'sea',
-  TW: 'sea',
-  VN: 'sea',
-};
-
-// Platform routing for Summoner API
-const PLATFORM_ROUTING = {
-  NA: 'na1',
-  BR: 'br1',
-  LAN: 'la1',
-  LAS: 'la2',
-  OCE: 'oc1',
-  KR: 'kr',
-  JP: 'jp1',
-  EUW: 'euw1',
-  EUNE: 'eun1',
-  TR: 'tr1',
-  RU: 'ru',
-  PH: 'ph2',
-  SG: 'sg2',
-  TH: 'th2',
-  TW: 'tw2',
-  VN: 'vn2',
-};
-
 /**
  * Get summoner data using Riot ID (gameName + tagLine)
  * This is a two-step process:
  * 1. Get PUUID from Account-v1 API using Riot ID
  * 2. Get summoner data from Summoner-v4 API using PUUID
- * 
+ *
  * @param {string} gameName - The player's Riot ID game name
  * @param {string} tagLine - The player's tagline (without #)
  * @param {string} region - The region (NA, EUW, etc.)
@@ -53,16 +13,21 @@ const PLATFORM_ROUTING = {
  */
 export const getRiotSummonerData = async (gameName, tagLine, region = 'NA') => {
   try {
+    // Validate tagLine doesn't contain #
+    if (tagLine && tagLine.includes('#')) {
+      throw new Error('Tagline should not include # symbol');
+    }
+
     // Call our backend API which will handle the Riot API calls
     const response = await api.get('/riot/summoner', {
       params: {
         gameName,
         tagLine,
-        region: region.toUpperCase()
-      }
+        region: region.toUpperCase(),
+      },
     });
 
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error fetching Riot summoner data:', error);
     throw error;
@@ -76,7 +41,7 @@ export const getRiotSummonerData = async (gameName, tagLine, region = 'NA') => {
 export const getDataDragonVersion = async () => {
   try {
     const response = await api.get('/riot/ddragon-version');
-    return response.data.version;
+    return response.data.version || '14.24.1';
   } catch (error) {
     console.error('Error fetching Data Dragon version:', error);
     // Fallback to a known version if API fails
@@ -90,7 +55,10 @@ export const getDataDragonVersion = async () => {
  * @param {boolean} useDataDragon - Whether to use official Data Dragon or Community Dragon
  * @returns {Promise<string>} Profile icon URL
  */
-export const getProfileIconUrl = async (profileIconId, useDataDragon = true) => {
+export const getProfileIconUrl = async (
+  profileIconId,
+  useDataDragon = true
+) => {
   if (!profileIconId) {
     // Return a default icon if no profileIconId
     return '/fallback-user.png';
@@ -121,16 +89,16 @@ export const getCompleteProfile = async (gameName, tagLine, region = 'NA') => {
   try {
     // Get summoner data
     const summonerData = await getRiotSummonerData(gameName, tagLine, region);
-    
+
     // Get profile icon URL
     const profileIconUrl = await getProfileIconUrl(summonerData.profileIconId);
-    
+
     return {
       ...summonerData,
       profileIconUrl,
       gameName,
       tagLine,
-      region
+      region,
     };
   } catch (error) {
     console.error('Error fetching complete profile:', error);
@@ -151,7 +119,7 @@ export const parseRiotId = (fullRiotId) => {
   const parts = fullRiotId.split('#');
   return {
     gameName: parts[0] || '',
-    tagLine: parts[1] || ''
+    tagLine: parts[1] || '',
   };
 };
 
@@ -178,7 +146,7 @@ export const getRankedBorderImage = (tier, rank) => {
     DIAMOND: 'diamond',
     MASTER: 'master',
     GRANDMASTER: 'grandmaster',
-    CHALLENGER: 'challenger'
+    CHALLENGER: 'challenger',
   };
 
   const borderStyle = tierBorders[tier.toUpperCase()];

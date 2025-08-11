@@ -19,7 +19,11 @@ export default function ProfileAccountDetails({
   userParticipatedScrims,
   stats,
 }) {
-  const userStats = useProfileAccountDetails(userParticipatedScrims, user, stats);
+  const userStats = useProfileAccountDetails(
+    userParticipatedScrims,
+    user,
+    stats
+  );
 
   const [openModal, setOpenModal] = useState(null);
 
@@ -52,17 +56,14 @@ export default function ProfileAccountDetails({
         spacing={1}>
         <Grid item spacing={1} container component="li" alignItems="center">
           <Grid item>
-            <strong>Name:</strong>&nbsp;{user.name}{user.summonerTagline ? `#${user.summonerTagline}` : ''}
-          </Grid>
-          <Grid item>
-            | <strong>Level:</strong>&nbsp;{userStats.userLevel}
+            <strong>Level:</strong>&nbsp;{userStats.userLevel}
             {userStats.expProgressPercent !== undefined && (
               <>
                 &nbsp;|&nbsp;
                 <span style={{ fontSize: '0.9em', color: '#888' }}>
                   {userStats.expProgressPercent}%
                 </span>
-                <span 
+                <span
                   style={{
                     display: 'inline-block',
                     width: '100px',
@@ -71,9 +72,8 @@ export default function ProfileAccountDetails({
                     borderRadius: '4px',
                     position: 'relative',
                     marginLeft: '8px',
-                    verticalAlign: 'middle'
-                  }}
-                >
+                    verticalAlign: 'middle',
+                  }}>
                   <span
                     style={{
                       display: 'block',
@@ -81,11 +81,16 @@ export default function ProfileAccountDetails({
                       height: '100%',
                       backgroundColor: '#4CAF50',
                       borderRadius: '4px',
-                      transition: 'width 0.3s ease'
+                      transition: 'width 0.3s ease',
                     }}
                   />
                 </span>
-                <span style={{ marginLeft: '8px', fontSize: '0.9em', color: '#888' }}>
+                <span
+                  style={{
+                    marginLeft: '8px',
+                    fontSize: '0.9em',
+                    color: '#888',
+                  }}>
                   100%
                 </span>
               </>

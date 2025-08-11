@@ -27,14 +27,29 @@ export default function UserSearchBar({ isSearchOpen }) {
 
   const filteredUsers = useMemo(() => {
     return allUsers
-      .filter(({ name }) => {
+      .filter((user) => {
         if (!userInput) return false;
-        return name.toLowerCase().includes(userInput.toLowerCase());
+        
+        // Check if input contains # for Riot ID search
+        if (userInput.includes('#')) {
+          const [searchName, searchTagline] = userInput.split('#');
+          const nameMatch = user.name.toLowerCase().includes(searchName.toLowerCase());
+          const taglineMatch = searchTagline 
+            ? user.summonerTagline?.toLowerCase().includes(searchTagline.toLowerCase())
+            : true;
+          return nameMatch && taglineMatch;
+        }
+        
+        // Otherwise search by name or tagline separately
+        const nameMatch = user.name.toLowerCase().includes(userInput.toLowerCase());
+        const taglineMatch = user.summonerTagline?.toLowerCase().includes(userInput.toLowerCase());
+        return nameMatch || taglineMatch;
       })
       .sort((a, b) => {
         // sort by levenshteinDistance
-        const levA = levenshteinDistance(a.name, userInput);
-        const levB = levenshteinDistance(b.name, userInput);
+        const searchString = userInput.includes('#') ? userInput.split('#')[0] : userInput;
+        const levA = levenshteinDistance(a.name, searchString);
+        const levB = levenshteinDistance(b.name, searchString);
 
         return levA - levB;
       });
@@ -91,14 +106,37 @@ export default function UserSearchBar({ isSearchOpen }) {
             <ul className="nav__dropdown-items">
               {filteredUsers.slice(0, 8).map((user) => {
                 const rankImage = getRankImage(user);
-                const regex = new RegExp('(' + userInput + ')', 'i');
-                const userName = user.name.replace(regex, '<b>$1</b>'); // if it matches the search input, it will be bolded, else just as it is.
+                
+                // Handle highlighting for both name and tagline
+                let displayName = user.name;
+                let displayTagline = user.summonerTagline ? `#${user.summonerTagline}` : '';
+                
+                if (userInput.includes('#')) {
+                  const [searchName, searchTagline] = userInput.split('#');
+                  const nameRegex = new RegExp('(' + searchName + ')', 'i');
+                  displayName = user.name.replace(nameRegex, '<b>$1</b>');
+                  if (searchTagline && user.summonerTagline) {
+                    const taglineRegex = new RegExp('(' + searchTagline + ')', 'i');
+                    displayTagline = '#' + user.summonerTagline.replace(taglineRegex, '<b>$1</b>');
+                  }
+                } else {
+                  const regex = new RegExp('(' + userInput + ')', 'i');
+                  displayName = user.name.replace(regex, '<b>$1</b>');
+                  if (user.summonerTagline) {
+                    displayTagline = '#' + user.summonerTagline.replace(regex, '<b>$1</b>');
+                  }
+                }
+
+                // Build the profile URL with tagline if available
+                const profileUrl = user.summonerTagline 
+                  ? `/users/${user.name}?region=${user.region}&tagline=${user.summonerTagline}`
+                  : `/users/${user.name}?region=${user.region}`;
 
                 return (
                   <Link
                     style={{ display: 'flex', alignItems: 'center' }}
                     onClick={handleClickOption}
-                    to={`/users/${user.name}?region=${user.region}`}
+                    to={profileUrl}
                     className="nav__autocomplete-option"
                     key={user._id}>
                     <img
@@ -107,11 +145,16 @@ export default function UserSearchBar({ isSearchOpen }) {
                       width="20px"
                       alt={user.rank}
                     />
-                    <span
-                      className="truncate"
-                      dangerouslySetInnerHTML={{ __html: userName }}
-                    />
-                    ({user.region})
+                    <span className="truncate">
+                      <span dangerouslySetInnerHTML={{ __html: displayName }} />
+                      <span 
+                        style={{ color: '#999', fontSize: '0.9em' }}
+                        dangerouslySetInnerHTML={{ __html: displayTagline }}
+                      />
+                    </span>
+                    <span style={{ marginLeft: '5px', color: '#666', fontSize: '0.9em' }}>
+                      ({user.region})
+                    </span>
                   </Link>
                 );
               })}
@@ -139,7 +182,7 @@ export default function UserSearchBar({ isSearchOpen }) {
           className="nav__search-input"
           onChange={handleChange}
           value={userInput || ''}
-          placeholder="Search users"
+          placeholder="Search users (e.g. GitCat or GitCat#NA1)"
           endAdornment={
             <InputAdornment position="end">
               {userInput ? (

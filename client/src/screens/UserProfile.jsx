@@ -69,6 +69,7 @@ export default function UserProfile() {
   const { name } = useParams();
 
   const region = useQuery().get('region'); // example: ?region="NA"
+  const tagline = useQuery().get('tagline'); // example: ?tagline="NA1"
 
   const isCurrentUser = useMemo(
     () => userData?._id === currentUser?._id,
@@ -80,7 +81,7 @@ export default function UserProfile() {
       try {
         setIsLoaded(false);
 
-        const fetchedUserData = await getOneUser(name, region);
+        const fetchedUserData = await getOneUser(name, region, tagline);
         let userId = fetchedUserData._id;
 
         setUserData(fetchedUserData);
@@ -127,7 +128,7 @@ export default function UserProfile() {
     fetchUserData();
 
     // eslint-disable-next-line
-  }, [name, region, isCurrentUser, isCurrentUserAdmin, history]);
+  }, [name, region, tagline, isCurrentUser, isCurrentUserAdmin, history]);
 
   useLayoutEffect(() => {
     if (!isLoaded) return;
@@ -183,6 +184,7 @@ export default function UserProfile() {
           <Grid item style={{ display: 'flex', alignItems: 'center' }}>
             <ProfileImage
               summonerName={userData?.name}
+              summonerTagline={userData?.summonerTagline}
               region={userData?.region}
             />
             <Typography variant="h1" className="inline-flex">
@@ -196,13 +198,25 @@ export default function UserProfile() {
               <Tooltip title={`visit ${userData?.name}'s op.gg`}>
                 <a
                   className="link"
-                  href={`https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`}
+                  href={userData?.summonerTagline 
+                    ? `https://www.op.gg/summoners/${userData?.region?.toLowerCase()}/${encodeURIComponent(userData?.name)}-${encodeURIComponent(userData?.summonerTagline)}`
+                    : `https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`}
                   target="_blank"
                   rel="noopener noreferrer">
                   {userData?.isDonator ? (
-                    <Sparkles>{userData?.name}{userData?.summonerTagline ? `#${userData.summonerTagline}` : ''}</Sparkles>
+                    <Sparkles>
+                      {userData?.name}
+                      {userData?.summonerTagline && (
+                        <span style={{ color: '#999', fontWeight: 400 }}>#{userData.summonerTagline}</span>
+                      )}
+                    </Sparkles>
                   ) : (
-                    <>{userData?.name}{userData?.summonerTagline ? `#${userData.summonerTagline}` : ''}</>
+                    <>
+                      {userData?.name}
+                      {userData?.summonerTagline && (
+                        <span style={{ color: '#999', fontWeight: 400 }}>#{userData.summonerTagline}</span>
+                      )}
+                    </>
                   )}
                 </a>
               </Tooltip>
