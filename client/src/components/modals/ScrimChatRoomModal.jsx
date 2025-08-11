@@ -24,6 +24,7 @@ import NewMessageSFX from '../../assets/sounds/new_message.mp3';
 // utils
 import makeStyles from '@mui/styles/makeStyles';
 import devLog from '../../utils/devLog';
+import { scrollbarStyles } from '../../styles/scrollbar.styles';
 
 // messenger modal chat room
 export default function ScrimChatRoomModal() {
@@ -244,5 +245,6 @@ const useStyles = makeStyles((theme) => ({
   chatRoomMessagesContainer: {
     maxHeight: '300px',
     overflowY: 'auto',
+    ...scrollbarStyles,
   },
 }));

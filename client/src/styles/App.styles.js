@@ -1,8 +1,6 @@
 // utils
 import { makeStyles } from '@mui/styles';
 
-import { COLORS } from './../appTheme';
-
 export const useAppStyles = makeStyles({
   root: {
     display: 'flex',
@@ -25,7 +23,7 @@ export const useAppStyles = makeStyles({
       filter: 'var(--bgBlur)', // blurred
       zIndex: -1, // behind page-content z-index
     },
-    
+
     '&::after': {
       content: '""',
       position: 'fixed',

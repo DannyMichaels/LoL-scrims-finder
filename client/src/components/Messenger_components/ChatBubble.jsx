@@ -73,21 +73,17 @@ const StyledBubble = styled.div`
 
   p.from-me {
     /* align-self: flex-end; */
-    background-color: #248bf5;
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
     color: #fff;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
   }
 
   p.from-me::before {
-    // bubble edge shape
-    border-bottom-left-radius: 0.8rem 0.7rem;
-    border-right: 1rem solid #248bf5;
-    right: -0.35rem;
-    transform: translate(0, -0.1rem);
   }
 
   p.from-me::after {
     /* fake edge of bubble with another shape (color of background) */
-    background-color: #606060;
+    background-color: transparent;
     border-bottom-left-radius: 0.5rem;
     right: -40px;
     transform: translate(-30px, -2px);
@@ -113,21 +109,19 @@ const StyledBubble = styled.div`
 
   p.from-them {
     align-items: flex-start;
-    background-color: #e5e5ea;
-    color: #000;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
   p.from-them:before {
-    /* little edge shape */
-    border-bottom-right-radius: 0.8rem 0.7rem;
-    border-left: 1rem solid #e5e5ea;
-    left: -0.35rem;
-    transform: translate(0, -0.1rem);
   }
 
   p.from-them::after {
     // background cover
-    background-color: #606060;
+    background-color: transparent;
     border-bottom-right-radius: 0.5rem;
     left: 20px;
     transform: translate(-30px, -2px);

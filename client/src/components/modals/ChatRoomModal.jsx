@@ -19,6 +19,7 @@ import { postNewMessage } from '../../services/messages.services';
 import makeStyles from '@mui/styles/makeStyles';
 import devLog from '../../utils/devLog';
 import { Modal } from '../shared/ModalComponents';
+import { scrollbarStyles } from '../../styles/scrollbar.styles';
 
 // service
 import { postMessageSeenByUser } from './../../services/messages.services';
@@ -285,5 +286,6 @@ const useStyles = makeStyles((theme) => ({
   chatRoomMessagesContainer: {
     maxHeight: '300px',
     overflowY: 'auto',
+    ...scrollbarStyles,
   },
 }));

@@ -23,6 +23,7 @@ import summonersRiftImg from '../assets/images/backgrounds/summoners_rift.jpg';
 import teemoSunsetImg from '../assets/images/backgrounds/teemo_sunset.png';
 import bootCampDragonImg from '../assets/images/backgrounds/bootcamp_dragon.png';
 import epicCatImg from '../assets/images/backgrounds/epic_cat.jpg';
+import reluminateThreshImg from '../assets/images/backgrounds/reluminate_thresh.jpg';
 
 export const ROLE_IMAGES = {
   Top: topLaneImg,
@@ -51,4 +52,5 @@ export const BG_IMAGES = {
   'Teemo Sunset': teemoSunsetImg,
   "Bootcamp Dragon": bootCampDragonImg,
   GitCat: epicCatImg,
+  'Reluminate Thresh': reluminateThreshImg,
 };

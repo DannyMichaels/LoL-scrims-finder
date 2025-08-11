@@ -6,7 +6,6 @@ import { InnerColumn } from './PageComponents';
 // utils
 import { styled } from '@mui/system';
 import { withRouter } from 'react-router-dom';
-import { COLORS } from '../../appTheme';
 
 const StyledFooter = styled('footer')({
   backgroundColor: 'rgba(18, 24, 38, 0.5)', // Semi-transparent
@@ -38,9 +37,9 @@ const Footer = ({ location }) => (
       <InnerColumn>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
-            <Typography 
-              variant="body2" 
-              sx={{ 
+            <Typography
+              variant="body2"
+              sx={{
                 color: 'rgba(255, 255, 255, 0.7)',
                 fontWeight: 500,
               }}>
@@ -48,9 +47,9 @@ const Footer = ({ location }) => (
             </Typography>
           </Grid>
           <Grid item>
-            <Typography 
-              variant="body2" 
-              sx={{ 
+            <Typography
+              variant="body2"
+              sx={{
                 background: 'linear-gradient(90deg, #64B5F6 0%, #2196F3 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',

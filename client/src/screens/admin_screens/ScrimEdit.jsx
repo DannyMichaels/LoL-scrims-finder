@@ -28,7 +28,7 @@ import TimePicker from '../../components/shared/TimePicker';
 
 // utils
 import devLog from '../../utils/devLog';
-import { getScrimById } from '../../services/scrims.services';
+import { getScrimById, deleteScrim } from '../../services/scrims.services';
 import { sample } from '../../utils/sample';
 import withAdminRoute from './../../utils/withAdminRoute';
 
@@ -56,6 +56,7 @@ function ScrimEdit() {
     _lobbyHost: RANDOM_HOST_CODE, // _id
     isWithCasters: false,
     maxCastersAllowedCount: 0,
+    riotTournament: null,
   });
 
   const { id } = useParams();
@@ -81,7 +82,7 @@ function ScrimEdit() {
         setScrimData({
           region,
           title: oneScrim?.title ?? `${oneScrim.createdBy.name}'s Scrim`, // default to this if no title exists in scrim
-          lobbyName,
+          lobbyName: oneScrim?.riotTournament?.tournamentCode || lobbyName,
           lobbyPassword,
           teamWon: oneScrim?.teamWon ?? null,
           gameStartTime: moment(gameStartTime),
@@ -94,6 +95,7 @@ function ScrimEdit() {
           _lobbyHost: oneScrim?.lobbyHost?._id ?? RANDOM_HOST_CODE,
           isWithCasters: oneScrim?.isWithCasters ?? false, // didn't exist in db in older versions
           maxCastersAllowedCount: oneScrim?.maxCastersAllowedCount ?? 2, // didn't exist in db in older versions
+          riotTournament: oneScrim?.riotTournament ?? null,
         });
       } catch (error) {
         history.push('/');
@@ -294,6 +296,28 @@ function ScrimEdit() {
     }
   };
 
+  const handleDeleteScrim = async () => {
+    try {
+      const confirmDelete = window.confirm('Are you sure you want to delete this scrim? This action cannot be undone.');
+      if (!confirmDelete) return;
+
+      await deleteScrim(id);
+      setCurrentAlert({
+        type: 'Success',
+        message: 'Scrim deleted successfully!',
+      });
+      
+      // Redirect to scrims page after successful deletion
+      history.push('/');
+    } catch (error) {
+      console.error('Error deleting scrim:', error);
+      setCurrentAlert({
+        type: 'Error',
+        message: 'Error deleting scrim',
+      });
+    }
+  };
+
   if (isUpdated) {
     return <Redirect to={`/scrims/${id}`} />;
   }
@@ -399,17 +423,49 @@ function ScrimEdit() {
 
                 <Grid item>
                   <FormHelperText className="text-white">
-                    Lobby Name
+                    {scrimData.riotTournament?.tournamentCode ? 'Tournament Code' : 'Lobby Name'}
                   </FormHelperText>
-                  <TextField
-                    fullWidth
-                    variant="standard"
-                    name="lobbyName"
-                    value={scrimData.lobbyName || ''}
-                    onChange={handleChange}
-                    placeholder="Enter custom lobby name"
-                    required
-                  />
+                  <Grid container alignItems="flex-end" spacing={1}>
+                    <Grid item xs>
+                      <TextField
+                        fullWidth
+                        variant="standard"
+                        name="lobbyName"
+                        value={scrimData.lobbyName || ''}
+                        onChange={handleChange}
+                        placeholder={scrimData.riotTournament?.tournamentCode ? "Tournament code" : "Enter custom lobby name"}
+                        required
+                        disabled={!!scrimData.riotTournament?.tournamentCode}
+                        InputProps={{
+                          style: scrimData.riotTournament?.tournamentCode ? { color: '#2196F3' } : {}
+                        }}
+                      />
+                    </Grid>
+                    {scrimData.riotTournament?.tournamentCode && (
+                      <Grid item>
+                        <Tooltip title="Clear tournament code to use custom lobby name">
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="secondary"
+                            onClick={() => {
+                              setScrimData(prev => ({
+                                ...prev,
+                                lobbyName: '',
+                                riotTournament: null
+                              }));
+                            }}>
+                            Clear Code
+                          </Button>
+                        </Tooltip>
+                      </Grid>
+                    )}
+                  </Grid>
+                  {scrimData.riotTournament?.tournamentCode && (
+                    <FormHelperText style={{ color: '#2196F3', fontSize: '0.7rem' }}>
+                      Using Riot Tournament Code - Clear to use custom lobby name
+                    </FormHelperText>
+                  )}
                 </Grid>
 
                 <Grid
@@ -600,9 +656,27 @@ function ScrimEdit() {
 
                 <Grid item>
                   <div className="page-break" />
-                  <Button variant="contained" color="primary" type="submit">
-                    Submit
-                  </Button>
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <Button variant="contained" color="primary" type="submit">
+                        Submit
+                      </Button>
+                    </Grid>
+                    <Grid item>
+                      <Button 
+                        variant="contained" 
+                        sx={{
+                          backgroundColor: 'error.main',
+                          '&:hover': {
+                            backgroundColor: 'error.dark',
+                          },
+                          color: 'white',
+                        }}
+                        onClick={handleDeleteScrim}>
+                        Delete Scrim
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </form>

@@ -39,7 +39,6 @@ export default function ScrimSectionHeader({
   casterEntered,
   joinCast,
   leaveCast,
-  handleDeleteScrim,
   buttonsDisabled,
   isBoxExpanded,
   isInDetail,
@@ -184,23 +183,6 @@ export default function ScrimSectionHeader({
                   onClick={() => history.push(`/scrims/${scrim._id}/edit`)}>
                   <SettingsIcon />
                   &nbsp; Edit
-                </Button>
-              </Tooltip>
-            </Grid>
-
-            <Grid item>
-              <Tooltip arrow placement="top" title="Admin only: delete scrim">
-                <Button
-                  sx={{
-                    bgcolor: 'error.main',
-                    '&:hover': {
-                      bgcolor: 'error.dark',
-                    },
-                    color: 'white',
-                  }}
-                  variant="contained"
-                  onClick={handleDeleteScrim}>
-                  Delete
                 </Button>
               </Tooltip>
             </Grid>

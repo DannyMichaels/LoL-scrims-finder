@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   PieChart,
   Pie,
@@ -13,14 +13,11 @@ import {
   Legend,
   RadialBarChart,
   RadialBar,
-  LineChart,
-  Line,
   Area,
   AreaChart,
 } from 'recharts';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Button from '@mui/material/Button';
@@ -40,8 +37,11 @@ const COLORS = {
   accent: '#9C27B0',
 };
 
-export default function UserStatsCharts({ stats, userParticipatedScrims, user }) {
-  const theme = useTheme();
+export default function UserStatsCharts({
+  stats,
+  userParticipatedScrims,
+  user,
+}) {
   const [activityFilter, setActivityFilter] = useState('all');
   const [timeRange, setTimeRange] = useState(6); // months
   const [customDateRange, setCustomDateRange] = useState({
@@ -51,41 +51,47 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
   const [useCustomRange, setUseCustomRange] = useState(false);
 
   // Prepare data for Win/Loss Pie Chart
-  const winLossData = stats ? [
-    {
-      name: 'Wins',
-      value: Math.round(
-        (stats.userGamesPlayedCount * stats.userWinrate) / 100
-      ),
-    },
-    {
-      name: 'Losses',
-      value:
-        stats.userGamesPlayedCount -
-        Math.round((stats.userGamesPlayedCount * stats.userWinrate) / 100),
-    },
-  ] : [];
+  const winLossData = stats
+    ? [
+        {
+          name: 'Wins',
+          value: Math.round(
+            (stats.userGamesPlayedCount * stats.userWinrate) / 100
+          ),
+        },
+        {
+          name: 'Losses',
+          value:
+            stats.userGamesPlayedCount -
+            Math.round((stats.userGamesPlayedCount * stats.userWinrate) / 100),
+        },
+      ]
+    : [];
 
   // Prepare data for Level Progress Radial Chart
-  const levelProgressData = stats ? [
-    {
-      name: 'Progress',
-      value: stats.expProgressPercent,
-      fill: COLORS.primary,
-    },
-  ] : [];
+  const levelProgressData = stats
+    ? [
+        {
+          name: 'Progress',
+          value: stats.expProgressPercent,
+          fill: COLORS.primary,
+        },
+      ]
+    : [];
 
   // Prepare data for Games Played vs Casted Bar Chart
-  const gamesData = stats ? [
-    {
-      name: 'Played',
-      count: stats.userGamesPlayedCount,
-    },
-    {
-      name: 'Casted',
-      count: stats.userGamesCastedCount,
-    },
-  ] : [];
+  const gamesData = stats
+    ? [
+        {
+          name: 'Played',
+          count: stats.userGamesPlayedCount,
+        },
+        {
+          name: 'Casted',
+          count: stats.userGamesCastedCount,
+        },
+      ]
+    : [];
 
   // Prepare monthly activity data with filters
   const monthlyActivityData = useMemo(() => {
@@ -99,18 +105,20 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
       // Find the date range based on actual scrim data
       if (userParticipatedScrims && userParticipatedScrims.length > 0) {
         // Sort scrims by date to find the most recent ones
-        const sortedScrims = [...userParticipatedScrims].sort((a, b) => 
-          new Date(b.gameStartTime) - new Date(a.gameStartTime)
+        const sortedScrims = [...userParticipatedScrims].sort(
+          (a, b) => new Date(b.gameStartTime) - new Date(a.gameStartTime)
         );
-        
+
         // Get the most recent scrim date
         endDate = moment(sortedScrims[0].gameStartTime);
-        
+
         // Start from timeRange months before the most recent activity
         startDate = endDate.clone().subtract(timeRange, 'months');
-        
+
         // But don't go earlier than the oldest scrim
-        const oldestScrimDate = moment(sortedScrims[sortedScrims.length - 1].gameStartTime);
+        const oldestScrimDate = moment(
+          sortedScrims[sortedScrims.length - 1].gameStartTime
+        );
         if (startDate.isBefore(oldestScrimDate)) {
           startDate = oldestScrimDate;
         }
@@ -125,11 +133,11 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
     const current = startDate.clone().startOf('month');
     while (current.isSameOrBefore(endDate, 'month')) {
       const monthKey = current.format('MMM YY');
-      monthlyData[monthKey] = { 
-        month: monthKey, 
+      monthlyData[monthKey] = {
+        month: monthKey,
         played: 0,
         casted: 0,
-        total: 0
+        total: 0,
       };
       current.add(1, 'month');
     }
@@ -137,17 +145,20 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
     // Count games per month with filtering
     userParticipatedScrims.forEach((scrim) => {
       const scrimDate = moment(scrim.gameStartTime);
-      
+
       // Check if scrim is within date range
       if (scrimDate.isBetween(startDate, endDate, null, '[]')) {
         const monthKey = scrimDate.format('MMM YY');
-        
+
         if (monthlyData[monthKey]) {
           // Check if user was a player or caster
-          const wasPlayer = [...(scrim.teamOne || []), ...(scrim.teamTwo || [])]
-            .some(player => player._user === user?._id);
-          const wasCaster = (scrim.casters || [])
-            .some(casterId => casterId === user?._id);
+          const wasPlayer = [
+            ...(scrim.teamOne || []),
+            ...(scrim.teamTwo || []),
+          ].some((player) => player._user === user?._id);
+          const wasCaster = (scrim.casters || []).some(
+            (casterId) => casterId === user?._id
+          );
 
           if (wasPlayer) {
             monthlyData[monthKey].played += 1;
@@ -161,7 +172,13 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
     });
 
     return Object.values(monthlyData);
-  }, [userParticipatedScrims, timeRange, customDateRange, useCustomRange, user?._id]);
+  }, [
+    userParticipatedScrims,
+    timeRange,
+    customDateRange,
+    useCustomRange,
+    user?._id,
+  ]);
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload[0]) {
@@ -173,7 +190,11 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
             borderRadius: '4px',
             color: 'white',
           }}>
-          {label && <p style={{ margin: 0 }}><strong>{label}</strong></p>}
+          {label && (
+            <p style={{ margin: 0 }}>
+              <strong>{label}</strong>
+            </p>
+          )}
           {payload.map((entry, index) => (
             <p key={index} style={{ margin: 0, color: entry.color }}>
               {entry.name}: {entry.value}
@@ -207,11 +228,16 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
   if (!stats) return null;
 
   return (
-    <Grid container spacing={3} style={{ marginTop: '24px' }} alignItems="stretch">
+    <Grid
+      container
+      spacing={3}
+      style={{ marginTop: '24px' }}
+      alignItems="stretch">
       {/* Win Rate Pie Chart - show placeholder if no games played */}
       {stats.userGamesPlayedCount > 0 ? (
         <Grid item xs={12} sm={6} md={3} style={{ display: 'flex' }}>
-          <GlassPanel sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+          <GlassPanel
+            sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" align="center" gutterBottom>
               Win Rate
             </Typography>
@@ -232,18 +258,33 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
                 <Tooltip content={<PieTooltip />} />
               </PieChart>
             </ResponsiveContainer>
-            <Typography variant="body2" align="center" style={{ marginTop: '8px' }}>
+            <Typography
+              variant="body2"
+              align="center"
+              style={{ marginTop: '8px' }}>
               {stats.userWinrate}% Win Rate
             </Typography>
           </GlassPanel>
         </Grid>
       ) : (
         <Grid item xs={12} sm={6} md={3} style={{ display: 'flex' }}>
-          <GlassPanel sx={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '290px' }}>
+          <GlassPanel
+            sx={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minHeight: '290px',
+            }}>
             <Typography variant="h6" align="center" gutterBottom>
               Win Rate
             </Typography>
-            <Typography variant="body2" align="center" color="textSecondary" sx={{ padding: '40px 20px' }}>
+            <Typography
+              variant="body2"
+              align="center"
+              color="textSecondary"
+              sx={{ padding: '40px 20px' }}>
               No games played yet
             </Typography>
           </GlassPanel>
@@ -252,7 +293,8 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
 
       {/* Level Progress Radial Chart */}
       <Grid item xs={12} sm={6} md={3} style={{ display: 'flex' }}>
-        <GlassPanel sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+        <GlassPanel
+          sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" align="center" gutterBottom>
             Level Progress
           </Typography>
@@ -295,7 +337,8 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
 
       {/* Games Played vs Casted */}
       <Grid item xs={12} sm={6} md={3} style={{ display: 'flex' }}>
-        <GlassPanel sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+        <GlassPanel
+          sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           <Typography variant="h6" align="center" gutterBottom>
             Game Participation
           </Typography>
@@ -333,7 +376,10 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h4" align="center" style={{ color: COLORS.win }}>
+              <Typography
+                variant="h4"
+                align="center"
+                style={{ color: COLORS.win }}>
                 {stats.userExp}
               </Typography>
               <Typography variant="body2" align="center" color="textSecondary">
@@ -341,7 +387,10 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h4" align="center" style={{ color: COLORS.secondary }}>
+              <Typography
+                variant="h4"
+                align="center"
+                style={{ color: COLORS.secondary }}>
                 {stats.userGamesPlayedCount + stats.userGamesCastedCount}
               </Typography>
               <Typography variant="body2" align="center" color="textSecondary">
@@ -349,7 +398,10 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Typography variant="h4" align="center" style={{ color: COLORS.accent }}>
+              <Typography
+                variant="h4"
+                align="center"
+                style={{ color: COLORS.accent }}>
                 {stats.userWinrate}%
               </Typography>
               <Typography variant="body2" align="center" color="textSecondary">
@@ -363,11 +415,13 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
       {/* Monthly Activity Line Chart */}
       <Grid item xs={12}>
         <GlassPanel>
-          <Grid container alignItems="center" justifyContent="space-between" style={{ marginBottom: '16px' }}>
+          <Grid
+            container
+            alignItems="center"
+            justifyContent="space-between"
+            style={{ marginBottom: '16px' }}>
             <Grid item>
-              <Typography variant="h6">
-                Activity Over Time
-              </Typography>
+              <Typography variant="h6">Activity Over Time</Typography>
             </Grid>
             <Grid item>
               <Grid container spacing={2} alignItems="center">
@@ -375,53 +429,56 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
                   <ToggleButtonGroup
                     value={activityFilter}
                     exclusive
-                    onChange={(e, newFilter) => newFilter && setActivityFilter(newFilter)}
-                    size="small"
-                  >
-                    <ToggleButton value="all">
-                      All
-                    </ToggleButton>
-                    <ToggleButton value="played">
-                      Played
-                    </ToggleButton>
-                    <ToggleButton value="casted">
-                      Casted
-                    </ToggleButton>
+                    onChange={(e, newFilter) =>
+                      newFilter && setActivityFilter(newFilter)
+                    }
+                    size="small">
+                    <ToggleButton value="all">All</ToggleButton>
+                    <ToggleButton value="played">Played</ToggleButton>
+                    <ToggleButton value="casted">Casted</ToggleButton>
                   </ToggleButtonGroup>
                 </Grid>
                 <Grid item>
                   <ButtonGroup size="small">
-                    <Button 
-                      variant={!useCustomRange && timeRange === 3 ? "contained" : "outlined"}
+                    <Button
+                      variant={
+                        !useCustomRange && timeRange === 3
+                          ? 'contained'
+                          : 'outlined'
+                      }
                       onClick={() => {
                         setTimeRange(3);
                         setUseCustomRange(false);
-                      }}
-                    >
+                      }}>
                       3M
                     </Button>
-                    <Button 
-                      variant={!useCustomRange && timeRange === 6 ? "contained" : "outlined"}
+                    <Button
+                      variant={
+                        !useCustomRange && timeRange === 6
+                          ? 'contained'
+                          : 'outlined'
+                      }
                       onClick={() => {
                         setTimeRange(6);
                         setUseCustomRange(false);
-                      }}
-                    >
+                      }}>
                       6M
                     </Button>
-                    <Button 
-                      variant={!useCustomRange && timeRange === 12 ? "contained" : "outlined"}
+                    <Button
+                      variant={
+                        !useCustomRange && timeRange === 12
+                          ? 'contained'
+                          : 'outlined'
+                      }
                       onClick={() => {
                         setTimeRange(12);
                         setUseCustomRange(false);
-                      }}
-                    >
+                      }}>
                       1Y
                     </Button>
-                    <Button 
-                      variant={useCustomRange ? "contained" : "outlined"}
-                      onClick={() => setUseCustomRange(true)}
-                    >
+                    <Button
+                      variant={useCustomRange ? 'contained' : 'outlined'}
+                      onClick={() => setUseCustomRange(true)}>
                       Custom
                     </Button>
                   </ButtonGroup>
@@ -433,10 +490,17 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
                         label="Start Date"
                         value={customDateRange.start}
                         onChange={(newValue) => {
-                          setCustomDateRange(prev => ({ ...prev, start: newValue }));
+                          setCustomDateRange((prev) => ({
+                            ...prev,
+                            start: newValue,
+                          }));
                         }}
                         renderInput={(params) => (
-                          <TextField {...params} size="small" sx={{ width: 150 }} />
+                          <TextField
+                            {...params}
+                            size="small"
+                            sx={{ width: 150 }}
+                          />
                         )}
                         maxDate={customDateRange.end}
                       />
@@ -446,10 +510,17 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
                         label="End Date"
                         value={customDateRange.end}
                         onChange={(newValue) => {
-                          setCustomDateRange(prev => ({ ...prev, end: newValue }));
+                          setCustomDateRange((prev) => ({
+                            ...prev,
+                            end: newValue,
+                          }));
                         }}
                         renderInput={(params) => (
-                          <TextField {...params} size="small" sx={{ width: 150 }} />
+                          <TextField
+                            {...params}
+                            size="small"
+                            sx={{ width: 150 }}
+                          />
                         )}
                         minDate={customDateRange.start}
                         maxDate={moment()}
@@ -464,16 +535,40 @@ export default function UserStatsCharts({ stats, userParticipatedScrims, user })
             <AreaChart data={monthlyActivityData}>
               <defs>
                 <linearGradient id="colorPlayed" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0.1}/>
+                  <stop
+                    offset="5%"
+                    stopColor={COLORS.primary}
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={COLORS.primary}
+                    stopOpacity={0.1}
+                  />
                 </linearGradient>
                 <linearGradient id="colorCasted" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS.secondary} stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor={COLORS.secondary} stopOpacity={0.1}/>
+                  <stop
+                    offset="5%"
+                    stopColor={COLORS.secondary}
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={COLORS.secondary}
+                    stopOpacity={0.1}
+                  />
                 </linearGradient>
                 <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={COLORS.accent} stopOpacity={0.6}/>
-                  <stop offset="95%" stopColor={COLORS.accent} stopOpacity={0.05}/>
+                  <stop
+                    offset="5%"
+                    stopColor={COLORS.accent}
+                    stopOpacity={0.6}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={COLORS.accent}
+                    stopOpacity={0.05}
+                  />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />

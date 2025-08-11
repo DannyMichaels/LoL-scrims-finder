@@ -249,5 +249,195 @@ export const appTheme = createTheme({
         },
       },
     },
+
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'rgba(18, 24, 38, 0.85)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(33, 150, 243, 0.3)',
+          borderRadius: '12px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+        },
+      },
+    },
+
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+          borderBottom: '1px solid rgba(33, 150, 243, 0.2)',
+          color: COLORS.TEXT_PRIMARY,
+        },
+      },
+    },
+
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'transparent',
+          color: COLORS.TEXT_PRIMARY,
+        },
+        dividers: {
+          borderTop: '1px solid rgba(33, 150, 243, 0.2)',
+          borderBottom: '1px solid rgba(33, 150, 243, 0.2)',
+        },
+      },
+    },
+
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(33, 150, 243, 0.05)',
+          borderTop: '1px solid rgba(33, 150, 243, 0.2)',
+          padding: '16px',
+        },
+      },
+    },
+
+    MuiBackdrop: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(5px)',
+          WebkitBackdropFilter: 'blur(5px)',
+        },
+      },
+    },
+
+    MuiSnackbar: {
+      styleOverrides: {
+        root: {
+          '& .MuiSnackbarContent-root': {
+            backgroundColor: 'rgba(18, 24, 38, 0.9)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(33, 150, 243, 0.3)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+          },
+        },
+      },
+    },
+
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(18, 24, 38, 0.9)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(33, 150, 243, 0.3)',
+          borderRadius: '8px',
+          color: COLORS.TEXT_PRIMARY,
+        },
+        standardSuccess: {
+          backgroundColor: 'rgba(76, 175, 80, 0.15)',
+          border: '1px solid rgba(76, 175, 80, 0.3)',
+        },
+        standardError: {
+          backgroundColor: 'rgba(244, 67, 54, 0.15)',
+          border: '1px solid rgba(244, 67, 54, 0.3)',
+        },
+        standardWarning: {
+          backgroundColor: 'rgba(255, 152, 0, 0.15)',
+          border: '1px solid rgba(255, 152, 0, 0.3)',
+        },
+        standardInfo: {
+          backgroundColor: 'rgba(33, 150, 243, 0.15)',
+          border: '1px solid rgba(33, 150, 243, 0.3)',
+        },
+      },
+    },
+
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'rgba(18, 24, 38, 0.9)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(33, 150, 243, 0.3)',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        },
+      },
+    },
+
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: 'rgba(33, 150, 243, 0.1)',
+          },
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(33, 150, 243, 0.15)',
+            '&:hover': {
+              backgroundColor: 'rgba(33, 150, 243, 0.2)',
+            },
+          },
+        },
+      },
+    },
+
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          '&:focus': {
+            backgroundColor: 'transparent',
+          },
+        },
+      },
+    },
+
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'rgba(18, 24, 38, 0.9)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(33, 150, 243, 0.3)',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        },
+      },
+    },
+
+    MuiPopper: {
+      styleOverrides: {
+        root: {
+          '& .MuiPaper-root': {
+            backgroundColor: 'rgba(18, 24, 38, 0.9)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(33, 150, 243, 0.3)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+          },
+        },
+      },
+    },
+
+    MuiAutocomplete: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'rgba(18, 24, 38, 0.9)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(33, 150, 243, 0.3)',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+        },
+        listbox: {
+          '& .MuiAutocomplete-option': {
+            '&:hover': {
+              backgroundColor: 'rgba(33, 150, 243, 0.1)',
+            },
+            '&[aria-selected="true"]': {
+              backgroundColor: 'rgba(33, 150, 243, 0.15)',
+            },
+          },
+        },
+      },
+    },
   },
 });

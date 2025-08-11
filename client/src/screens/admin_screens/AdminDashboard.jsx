@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import useAlerts from '../../hooks/useAlerts';
@@ -17,7 +17,6 @@ import Chip from '@mui/material/Chip';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -25,8 +24,6 @@ import { Helmet } from 'react-helmet';
 
 // Charts
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
   BarChart,
@@ -49,7 +46,6 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import GroupIcon from '@mui/icons-material/Group';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import BlockIcon from '@mui/icons-material/Block';
-import VerifiedIcon from '@mui/icons-material/Verified';
 import WarningIcon from '@mui/icons-material/Warning';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -112,14 +108,15 @@ const RecentActivityTable = ({ activities, history }) => {
   const hasActivities = activities && activities.length > 0;
 
   return (
-    <GlassPanel sx={{ p: 2, height: '400px', display: 'flex', flexDirection: 'column' }}>
+    <GlassPanel
+      sx={{ p: 2, height: '400px', display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h6" gutterBottom>
         Recent Activity
       </Typography>
       <Divider sx={{ mb: 2 }} />
       <Box
-        sx={{ 
-          flexGrow: 1, 
+        sx={{
+          flexGrow: 1,
           overflowY: 'auto',
           overflowX: 'hidden',
           maxHeight: 'calc(400px - 80px)',
@@ -151,115 +148,117 @@ const RecentActivityTable = ({ activities, history }) => {
             </Grid>
           ) : (
             activities.map((activity, index) => {
-            const getClickHandler = () => {
-              if (activity.type === 'scrim' && activity.details?.scrimId) {
-                history.push(`/scrims/${activity.details.scrimId}`);
-              } else if (
-                activity.type === 'user' &&
-                activity.details?.userName
-              ) {
-                history.push(
-                  `/users/${activity.details.userName}?region=${activity.details.region}`
-                );
-              } else if (
-                activity.type === 'ban' &&
-                activity.details?.userId &&
-                activity.details?.userName
-              ) {
-                history.push(`/users/${activity.details.userName}`);
-              }
-            };
+              const getClickHandler = () => {
+                if (activity.type === 'scrim' && activity.details?.scrimId) {
+                  history.push(`/scrims/${activity.details.scrimId}`);
+                } else if (
+                  activity.type === 'user' &&
+                  activity.details?.userName
+                ) {
+                  history.push(
+                    `/users/${activity.details.userName}?region=${activity.details.region}`
+                  );
+                } else if (
+                  activity.type === 'ban' &&
+                  activity.details?.userId &&
+                  activity.details?.userName
+                ) {
+                  history.push(`/users/${activity.details.userName}`);
+                }
+              };
 
-            const getStatusColor = () => {
-              switch (activity.status) {
-                case 'active':
-                  return 'success';
-                case 'completed':
-                  return 'info';
-                case 'banned':
-                  return 'error';
-                case 'lifted':
-                  return 'warning';
-                case 'new':
-                  return 'primary';
-                default:
-                  return 'default';
-              }
-            };
+              const getStatusColor = () => {
+                switch (activity.status) {
+                  case 'active':
+                    return 'success';
+                  case 'completed':
+                    return 'info';
+                  case 'banned':
+                    return 'error';
+                  case 'lifted':
+                    return 'warning';
+                  case 'new':
+                    return 'primary';
+                  default:
+                    return 'default';
+                }
+              };
 
-            return (
-              <Grid item key={index}>
-                <Tooltip
-                  title={
-                    activity.type === 'scrim'
-                      ? `Click to view scrim details`
-                      : activity.type === 'user'
-                      ? `Click to view ${activity.details?.userName}'s profile`
-                      : activity.type === 'ban'
-                      ? `${
-                          activity.details?.reason
-                            ? `Reason: ${activity.details.reason}`
-                            : 'Click to view user'
-                        }`
-                      : ''
-                  }>
-                  <Grid
-                    container
-                    alignItems="center"
-                    spacing={2}
-                    sx={{
-                      cursor: 'pointer',
-                      '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' },
-                      borderRadius: 1,
-                      p: 0.5,
-                    }}
-                    onClick={getClickHandler}>
-                    <Grid item>
-                      <Avatar
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          bgcolor:
-                            activity.type === 'scrim'
-                              ? COLORS.primary
-                              : activity.type === 'user'
-                              ? COLORS.success
-                              : activity.type === 'ban'
-                              ? COLORS.error
-                              : COLORS.info,
-                        }}>
-                        {activity.type === 'scrim' && <GamesIcon />}
-                        {activity.type === 'user' && <PersonIcon />}
-                        {activity.type === 'ban' && <BlockIcon />}
-                      </Avatar>
-                    </Grid>
-                    <Grid item xs>
-                      <Typography variant="body2">
-                        {activity.description}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        {new Date(activity.timestamp).toLocaleString()}
-                        {activity.details?.region &&
-                          ` • ${activity.details.region}`}
-                        {activity.details?.rank &&
-                          ` • ${activity.details.rank}`}
-                      </Typography>
-                    </Grid>
-                    {activity.status && (
+              return (
+                <Grid item key={index}>
+                  <Tooltip
+                    title={
+                      activity.type === 'scrim'
+                        ? `Click to view scrim details`
+                        : activity.type === 'user'
+                        ? `Click to view ${activity.details?.userName}'s profile`
+                        : activity.type === 'ban'
+                        ? `${
+                            activity.details?.reason
+                              ? `Reason: ${activity.details.reason}`
+                              : 'Click to view user'
+                          }`
+                        : ''
+                    }>
+                    <Grid
+                      container
+                      alignItems="center"
+                      spacing={2}
+                      sx={{
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.05)',
+                        },
+                        borderRadius: 1,
+                        p: 0.5,
+                      }}
+                      onClick={getClickHandler}>
                       <Grid item>
-                        <Chip
-                          label={activity.status}
-                          size="small"
-                          color={getStatusColor()}
-                        />
+                        <Avatar
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            bgcolor:
+                              activity.type === 'scrim'
+                                ? COLORS.primary
+                                : activity.type === 'user'
+                                ? COLORS.success
+                                : activity.type === 'ban'
+                                ? COLORS.error
+                                : COLORS.info,
+                          }}>
+                          {activity.type === 'scrim' && <GamesIcon />}
+                          {activity.type === 'user' && <PersonIcon />}
+                          {activity.type === 'ban' && <BlockIcon />}
+                        </Avatar>
                       </Grid>
-                    )}
-                  </Grid>
-                </Tooltip>
-              </Grid>
-            );
-          })
-        )}
+                      <Grid item xs>
+                        <Typography variant="body2">
+                          {activity.description}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          {new Date(activity.timestamp).toLocaleString()}
+                          {activity.details?.region &&
+                            ` • ${activity.details.region}`}
+                          {activity.details?.rank &&
+                            ` • ${activity.details.rank}`}
+                        </Typography>
+                      </Grid>
+                      {activity.status && (
+                        <Grid item>
+                          <Chip
+                            label={activity.status}
+                            size="small"
+                            color={getStatusColor()}
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
+                  </Tooltip>
+                </Grid>
+              );
+            })
+          )}
         </Grid>
       </Box>
     </GlassPanel>
@@ -278,7 +277,7 @@ export default function AdminDashboard() {
   const [userGrowthRange, setUserGrowthRange] = useState('6M');
   const [customDateRange, setCustomDateRange] = useState({
     start: null,
-    end: null
+    end: null,
   });
   const [useCustomRange, setUseCustomRange] = useState(false);
 
@@ -293,6 +292,8 @@ export default function AdminDashboard() {
     }
 
     fetchDashboardData();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCurrentUserAdmin, history]);
 
   const fetchDashboardData = async () => {
@@ -361,25 +362,29 @@ export default function AdminDashboard() {
         // Use custom date range
         const startDate = new Date(customDateRange.start);
         const endDate = new Date(customDateRange.end);
-        
+
         // Generate months between start and end dates
-        let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+        let currentDate = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          1
+        );
         const endMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
-        
+
         while (currentDate <= endMonth) {
           const monthIndex = currentDate.getMonth();
           const year = currentDate.getFullYear();
           const monthName = months[monthIndex];
           const key = `${year}-${monthIndex + 1}`;
-          
+
           const monthlyCount = dataMap.get(key) || 0;
-          
+
           data.push({
             month: `${monthName} ${year}`,
             users: monthlyCount,
             fullDate: `${monthName} ${year}`,
           });
-          
+
           // Move to next month
           currentDate.setMonth(currentDate.getMonth() + 1);
         }
@@ -535,10 +540,7 @@ export default function AdminDashboard() {
       <Helmet>
         <meta charSet="utf-8" />
         <title>Admin Dashboard | Reluminate.gg</title>
-        <meta
-          name="description"
-          content="Admin Dashboard for Reluminate.gg"
-        />
+        <meta name="description" content="Admin Dashboard for Reluminate.gg" />
       </Helmet>
 
       <Navbar />
@@ -619,7 +621,11 @@ export default function AdminDashboard() {
                   <Typography variant="h6">New User Registrations</Typography>
                 </Grid>
                 <Grid item sx={{ flexGrow: 1 }}>
-                  <Grid container spacing={1} alignItems="center" justifyContent="flex-end">
+                  <Grid
+                    container
+                    spacing={1}
+                    alignItems="center"
+                    justifyContent="flex-end">
                     <Grid item sx={{ marginRight: 'auto' }}>
                       <Grid container spacing={1}>
                         {['3M', '6M', '1Y'].map((range) => (
@@ -627,7 +633,9 @@ export default function AdminDashboard() {
                             <Button
                               size="small"
                               variant={
-                                !useCustomRange && userGrowthRange === range ? 'contained' : 'outlined'
+                                !useCustomRange && userGrowthRange === range
+                                  ? 'contained'
+                                  : 'outlined'
                               }
                               onClick={() => {
                                 setUserGrowthRange(range);
@@ -641,7 +649,10 @@ export default function AdminDashboard() {
                       </Grid>
                     </Grid>
                     <Grid item>
-                      <Divider orientation="vertical" sx={{ mx: 1, height: 24 }} />
+                      <Divider
+                        orientation="vertical"
+                        sx={{ mx: 1, height: 24 }}
+                      />
                     </Grid>
                     <Grid item>
                       <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -650,7 +661,10 @@ export default function AdminDashboard() {
                           views={['year', 'month']}
                           value={customDateRange.start}
                           onChange={(newValue) => {
-                            setCustomDateRange(prev => ({ ...prev, start: newValue }));
+                            setCustomDateRange((prev) => ({
+                              ...prev,
+                              start: newValue,
+                            }));
                             if (newValue && customDateRange.end) {
                               setUseCustomRange(true);
                             }
@@ -658,8 +672,8 @@ export default function AdminDashboard() {
                           slotProps={{
                             textField: {
                               size: 'small',
-                              sx: { width: 140 }
-                            }
+                              sx: { width: 140 },
+                            },
                           }}
                         />
                       </LocalizationProvider>
@@ -671,7 +685,10 @@ export default function AdminDashboard() {
                           views={['year', 'month']}
                           value={customDateRange.end}
                           onChange={(newValue) => {
-                            setCustomDateRange(prev => ({ ...prev, end: newValue }));
+                            setCustomDateRange((prev) => ({
+                              ...prev,
+                              end: newValue,
+                            }));
                             if (customDateRange.start && newValue) {
                               setUseCustomRange(true);
                             }
@@ -680,8 +697,8 @@ export default function AdminDashboard() {
                           slotProps={{
                             textField: {
                               size: 'small',
-                              sx: { width: 140 }
-                            }
+                              sx: { width: 140 },
+                            },
                           }}
                         />
                       </LocalizationProvider>
@@ -726,7 +743,10 @@ export default function AdminDashboard() {
                       backgroundColor: 'rgba(0,0,0,0.8)',
                       border: 'none',
                     }}
-                    formatter={(value) => [`${value} new users`, 'New Registrations']}
+                    formatter={(value) => [
+                      `${value} new users`,
+                      'New Registrations',
+                    ]}
                     labelFormatter={(label) => `Month: ${label}`}
                   />
                   <Area
@@ -1023,17 +1043,23 @@ export default function AdminDashboard() {
 
           {/* System Status */}
           <Grid item xs={12} md={6}>
-            <GlassPanel sx={{ p: 2, height: '400px', display: 'flex', flexDirection: 'column' }}>
+            <GlassPanel
+              sx={{
+                p: 2,
+                height: '400px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}>
               <Typography variant="h6" gutterBottom>
                 System Status
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              <Grid 
-                container 
-                direction="column" 
+              <Grid
+                container
+                direction="column"
                 spacing={2}
-                sx={{ 
-                  flexGrow: 1, 
+                sx={{
+                  flexGrow: 1,
                   overflowY: 'auto',
                   overflowX: 'hidden',
                   '&::-webkit-scrollbar': {
