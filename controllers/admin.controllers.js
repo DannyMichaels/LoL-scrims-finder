@@ -152,7 +152,7 @@ const getAllBans = async (req, res) => {
       .populate('_bannedBy', populateUser)
       .populate('_unbannedBy', populateUser)
       .populate('_user', populateUser);
-    
+
     return res.status(200).json(_allBans);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -174,11 +174,7 @@ const updateUserAsAdmin = async (req, res) => {
       if (!isValidRank) return;
     }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      req.body,
-      { new: true }
-    );
+    const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -198,36 +194,36 @@ const updateUserAsAdmin = async (req, res) => {
 const getRecentActivities = async (req, res) => {
   try {
     const activities = [];
-    
+
     // Get most recent scrims (regardless of time, just get the latest ones)
     const recentScrims = await Scrim.find({})
-    .populate('createdBy', 'name')
-    .sort({ createdAt: -1 })
-    .limit(5);
-    
+      .populate('createdBy', 'name')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
     // Get most recent users
     const recentUsers = await User.find({})
-    .select('name discord region rank createdAt summonerTagline')
-    .sort({ createdAt: -1 })
-    .limit(5);
-    
+      .select('name discord region rank createdAt summonerTagline')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
     // Get most recent bans
     const recentBans = await Ban.find({})
-    .populate('_user', 'name')
-    .populate('_bannedBy', 'name')
-    .sort({ createdAt: -1 })
-    .limit(5);
-    
+      .populate('_user', 'name')
+      .populate('_bannedBy', 'name')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
     // Get recently completed scrims (scrims that have started)
     const completedScrims = await Scrim.find({
-      gameStartTime: { $lte: new Date() }
+      gameStartTime: { $lte: new Date() },
     })
-    .populate('createdBy', 'name')
-    .sort({ gameStartTime: -1 })
-    .limit(5);
-    
+      .populate('createdBy', 'name')
+      .sort({ gameStartTime: -1 })
+      .limit(5);
+
     // Format activities
-    recentScrims.forEach(scrim => {
+    recentScrims.forEach((scrim) => {
       activities.push({
         type: 'scrim',
         action: 'created',
@@ -237,14 +233,14 @@ const getRecentActivities = async (req, res) => {
           title: scrim.title,
           createdBy: scrim.createdBy?.name || 'Unknown',
           region: scrim.region,
-          gameMode: scrim.gameMode
+          gameMode: scrim.gameMode,
         },
         timestamp: scrim.createdAt,
-        status: scrim.isActive ? 'active' : 'inactive'
+        status: scrim.isActive ? 'active' : 'inactive',
       });
     });
-    
-    recentUsers.forEach(user => {
+
+    recentUsers.forEach((user) => {
       activities.push({
         type: 'user',
         action: 'registered',
@@ -254,18 +250,20 @@ const getRecentActivities = async (req, res) => {
           userName: user.name,
           discord: user.discord,
           region: user.region,
-          rank: user.rank
+          rank: user.rank,
         },
         timestamp: user.createdAt,
-        status: 'new'
+        status: 'new',
       });
     });
-    
-    recentBans.forEach(ban => {
+
+    recentBans.forEach((ban) => {
       activities.push({
         type: 'ban',
         action: ban.isActive ? 'banned' : 'unbanned',
-        description: `User ${ban.isActive ? 'banned' : 'unbanned'}: ${ban._user?.name || 'Unknown'}`,
+        description: `User ${ban.isActive ? 'banned' : 'unbanned'}: ${
+          ban._user?.name || 'Unknown'
+        }`,
         details: {
           banId: ban._id,
           userId: ban._user?._id,
@@ -273,14 +271,14 @@ const getRecentActivities = async (req, res) => {
           bannedBy: ban._bannedBy?.name || 'System',
           reason: ban.reason,
           dateFrom: ban.dateFrom,
-          dateTo: ban.dateTo
+          dateTo: ban.dateTo,
         },
         timestamp: ban.createdAt,
-        status: ban.isActive ? 'banned' : 'lifted'
+        status: ban.isActive ? 'banned' : 'lifted',
       });
     });
-    
-    completedScrims.forEach(scrim => {
+
+    completedScrims.forEach((scrim) => {
       if (scrim.gameStartTime < new Date()) {
         activities.push({
           type: 'scrim',
@@ -290,20 +288,19 @@ const getRecentActivities = async (req, res) => {
             scrimId: scrim._id,
             title: scrim.title,
             createdBy: scrim.createdBy?.name || 'Unknown',
-            region: scrim.region
+            region: scrim.region,
           },
           timestamp: scrim.gameStartTime,
-          status: 'completed'
+          status: 'completed',
         });
       }
     });
-    
+
     // Sort all activities by timestamp
     activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     // Return top 20 most recent activities
     res.json(activities.slice(0, 20));
-    
   } catch (error) {
     console.error('Error fetching recent activities:', error);
     res.status(500).json({ error: 'Failed to fetch recent activities' });
@@ -318,48 +315,54 @@ const getDashboardStats = async (req, res) => {
     // Get basic counts
     const totalUsers = await User.countDocuments();
     const totalScrims = await Scrim.countDocuments();
-    
+
     // Get detailed ban statistics
     const currentDate = new Date();
-    
+
     // Active bans (not expired)
-    const activeBans = await User.countDocuments({ 
+    const activeBans = await User.countDocuments({
       'currentBan.isActive': true,
-      'currentBan.dateTo': { $gt: currentDate }
+      'currentBan.dateTo': { $gt: currentDate },
     });
-    
+
     // Expired but not lifted bans
     const expiredBans = await User.countDocuments({
       'currentBan.isActive': true,
-      'currentBan.dateTo': { $lte: currentDate }
+      'currentBan.dateTo': { $lte: currentDate },
     });
-    
+
     // Total users with ban history
     const totalBannedUsers = await User.countDocuments({
-      'bansHistory.0': { $exists: true }
+      'bansHistory.0': { $exists: true },
     });
-    
+
     // Get all bans from Ban collection for more detailed stats
     const allBans = await Ban.countDocuments();
     const activeBansFromBanModel = await Ban.countDocuments({
       isActive: true,
-      dateTo: { $gt: currentDate }
+      dateTo: { $gt: currentDate },
     });
 
-    // Get active users today
+    // Get active users today (users who logged in today)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const activeToday = await User.countDocuments({
+      lastLoggedIn: { $gte: today, $lt: tomorrow },
+    });
+
     // Get weekly stats
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    
+
     const weeklyNewUsers = await User.countDocuments({
-      createdAt: { $gte: weekAgo }
+      createdAt: { $gte: weekAgo },
     });
-    
+
     const weeklyNewScrims = await Scrim.countDocuments({
-      createdAt: { $gte: weekAgo }
+      createdAt: { $gte: weekAgo },
     });
 
     // Get region distribution
@@ -367,43 +370,102 @@ const getDashboardStats = async (req, res) => {
       {
         $group: {
           _id: '$region',
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
-    // Get rank distribution  
+    // Get rank distribution
     const rankDistribution = await User.aggregate([
       {
         $group: {
           _id: '$rank',
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Get weekly scrim activity (find most recent week with scrim activity)
+    const weeklyScrimActivity = [];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // First, find the most recent scrim
+    const mostRecentScrim = await Scrim.findOne().sort({ createdAt: -1 });
+
+    if (mostRecentScrim) {
+      // Start from the most recent scrim date
+      const endDate = new Date(mostRecentScrim.createdAt);
+      endDate.setHours(23, 59, 59, 999);
+
+      // Go back 6 days from the most recent scrim to get a full week
+      for (let i = 6; i >= 0; i--) {
+        const dayStart = new Date(endDate);
+        dayStart.setDate(dayStart.getDate() - i);
+        dayStart.setHours(0, 0, 0, 0);
+
+        const dayEnd = new Date(dayStart);
+        dayEnd.setHours(23, 59, 59, 999);
+
+        const scrimsCount = await Scrim.countDocuments({
+          createdAt: { $gte: dayStart, $lte: dayEnd },
+        });
+
+        weeklyScrimActivity.push({
+          day: dayNames[dayStart.getDay()],
+          scrims: scrimsCount,
+          date: dayStart.toISOString().split('T')[0], // Include date for reference
+        });
       }
+    }
+
+    // Get monthly user growth for the chart
+    const monthlyUserGrowth = await User.aggregate([
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          year: '$_id.year',
+          month: '$_id.month',
+          count: 1,
+        },
+      },
+      {
+        $sort: { year: 1, month: 1 },
+      },
     ]);
 
     res.json({
       totalUsers,
       totalScrims,
+      activeToday,
       banStatistics: {
         activeBans,
         expiredBans,
         totalBannedUsers,
-        totalBans: allBans
+        totalBans: allBans,
       },
       weeklyNewUsers,
       weeklyNewScrims,
-      regionDistribution: regionDistribution.map(r => ({
+      weeklyScrimActivity,
+      monthlyUserGrowth,
+      regionDistribution: regionDistribution.map((r) => ({
         region: r._id,
-        count: r.count
+        count: r.count,
       })),
-      rankDistribution: rankDistribution.map(r => ({
+      rankDistribution: rankDistribution.map((r) => ({
         rank: r._id,
-        count: r.count
+        count: r.count,
       })),
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     });
-
   } catch (error) {
     console.error('Dashboard stats error:', error);
     res.status(500).json({ error: 'Failed to fetch dashboard statistics' });
@@ -416,26 +478,26 @@ const getDashboardStats = async (req, res) => {
 const liftExpiredBans = async (req, res) => {
   try {
     await manualLiftExpiredBans();
-    
+
     // Get updated ban statistics
     const currentDate = new Date();
-    const activeBans = await User.countDocuments({ 
+    const activeBans = await User.countDocuments({
       'currentBan.isActive': true,
-      'currentBan.dateTo': { $gt: currentDate }
+      'currentBan.dateTo': { $gt: currentDate },
     });
-    
+
     const expiredBans = await User.countDocuments({
       'currentBan.isActive': true,
-      'currentBan.dateTo': { $lte: currentDate }
+      'currentBan.dateTo': { $lte: currentDate },
     });
-    
+
     res.json({
       success: true,
       message: 'Expired bans have been lifted',
       statistics: {
         activeBans,
-        expiredBans
-      }
+        expiredBans,
+      },
     });
   } catch (error) {
     console.error('Error lifting expired bans:', error);
@@ -453,44 +515,44 @@ const getServerStatus = async (req, res) => {
         name: 'MongoDB',
         status: 'unknown',
         details: null,
-        latency: null
+        latency: null,
       },
       websocket: {
         name: 'WebSocket Server',
         status: 'unknown',
         details: null,
-        connections: 0
+        connections: 0,
       },
       emailService: {
         name: 'Email Service',
         status: 'unknown',
-        details: null
+        details: null,
       },
       riotApi: {
         name: 'Riot API',
         status: 'unknown',
         details: null,
-        rateLimit: null
+        rateLimit: null,
       },
       server: {
         name: 'Express Server',
         status: 'operational',
         uptime: process.uptime(),
         memory: process.memoryUsage(),
-        nodeVersion: process.version
-      }
+        nodeVersion: process.version,
+      },
     };
 
     // Check MongoDB connection
     try {
       const dbState = mongoose.connection.readyState;
       const startTime = Date.now();
-      
+
       if (dbState === 1) {
         // Ping the database to check latency
         await mongoose.connection.db.admin().ping();
         const latency = Date.now() - startTime;
-        
+
         status.database.status = 'operational';
         status.database.details = 'Connected and responsive';
         status.database.latency = `${latency}ms`;
@@ -547,20 +609,19 @@ const getServerStatus = async (req, res) => {
       // Check if we have an API key
       if (process.env.RIOT_API_KEY) {
         // Make a simple request to Riot API status endpoint
-        const riotResponse = await axios.get(
-          'https://na1.api.riotgames.com/lol/status/v4/platform-data',
-          {
+        const riotResponse = await axios
+          .get('https://na1.api.riotgames.com/lol/status/v4/platform-data', {
             headers: {
-              'X-Riot-Token': process.env.RIOT_API_KEY
+              'X-Riot-Token': process.env.RIOT_API_KEY,
             },
-            timeout: 5000
-          }
-        ).catch(err => {
-          if (err.response?.status === 429) {
-            return { status: 429, data: { message: 'Rate limited' } };
-          }
-          throw err;
-        });
+            timeout: 5000,
+          })
+          .catch((err) => {
+            if (err.response?.status === 429) {
+              return { status: 429, data: { message: 'Rate limited' } };
+            }
+            throw err;
+          });
 
         if (riotResponse.status === 200) {
           status.riotApi.status = 'operational';
@@ -588,10 +649,18 @@ const getServerStatus = async (req, res) => {
     }
 
     // Calculate overall health
-    const services = [status.database, status.websocket, status.emailService, status.riotApi, status.server];
-    const operationalCount = services.filter(s => s.status === 'operational').length;
-    const warningCount = services.filter(s => s.status === 'warning').length;
-    const errorCount = services.filter(s => s.status === 'error').length;
+    const services = [
+      status.database,
+      status.websocket,
+      status.emailService,
+      status.riotApi,
+      status.server,
+    ];
+    const operationalCount = services.filter(
+      (s) => s.status === 'operational'
+    ).length;
+    const warningCount = services.filter((s) => s.status === 'warning').length;
+    const errorCount = services.filter((s) => s.status === 'error').length;
 
     let overallStatus = 'operational';
     if (errorCount > 0) {
@@ -600,7 +669,10 @@ const getServerStatus = async (req, res) => {
     if (errorCount >= 3) {
       overallStatus = 'degraded';
     }
-    if (status.database.status === 'error' || status.server.status === 'error') {
+    if (
+      status.database.status === 'error' ||
+      status.server.status === 'error'
+    ) {
       overallStatus = 'critical';
     }
 
@@ -611,16 +683,15 @@ const getServerStatus = async (req, res) => {
         operational: operationalCount,
         warning: warningCount,
         error: errorCount,
-        total: services.length
+        total: services.length,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
-
   } catch (error) {
     console.error('Error checking server status:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to check server status',
-      overall: 'error'
+      overall: 'error',
     });
   }
 };

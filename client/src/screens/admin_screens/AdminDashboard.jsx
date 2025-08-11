@@ -15,6 +15,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Chip from '@mui/material/Chip';
 import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
 import { Helmet } from 'react-helmet';
 
 // Charts
@@ -31,7 +32,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   Legend,
   ResponsiveContainer,
 } from 'recharts';
@@ -104,9 +105,9 @@ const StatCard = ({ title, value, icon, color, change, subtitle }) => (
 // Recent Activity Table Component
 const RecentActivityTable = ({ activities, history }) => {
   const hasActivities = activities && activities.length > 0;
-  
+
   return (
-    <GlassPanel sx={{ p: 2, height: '100%' }}>
+    <GlassPanel sx={{ p: 2 }}>
       <Typography variant="h6" gutterBottom>
         Recent Activity
       </Typography>
@@ -114,7 +115,11 @@ const RecentActivityTable = ({ activities, history }) => {
       <Grid container direction="column" spacing={2}>
         {!hasActivities ? (
           <Grid item>
-            <Typography variant="body2" color="textSecondary" align="center" sx={{ py: 4 }}>
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              align="center"
+              sx={{ py: 4 }}>
               No recent activities found
             </Typography>
           </Grid>
@@ -123,7 +128,10 @@ const RecentActivityTable = ({ activities, history }) => {
             const getClickHandler = () => {
               if (activity.type === 'scrim' && activity.details?.scrimId) {
                 history.push(`/scrims/${activity.details.scrimId}`);
-              } else if (activity.type === 'user' && activity.details?.userName) {
+              } else if (
+                activity.type === 'user' &&
+                activity.details?.userName
+              ) {
                 history.push(
                   `/users/${activity.details.userName}?region=${activity.details.region}`
                 );
@@ -207,7 +215,8 @@ const RecentActivityTable = ({ activities, history }) => {
                         {new Date(activity.timestamp).toLocaleString()}
                         {activity.details?.region &&
                           ` • ${activity.details.region}`}
-                        {activity.details?.rank && ` • ${activity.details.rank}`}
+                        {activity.details?.rank &&
+                          ` • ${activity.details.rank}`}
                       </Typography>
                     </Grid>
                     {activity.status && (
@@ -287,70 +296,171 @@ export default function AdminDashboard() {
 
   // Generate user growth data based on selected range
   const getUserGrowthData = () => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-    
-    let monthsToShow = 6;
-    if (userGrowthRange === '3M') monthsToShow = 3;
-    if (userGrowthRange === '1Y') monthsToShow = 12;
-    
-    const data = [];
-    for (let i = monthsToShow - 1; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      const year = currentMonth - i < 0 ? currentYear - 1 : currentYear;
-      const monthName = months[monthIndex];
-      const yearSuffix = year !== currentYear ? ` '${String(year).slice(-2)}` : '';
-      
-      // Mock data - in production this would come from backend
-      const baseUsers = dashboardData?.totalUsers || 500;
-      const growth = Math.floor(Math.random() * 50) + 20;
-      
-      data.push({
-        month: `${monthName}${yearSuffix}`,
-        users: Math.floor(baseUsers - (monthsToShow - i) * growth),
-        fullDate: `${monthName} ${year}`
+    // If backend provides monthly user growth data, use it
+    if (
+      dashboardData?.monthlyUserGrowth &&
+      dashboardData.monthlyUserGrowth.length > 0
+    ) {
+      const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+
+      // Find the most recent date with data
+      const sortedData = [...dashboardData.monthlyUserGrowth].sort((a, b) => {
+        if (a.year !== b.year) return b.year - a.year;
+        return b.month - a.month;
       });
+
+      const mostRecentData = sortedData[0];
+      const endMonth = mostRecentData.month - 1; // Convert to 0-indexed
+      const endYear = mostRecentData.year;
+
+      let monthsToShow = 6;
+      if (userGrowthRange === '3M') monthsToShow = 3;
+      if (userGrowthRange === '1Y') monthsToShow = 12;
+
+      const dataMap = new Map(
+        dashboardData.monthlyUserGrowth.map((item) => [
+          `${item.year}-${item.month}`,
+          item.count,
+        ])
+      );
+
+      const data = [];
+      let cumulativeUsers = 0;
+
+      for (let i = monthsToShow - 1; i >= 0; i--) {
+        const monthIndex = (endMonth - i + 12) % 12;
+        const year = endMonth - i < 0 ? endYear - 1 : endYear;
+        const monthName = months[monthIndex];
+        const key = `${year}-${monthIndex + 1}`;
+
+        const monthlyCount = dataMap.get(key) || 0;
+        cumulativeUsers += monthlyCount;
+
+        data.push({
+          month: `${monthName} ${year}`,
+          users: cumulativeUsers,
+          fullDate: `${monthName} ${year}`,
+        });
+      }
+
+      return data;
     }
-    return data;
+
+    // No data available
+    return [];
   };
-  
+
   const userGrowthData = getUserGrowthData();
 
-  const scrimActivityData = [
-    { day: 'Mon', scrims: 45 },
-    { day: 'Tue', scrims: 52 },
-    { day: 'Wed', scrims: 48 },
-    { day: 'Thu', scrims: 70 },
-    { day: 'Fri', scrims: 85 },
-    { day: 'Sat', scrims: 95 },
-    { day: 'Sun', scrims: 88 },
-  ];
+  // Get weekly scrim activity from backend data
+  const getScrimActivityData = () => {
+    if (
+      dashboardData?.weeklyScrimActivity &&
+      dashboardData.weeklyScrimActivity.length > 0
+    ) {
+      return dashboardData.weeklyScrimActivity;
+    }
 
-  const regionDistribution = dashboardData?.regionDistribution || [
-    { name: 'NA', value: 35, color: COLORS.primary },
-    { name: 'EUW', value: 30, color: COLORS.secondary },
-    { name: 'EUNE', value: 15, color: COLORS.success },
-    { name: 'LAN', value: 12, color: COLORS.warning },
-    { name: 'OCE', value: 8, color: COLORS.info },
-  ];
+    // No fallback - return empty array if no data
+    return [];
+  };
 
-  const rankDistribution = dashboardData?.rankDistribution || [
-    { rank: 'Iron', count: 50 },
-    { rank: 'Bronze', count: 120 },
-    { rank: 'Silver', count: 200 },
-    { rank: 'Gold', count: 250 },
-    { rank: 'Platinum', count: 180 },
-    { rank: 'Diamond', count: 100 },
-    { rank: 'Master+', count: 30 },
-  ];
-  
+  const scrimActivityData = getScrimActivityData();
+
+  // Process region distribution data from backend
+  const getRegionDistribution = () => {
+    if (
+      dashboardData?.regionDistribution &&
+      dashboardData.regionDistribution.length > 0
+    ) {
+      const totalUsers = dashboardData.regionDistribution.reduce(
+        (sum, r) => sum + r.count,
+        0
+      );
+      const colorMap = {
+        NA: COLORS.primary,
+        EUW: COLORS.secondary,
+        EUNE: COLORS.success,
+        LAN: COLORS.warning,
+        OCE: COLORS.info,
+      };
+
+      return dashboardData.regionDistribution.map((region) => ({
+        name: region.region || 'Unknown',
+        value:
+          totalUsers > 0 ? Math.round((region.count / totalUsers) * 100) : 0,
+        count: region.count,
+        color: colorMap[region.region] || COLORS.primary,
+      }));
+    }
+
+    // No fallback - return empty array if no data
+    return [];
+  };
+
+  const regionDistribution = getRegionDistribution();
+
+  // Process rank distribution data from backend
+  const getRankDistribution = () => {
+    if (
+      dashboardData?.rankDistribution &&
+      dashboardData.rankDistribution.length > 0
+    ) {
+      // Sort ranks in proper order
+      const rankOrder = [
+        'Iron',
+        'Bronze',
+        'Silver',
+        'Gold',
+        'Platinum',
+        'Diamond',
+        'Master',
+        'Grandmaster',
+        'Challenger',
+        'Unranked',
+      ];
+
+      return dashboardData.rankDistribution
+        .map((item) => ({
+          rank: item.rank || 'Unknown',
+          count: item.count || 0,
+        }))
+        .sort((a, b) => {
+          const aIndex = rankOrder.indexOf(a.rank.split(' ')[0]);
+          const bIndex = rankOrder.indexOf(b.rank.split(' ')[0]);
+          if (aIndex === -1) return 1;
+          if (bIndex === -1) return -1;
+          return aIndex - bIndex;
+        });
+    }
+
+    return [];
+  };
+
+  const rankDistribution = getRankDistribution();
+
   // Helper function to get status icon and color
   const getStatusDisplay = (status) => {
-    switch(status) {
+    switch (status) {
       case 'operational':
-        return { icon: <CheckCircleIcon />, color: 'success', label: 'Operational' };
+        return {
+          icon: <CheckCircleIcon />,
+          color: 'success',
+          label: 'Operational',
+        };
       case 'warning':
         return { icon: <WarningIcon />, color: 'warning', label: 'Warning' };
       case 'error':
@@ -402,8 +512,7 @@ export default function AdminDashboard() {
               value={dashboardData?.totalUsers || 0}
               icon={<PersonIcon />}
               color={COLORS.primary}
-              change={12}
-              subtitle="Active this month: 450"
+              subtitle={`New this week: ${dashboardData?.weeklyNewUsers || 0}`}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -412,8 +521,7 @@ export default function AdminDashboard() {
               value={dashboardData?.totalScrims || 0}
               icon={<GamesIcon />}
               color={COLORS.secondary}
-              change={8}
-              subtitle="This week: 234"
+              subtitle={`This week: ${dashboardData?.weeklyNewScrims || 0}`}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -422,7 +530,6 @@ export default function AdminDashboard() {
               value={dashboardData?.activeToday || 0}
               icon={<GroupIcon />}
               color={COLORS.success}
-              change={-5}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -445,11 +552,13 @@ export default function AdminDashboard() {
           {/* User Growth Chart */}
           <Grid item xs={12} md={8}>
             <GlassPanel sx={{ p: 2 }}>
-              <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 2 }}>
                 <Grid item>
-                  <Typography variant="h6">
-                    User Growth
-                  </Typography>
+                  <Typography variant="h6">User Growth</Typography>
                 </Grid>
                 <Grid item>
                   <Grid container spacing={1}>
@@ -457,7 +566,9 @@ export default function AdminDashboard() {
                       <Grid item key={range}>
                         <Button
                           size="small"
-                          variant={userGrowthRange === range ? 'contained' : 'outlined'}
+                          variant={
+                            userGrowthRange === range ? 'contained' : 'outlined'
+                          }
                           onClick={() => setUserGrowthRange(range)}
                           sx={{ minWidth: 40 }}>
                           {range}
@@ -486,8 +597,11 @@ export default function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                   <XAxis dataKey="month" stroke="#999" />
                   <YAxis stroke="#999" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: 'none' }}
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(0,0,0,0.8)',
+                      border: 'none',
+                    }}
                     formatter={(value) => [`${value} users`, 'Total Users']}
                     labelFormatter={(label) => `Period: ${label}`}
                   />
@@ -521,10 +635,16 @@ export default function AdminDashboard() {
                     fill="#8884d8"
                     dataKey="value">
                     {regionDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color || COLORS.primary} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color || COLORS.primary}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <RechartsTooltip
+                    formatter={(value, name) => [`${value}%`, name]}
+                    labelFormatter={() => 'Region Distribution'}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </GlassPanel>
@@ -544,7 +664,7 @@ export default function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                   <XAxis dataKey="day" stroke="#999" />
                   <YAxis stroke="#999" />
-                  <Tooltip />
+                  <RechartsTooltip />
                   <Bar dataKey="scrims" fill={COLORS.secondary} />
                 </BarChart>
               </ResponsiveContainer>
@@ -562,7 +682,7 @@ export default function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                   <XAxis dataKey="rank" stroke="#999" />
                   <YAxis stroke="#999" />
-                  <Tooltip />
+                  <RechartsTooltip />
                   <Bar dataKey="count" fill={COLORS.info} />
                 </BarChart>
               </ResponsiveContainer>
@@ -635,7 +755,7 @@ export default function AdminDashboard() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                   </Pie>
-                  <Tooltip />
+                  <RechartsTooltip />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -802,9 +922,21 @@ export default function AdminDashboard() {
                         </Grid>
                         <Grid item>
                           <Chip
-                            icon={getStatusDisplay(serverStatus.services.database?.status).icon}
-                            label={getStatusDisplay(serverStatus.services.database?.status).label}
-                            color={getStatusDisplay(serverStatus.services.database?.status).color}
+                            icon={
+                              getStatusDisplay(
+                                serverStatus.services.database?.status
+                              ).icon
+                            }
+                            label={
+                              getStatusDisplay(
+                                serverStatus.services.database?.status
+                              ).label
+                            }
+                            color={
+                              getStatusDisplay(
+                                serverStatus.services.database?.status
+                              ).color
+                            }
                             size="small"
                           />
                         </Grid>
@@ -816,18 +948,34 @@ export default function AdminDashboard() {
                         justifyContent="space-between"
                         alignItems="center">
                         <Grid item xs>
-                          <Typography variant="body2">WebSocket Server</Typography>
-                          {serverStatus.services.websocket?.connections !== undefined && (
+                          <Typography variant="body2">
+                            WebSocket Server
+                          </Typography>
+                          {serverStatus.services.websocket?.connections !==
+                            undefined && (
                             <Typography variant="caption" color="textSecondary">
-                              {serverStatus.services.websocket.connections} connections
+                              {serverStatus.services.websocket.connections}{' '}
+                              connections
                             </Typography>
                           )}
                         </Grid>
                         <Grid item>
                           <Chip
-                            icon={getStatusDisplay(serverStatus.services.websocket?.status).icon}
-                            label={getStatusDisplay(serverStatus.services.websocket?.status).label}
-                            color={getStatusDisplay(serverStatus.services.websocket?.status).color}
+                            icon={
+                              getStatusDisplay(
+                                serverStatus.services.websocket?.status
+                              ).icon
+                            }
+                            label={
+                              getStatusDisplay(
+                                serverStatus.services.websocket?.status
+                              ).label
+                            }
+                            color={
+                              getStatusDisplay(
+                                serverStatus.services.websocket?.status
+                              ).color
+                            }
                             size="small"
                           />
                         </Grid>
@@ -843,9 +991,21 @@ export default function AdminDashboard() {
                         </Grid>
                         <Grid item>
                           <Chip
-                            icon={getStatusDisplay(serverStatus.services.riotApi?.status).icon}
-                            label={getStatusDisplay(serverStatus.services.riotApi?.status).label}
-                            color={getStatusDisplay(serverStatus.services.riotApi?.status).color}
+                            icon={
+                              getStatusDisplay(
+                                serverStatus.services.riotApi?.status
+                              ).icon
+                            }
+                            label={
+                              getStatusDisplay(
+                                serverStatus.services.riotApi?.status
+                              ).label
+                            }
+                            color={
+                              getStatusDisplay(
+                                serverStatus.services.riotApi?.status
+                              ).color
+                            }
                             size="small"
                           />
                         </Grid>
@@ -861,9 +1021,21 @@ export default function AdminDashboard() {
                         </Grid>
                         <Grid item>
                           <Chip
-                            icon={getStatusDisplay(serverStatus.services.emailService?.status).icon}
-                            label={getStatusDisplay(serverStatus.services.emailService?.status).label}
-                            color={getStatusDisplay(serverStatus.services.emailService?.status).color}
+                            icon={
+                              getStatusDisplay(
+                                serverStatus.services.emailService?.status
+                              ).icon
+                            }
+                            label={
+                              getStatusDisplay(
+                                serverStatus.services.emailService?.status
+                              ).label
+                            }
+                            color={
+                              getStatusDisplay(
+                                serverStatus.services.emailService?.status
+                              ).color
+                            }
                             size="small"
                           />
                         </Grid>
@@ -872,7 +1044,10 @@ export default function AdminDashboard() {
                   </>
                 ) : (
                   <Grid item>
-                    <Typography variant="body2" color="textSecondary" align="center">
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      align="center">
                       Unable to fetch server status
                     </Typography>
                   </Grid>
