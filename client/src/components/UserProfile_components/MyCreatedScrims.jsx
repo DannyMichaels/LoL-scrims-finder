@@ -67,6 +67,9 @@ export default function MyCreatedScrims({
   }, [sortType, filterType, sortedCreatedScrims]);
 
   if (!isCurrentUser && !isCurrentUserAdmin) return null;
+  
+  // Hide the section if user has no created scrims
+  if (scrims.length <= 0) return null;
 
   return (
     <>
