@@ -1,8 +1,7 @@
 // hooks
 import { useState, useCallback } from 'react';
 import useAuth, { useAuthActions } from '@/features/auth/hooks/useAuth';
-import { makeStyles, useTheme } from '@mui/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { makeStyles } from '@mui/styles';
 import useUsers from '@/features/users/hooks/useUsers';
 import { useDispatch } from 'react-redux';
 
@@ -63,8 +62,6 @@ export default function Navbar({
 
   const classes = useStyles();
 
-  const theme = useTheme();
-
   const { usersLoaded, usersSearchValue } = useUsers();
   const { currentUser } = useAuth();
   const { handleLogin } = useAuthActions();
@@ -77,18 +74,16 @@ export default function Navbar({
   return (
     <>
       <HideOnScroll>
-        <AppBar 
+        <AppBar
           position="sticky"
           sx={{
             background: 'rgba(10, 14, 26, 0.85)',
             backdropFilter: 'blur(20px)',
             borderBottom: '1px solid rgba(33, 150, 243, 0.1)',
-          }}
-        >
-          <Toolbar 
+          }}>
+          <Toolbar
             className={classes.toolbar}
-            sx={{ minHeight: '64px !important' }}
-          >
+            sx={{ minHeight: '64px !important' }}>
             <InnerColumn>
               <Box
                 sx={{
@@ -97,10 +92,15 @@ export default function Navbar({
                   justifyContent: 'space-between',
                   width: '100%',
                   gap: 2,
-                }}
-              >
+                }}>
                 {/* Left Section - Logo & Search */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    flex: 1,
+                  }}>
                   <Link
                     to="/"
                     className="link-2"
@@ -110,9 +110,12 @@ export default function Navbar({
                       gap: '8px',
                       transition: 'transform 0.2s',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                  >
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = 'scale(1.05)')
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = 'scale(1)')
+                    }>
                     <img
                       src="/reluminate-logo.png"
                       style={{
@@ -129,11 +132,11 @@ export default function Navbar({
                           fontWeight: 700,
                           color: '#2196F3',
                           whiteSpace: 'nowrap',
-                          background: 'linear-gradient(135deg, #2196F3, #64B5F6)',
+                          background:
+                            'linear-gradient(135deg, #2196F3, #64B5F6)',
                           WebkitBackgroundClip: 'text',
                           WebkitTextFillColor: 'transparent',
-                        }}
-                      >
+                        }}>
                         RELUMINATE.GG
                       </Typography>
                     </Hidden>
@@ -147,12 +150,10 @@ export default function Navbar({
                         if (usersSearchValue) {
                           dispatch({ type: 'users/setSearch', payload: '' });
                         }
-                      }}
-                    >
+                      }}>
                       <Box
                         onClick={() => setIsSearchOpen(true)}
-                        sx={{ minWidth: 120, maxWidth: 240 }}
-                      >
+                        sx={{ minWidth: 120, maxWidth: 240 }}>
                         <UserSearchBar
                           setIsSearchOpen={setIsSearchOpen}
                           isSearchOpen={isSearchOpen}
@@ -165,15 +166,16 @@ export default function Navbar({
                 {/* Center Section - Controls (when expanded) */}
                 {!showLess && (
                   <Hidden lgDown>
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 1.5,
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      padding: '6px 12px',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                    }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        padding: '6px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                      }}>
                       {showCheckboxes && <NavbarCheckboxes compact />}
                       {showDropdowns && <NavbarDropdowns compact />}
                     </Box>
@@ -196,8 +198,7 @@ export default function Navbar({
                           borderColor: '#2196F3',
                           backgroundColor: 'rgba(33, 150, 243, 0.1)',
                         },
-                      }}
-                    >
+                      }}>
                       <Hidden smDown>Guide</Hidden>
                     </Button>
                   )}
@@ -211,10 +212,10 @@ export default function Navbar({
                       sx={{
                         background: 'linear-gradient(135deg, #2196F3, #1976D2)',
                         '&:hover': {
-                          background: 'linear-gradient(135deg, #64B5F6, #2196F3)',
+                          background:
+                            'linear-gradient(135deg, #64B5F6, #2196F3)',
                         },
-                      }}
-                    >
+                      }}>
                       Log In
                     </Button>
                   )}
@@ -238,8 +239,7 @@ export default function Navbar({
                             '&:hover': {
                               backgroundColor: 'rgba(255, 255, 255, 0.1)',
                             },
-                          }}
-                        >
+                          }}>
                           <MenuIcon />
                         </IconButton>
                       </Tooltip>
