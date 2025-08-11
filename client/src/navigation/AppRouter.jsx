@@ -1,5 +1,6 @@
 import { Switch, Route } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
+import AdminRoute from './AdminRoute';
 
 // screens
 import SignUp from '../screens/SignUp';
@@ -13,11 +14,14 @@ import UserProfile from '../screens/UserProfile';
 import ServerError from '../screens/ServerError';
 import Guide from '../screens/Guide';
 import BanHistory from '../screens/admin_screens/BanHistory';
+import AdminDashboard from '../screens/admin_screens/AdminDashboard';
 
 const AppRouter = () => (
   <Switch>
-    <PrivateRoute exact path="/scrims/new" component={ScrimCreate} />
-    <PrivateRoute exact path="/scrims/:id/edit" component={ScrimEdit} />
+    <AdminRoute exact path="/admin/dashboard" component={AdminDashboard} />
+    <AdminRoute exact path="/scrims/new" component={ScrimCreate} />
+    <AdminRoute exact path="/scrims/:id/edit" component={ScrimEdit} />
+    <AdminRoute exact path={['/bans', '/ban-history']} component={BanHistory} />
     <PrivateRoute exact path="/scrims/:id" component={ScrimDetail} />
     <PrivateRoute exact path="/settings" component={Settings} />
     <PrivateRoute exact path="/users/:name" component={UserProfile} />
@@ -25,11 +29,6 @@ const AppRouter = () => (
     <Route exact path="/server-error" component={ServerError} />
     <PrivateRoute exact path={['/', '/scrims']} component={Scrims} />
     <Route exact path="/guide" component={Guide} />
-    <PrivateRoute
-      exact
-      path={['/bans', 'ban-history']}
-      component={BanHistory}
-    />
 
     <Route component={NotFound} />
   </Switch>

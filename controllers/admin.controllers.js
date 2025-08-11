@@ -1,6 +1,7 @@
 const KEYS = require('../config/keys');
 const User = require('../models/user.model');
 const Ban = require('../models/ban.model');
+const Scrim = require('../models/scrim.model');
 const { unbanUser: utilUnbanUser } = require('../utils/adminUtils');
 const { validateRank } = require('../utils/validators');
 
@@ -188,9 +189,110 @@ const updateUserAsAdmin = async (req, res) => {
   }
 };
 
+// @route   GET /api/admin/dashboard-stats
+// @desc    Get dashboard statistics for admin
+// @access  Admin only
+const getDashboardStats = async (req, res) => {
+  try {
+    // Get basic counts
+    const totalUsers = await User.countDocuments();
+    const totalScrims = await Scrim.countDocuments();
+    
+    // Get detailed ban statistics
+    const currentDate = new Date();
+    
+    // Active bans (not expired)
+    const activeBans = await User.countDocuments({ 
+      'currentBan.isActive': true,
+      'currentBan.dateTo': { $gt: currentDate }
+    });
+    
+    // Expired but not lifted bans
+    const expiredBans = await User.countDocuments({
+      'currentBan.isActive': true,
+      'currentBan.dateTo': { $lte: currentDate }
+    });
+    
+    // Total users with ban history
+    const totalBannedUsers = await User.countDocuments({
+      'bansHistory.0': { $exists: true }
+    });
+    
+    // Get all bans from Ban collection for more detailed stats
+    const allBans = await Ban.countDocuments();
+    const activeBansFromBanModel = await Ban.countDocuments({
+      isActive: true,
+      dateTo: { $gt: currentDate }
+    });
+
+    // Get active users today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Get weekly stats
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    
+    const weeklyNewUsers = await User.countDocuments({
+      createdAt: { $gte: weekAgo }
+    });
+    
+    const weeklyNewScrims = await Scrim.countDocuments({
+      createdAt: { $gte: weekAgo }
+    });
+
+    // Get region distribution
+    const regionDistribution = await User.aggregate([
+      {
+        $group: {
+          _id: '$region',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Get rank distribution  
+    const rankDistribution = await User.aggregate([
+      {
+        $group: {
+          _id: '$rank',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    res.json({
+      totalUsers,
+      totalScrims,
+      banStatistics: {
+        activeBans,
+        expiredBans,
+        totalBannedUsers,
+        totalBans: allBans
+      },
+      weeklyNewUsers,
+      weeklyNewScrims,
+      regionDistribution: regionDistribution.map(r => ({
+        region: r._id,
+        count: r.count
+      })),
+      rankDistribution: rankDistribution.map(r => ({
+        rank: r._id,
+        count: r.count
+      })),
+      lastUpdated: new Date()
+    });
+
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ error: 'Failed to fetch dashboard statistics' });
+  }
+};
+
 module.exports = {
   banUser,
   unbanUser,
   getAllBans,
   updateUserAsAdmin,
+  getDashboardStats,
 };

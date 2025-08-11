@@ -90,7 +90,28 @@ const checkSummonerNameValid = (summonerName) => {
   return format.test(summonerName);
 };
 
+const validateSummonerTagline = (tagline) => {
+  // Tagline should be alphanumeric, typically 3-5 characters
+  // Examples: "NA1", "EUW", "2737", "ABC1"
+  const taglineFormat = /^[A-Za-z0-9]{2,5}$/;
+  return taglineFormat.test(tagline);
+};
+
+const validateDiscordUsername = (discord) => {
+  // New Discord username format: lowercase letters, numbers, underscore, period
+  // Min 2 chars, max 32 chars
+  // Can't start/end with period, no consecutive periods
+  const discordFormat = /^(?!.*\.\.)(?!\.)[a-z0-9_.]{2,32}(?<!\.)$/;
+  
+  // Also allow old format for backwards compatibility (username#0000)
+  const oldDiscordFormat = /^.+#\d{4}$/;
+  
+  return discordFormat.test(discord.toLowerCase()) || oldDiscordFormat.test(discord);
+};
+
 module.exports = {
   validateRank,
   checkSummonerNameValid,
+  validateSummonerTagline,
+  validateDiscordUsername,
 };

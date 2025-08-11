@@ -8,9 +8,15 @@ const LoginInfo = require('./login-info.model').schema;
 const User = new Schema(
   {
     name: {
-      // LoL summoner name
+      // LoL summoner name (without tagline)
       type: String,
       required: true,
+    },
+    summonerTagline: {
+      // Riot tagline (e.g., "NA1", "2737", etc.)
+      type: String,
+      required: false, // Making it optional for backwards compatibility
+      default: '', // Will be set in pre-save hook if not provided
     },
     discord: { type: String, required: true, unique: true },
     rank: {
@@ -86,5 +92,28 @@ const User = new Schema(
   },
   { timestamps: true }
 );
+
+// Pre-save hook to set default tagline based on region if not provided
+User.pre('save', function(next) {
+  if (!this.summonerTagline || this.summonerTagline === '') {
+    // Default taglines based on region
+    const regionTaglines = {
+      'NA': 'NA1',
+      'EUW': 'EUW1',
+      'EUNE': 'EUN1',
+      'LAN': 'LAN1',
+      'OCE': 'OCE1',
+      'BR': 'BR1',
+      'JP': 'JP1',
+      'KR': 'KR',
+      'TR': 'TR1',
+      'RU': 'RU',
+      'LAS': 'LAS1',
+    };
+    
+    this.summonerTagline = regionTaglines[this.region] || `${this.region}1`;
+  }
+  next();
+});
 
 module.exports = mongoose.model('User', User, 'users');

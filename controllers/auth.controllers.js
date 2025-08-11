@@ -5,7 +5,7 @@ const escape = require('escape-html');
 const { REGIONS } = require('../utils/constants');
 const KEYS = require('../config/keys');
 const { unbanUser, banDateExpired } = require('../utils/adminUtils');
-const { validateRank, checkSummonerNameValid } = require('../utils/validators');
+const { validateRank, checkSummonerNameValid, validateSummonerTagline, validateDiscordUsername } = require('../utils/validators');
 const { removeSpacesBeforeHashTag } = require('../utils/discord');
 
 // models
@@ -87,6 +87,7 @@ const loginUser = async (req, res) => {
       adminKey: foundUser.adminKey,
       isAdmin: foundUser.adminKey === KEYS.ADMIN_KEY,
       name: foundUser.name,
+      summonerTagline: foundUser.summonerTagline || '', // Include tagline
       notifications: foundUser.notifications,
       friendRequests: foundUser.friendRequests,
       friends: foundUser.friends,
@@ -129,6 +130,7 @@ const registerUser = async (req, res) => {
     const {
       uid,
       name,
+      summonerTagline,
       discord,
       rank,
       adminKey = '',
@@ -142,6 +144,7 @@ const registerUser = async (req, res) => {
     const userData = {
       uid,
       name: name.trim(),
+      summonerTagline: summonerTagline || '', // Will be set by pre-save hook if empty
       discord: noSpacesDiscord,
       rank,
       adminKey,
@@ -204,6 +207,22 @@ const registerUser = async (req, res) => {
       });
     }
 
+    // Validate tagline if provided
+    if (summonerTagline && summonerTagline !== '') {
+      if (!validateSummonerTagline(summonerTagline)) {
+        return res.status(400).json({
+          error: 'Error: Invalid tagline format. Must be 2-5 alphanumeric characters.',
+        });
+      }
+    }
+
+    // Validate Discord username
+    if (!validateDiscordUsername(noSpacesDiscord)) {
+      return res.status(400).json({
+        error: 'Error: Invalid Discord username format.',
+      });
+    }
+
     const newUser = new User(userData);
 
     const salt = await bcrypt.genSalt(10);
@@ -222,6 +241,7 @@ const registerUser = async (req, res) => {
       canSendEmailsToUser: newUser.canSendEmailsToUser ?? false,
       isAdmin: false,
       name: newUser.name,
+      summonerTagline: newUser.summonerTagline || '', // Include tagline
       notifications: [],
       friendRequests: [],
       friends: [],
@@ -288,6 +308,7 @@ const verifyUser = async (req, res) => {
       adminKey: foundUser.adminKey,
       isAdmin: foundUser.adminKey === KEYS.ADMIN_KEY,
       name: foundUser.name,
+      summonerTagline: foundUser.summonerTagline || '', // Include tagline
       notifications: foundUser.notifications,
       friendRequests: foundUser.friendRequests,
       friends: foundUser.friends,
@@ -370,6 +391,7 @@ const updateUser = async (req, res) => {
       discord: req.body.discord ?? foundUser.discord,
       adminKey: req.body.adminKey ?? foundUser.adminKey,
       name: req.body.name?.trim() ?? foundUser.name,
+      summonerTagline: req.body.summonerTagline ?? foundUser.summonerTagline ?? '', // Include tagline
 
       isAdmin,
 

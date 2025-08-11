@@ -44,6 +44,24 @@ export default function SignUpForms({
         />
       </Grid>
 
+      <Grid item sm={2}>
+        <TextField
+          variant="standard"
+          type="text"
+          name="summonerTagline"
+          value={userData.summonerTagline}
+          onChange={(e) => handleChange(e, setUserData)}
+          onKeyPress={(e) => {
+            // only allow alphanumeric characters
+            if (!/^[0-9a-zA-Z\b]+$/.test(e.key)) e.preventDefault();
+          }}
+          label="Tagline"
+          helperText="e.g. NA1, 2737"
+          inputProps={{ maxLength: 5 }}
+          required
+        />
+      </Grid>
+
       <Grid item sm={2} mb={'2%'}>
         <FormHelperText>Region</FormHelperText>
 
@@ -73,8 +91,8 @@ export default function SignUpForms({
           name="discord"
           value={userData.discord}
           onChange={(e) => handleChange(e, setUserData)}
-          label="Discord (name and #)"
-          helperText="required"
+          label="Discord Username"
+          helperText="e.g. .gitcat or GitCat#0000"
           required
         />
       </Grid>

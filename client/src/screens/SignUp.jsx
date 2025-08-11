@@ -28,7 +28,7 @@ import { registerUser } from '../services/auth.services';
 
 function getSteps() {
   return [
-    'Summoner Name, region and Discord',
+    'Summoner Name, Tagline, Region and Discord',
     'Rank division and / or number',
     'Verification and sign-up',
   ];
@@ -42,6 +42,7 @@ export default function SignUp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userData, setUserData] = useState({
     name: '',
+    summonerTagline: '',
     rank: '',
     region: 'NA',
     discord: '',
@@ -143,6 +144,7 @@ export default function SignUp() {
         let newUser = {
           uid: result.user.uid, // google id
           name: userData.name,
+          summonerTagline: userData.summonerTagline,
           region: userData.region,
           discord: userData.discord,
           canSendEmailsToUser: userData.canSendEmailsToUser,

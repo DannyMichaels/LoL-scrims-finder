@@ -52,7 +52,7 @@ export default function ProfileAccountDetails({
         spacing={1}>
         <Grid item spacing={1} container component="li" alignItems="center">
           <Grid item>
-            <strong>Name:</strong>&nbsp;{user.name}
+            <strong>Name:</strong>&nbsp;{user.name}{user.summonerTagline ? `#${user.summonerTagline}` : ''}
           </Grid>
           <Grid item>
             | <strong>Level:</strong>&nbsp;{userStats.userLevel}

@@ -200,9 +200,9 @@ export default function UserProfile() {
                   target="_blank"
                   rel="noopener noreferrer">
                   {userData?.isDonator ? (
-                    <Sparkles>{userData?.name}</Sparkles>
+                    <Sparkles>{userData?.name}{userData?.summonerTagline ? `#${userData.summonerTagline}` : ''}</Sparkles>
                   ) : (
-                    userData?.name
+                    <>{userData?.name}{userData?.summonerTagline ? `#${userData.summonerTagline}` : ''}</>
                   )}
                 </a>
               </Tooltip>

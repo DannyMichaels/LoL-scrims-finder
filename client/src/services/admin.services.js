@@ -51,3 +51,12 @@ export const updateUserAsAdmin = async (userId, body, setAlert) => {
     return;
   }
 };
+
+export const getAdminDashboardStats = async () => {
+  try {
+    const response = await api.get('/admin/dashboard-stats');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
