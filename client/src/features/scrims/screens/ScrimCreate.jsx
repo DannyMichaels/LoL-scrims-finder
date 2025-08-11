@@ -167,7 +167,7 @@ function ScrimCreate() {
             <Typography
               variant="h1"
               align="center"
-              sx={{ mb: 4, color: '#fff', fontWeight: 'bold' }}>
+              sx={{ mb: 2, color: '#fff', fontWeight: 'bold', fontSize: { xs: '1.8rem', md: '2.5rem' } }}>
               🚀 Create New Scrim
             </Typography>
 
@@ -175,12 +175,12 @@ function ScrimCreate() {
               component="form"
               onSubmit={handleSubmit}
               sx={{ width: '100%', maxWidth: 1200 }}>
-              <Grid container spacing={3}>
+              <Grid container spacing={2}>
                 {/* Basic Information Section */}
                 <Grid item xs={12}>
                   <GlassPanel variant="elevated">
                     <SectionHeader icon="📝">Basic Information</SectionHeader>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} md={6}>
                         <GlassTextField
                           onChange={handleChange}
@@ -268,7 +268,7 @@ function ScrimCreate() {
                 <Grid item xs={12}>
                   <GlassPanel variant="blue">
                     <SectionHeader icon="⏰">Schedule</SectionHeader>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
                         <DatePicker
                           fullWidth
@@ -345,7 +345,7 @@ function ScrimCreate() {
                 <Grid item xs={12}>
                   <GlassPanel variant="default">
                     <SectionHeader icon="⚙️">Game Configuration</SectionHeader>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} sm={4}>
                         <GlassSelect
                           name="region"

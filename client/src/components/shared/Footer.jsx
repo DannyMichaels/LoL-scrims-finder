@@ -13,10 +13,9 @@ const StyledFooter = styled('footer')({
   boxShadow: '0 -2px 20px rgba(0, 0, 0, 0.3)',
   scrollMarginTop: '2em',
   overflow: 'hidden',
-  padding: '20px 0',
+  padding: '10px 0',
   backdropFilter: 'blur(12px)', // Glass effect
   WebkitBackdropFilter: 'blur(12px)', // Safari support
-
   // fixed footer.
   position: 'fixed',
   bottom: '0',
@@ -42,6 +41,7 @@ const Footer = ({ location }) => (
               sx={{
                 color: 'rgba(255, 255, 255, 0.7)',
                 fontWeight: 500,
+                fontSize: '12px',
               }}>
               &copy; {currentYear} Reluminate.gg - Lighting up the rift
             </Typography>
@@ -54,6 +54,7 @@ const Footer = ({ location }) => (
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 fontWeight: 600,
+                fontSize: '12px',
               }}>
               Connecting the League of Legends community, one soul at a time
             </Typography>

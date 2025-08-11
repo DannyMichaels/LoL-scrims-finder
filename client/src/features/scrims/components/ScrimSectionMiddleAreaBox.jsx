@@ -52,6 +52,7 @@ export default function ScrimSectionMiddleAreaBox({
   casterEntered,
   setScrim,
   socket,
+  isBoxExpanded,
 }) {
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
@@ -73,7 +74,8 @@ export default function ScrimSectionMiddleAreaBox({
       !scrim.riotTournament?.tournamentCode &&
       scrim.teamOne.length === 5 &&
       scrim.teamTwo.length === 5 &&
-      scrim.useTournamentCode !== false
+      scrim.useTournamentCode !== false &&
+      !isBoxExpanded // Don't show spinner if box is already expanded
     ) {
       // Game just started, teams are full, waiting for tournament code (only if using tournament mode)
       setIsTransitioning(true);
@@ -91,6 +93,7 @@ export default function ScrimSectionMiddleAreaBox({
     scrim.teamOne.length,
     scrim.teamTwo.length,
     scrim.useTournamentCode,
+    isBoxExpanded,
   ]);
 
   return (

@@ -34,20 +34,16 @@ export default function ScrimSectionExpander({
     );
   }, [scrimBoxRef]);
 
-  const scrollToScrimBox = useCallback((isExpanding) => {
-    if (scrimBoxRef.current) {
-      // Use scrollIntoView for better control
+  const scrollToScrimBox = useCallback((isCollapsing = false) => {
+    if (scrimBoxRef.current && isCollapsing) {
+      // Only scroll when collapsing
       setTimeout(() => {
         scrimBoxRef.current.scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
+          block: 'nearest', // Use 'nearest' to keep it visible without jumping
+          inline: 'nearest'
         });
-        // Add a small offset for the navbar
-        window.scrollBy({
-          top: -100,
-          behavior: 'smooth'
-        });
-      }, 100); // Small delay to ensure DOM updates
+      }, 150); // Small delay to ensure DOM updates after collapse animation
     }
   }, [scrimBoxRef]);
 
@@ -66,7 +62,7 @@ export default function ScrimSectionExpander({
             onClick={() => {
               setIsBoxExpanded(false);
               setIsHover(false);
-              scrollToScrimBox();
+              scrollToScrimBox(true); // Pass true for collapsing
               blinkScrimBox();
             }}>
             <ShowLessIcon className="modal__expandIcon" />

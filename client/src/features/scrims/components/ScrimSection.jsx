@@ -381,6 +381,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
                 playerEntered={playerEntered}
                 casterEntered={casterEntered}
                 socket={socket}
+                isBoxExpanded={isBoxExpanded}
               />
 
               <ScrimTeamList

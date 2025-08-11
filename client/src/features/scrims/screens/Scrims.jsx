@@ -64,8 +64,8 @@ export default function Scrims() {
         <InnerColumn>
           <Box
             sx={{
-              mb: 4,
-              mt: 2,
+              mb: 2,
+              mt: 1,
               textAlign: 'center',
               position: 'relative',
               overflow: 'hidden',
@@ -90,13 +90,13 @@ export default function Scrims() {
               variant="h2"
               sx={{
                 fontWeight: 800,
-                fontSize: { xs: '2rem', md: '3rem' },
+                fontSize: { xs: '1.5rem', md: '2rem' },
                 background:
                   'linear-gradient(135deg, #fff 0%, #64B5F6 50%, #2196F3 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 textShadow: '0 0 40px rgba(33, 150, 243, 0.3)',
-                mb: 1,
+                mb: 0.5,
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
@@ -105,7 +105,7 @@ export default function Scrims() {
               }}>
               <SportsEsportsIcon
                 sx={{
-                  fontSize: { xs: '2rem', md: '3rem' },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
                   color: '#2196F3',
                   filter: 'drop-shadow(0 0 10px rgba(33, 150, 243, 0.5))',
                 }}
@@ -113,7 +113,7 @@ export default function Scrims() {
               Scrims Hub
               <EmojiEventsIcon
                 sx={{
-                  fontSize: { xs: '2rem', md: '3rem' },
+                  fontSize: { xs: '1.5rem', md: '2rem' },
                   color: '#FFD700',
                   filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.5))',
                 }}
@@ -144,8 +144,8 @@ export default function Scrims() {
                 <Box
                   sx={{
                     display: 'flex',
-                    gap: 2,
-                    mb: 3,
+                    gap: 1.5,
+                    mb: 2,
                     flexWrap: 'wrap',
                     justifyContent: 'center',
                   }}>
@@ -170,20 +170,20 @@ export default function Scrims() {
                     },
                   ].map((stat) => {
                     const iconComponents = {
-                      '🔥': <WhatshotIcon sx={{ fontSize: '1.5rem' }} />,
-                      '⏰': <ScheduleIcon sx={{ fontSize: '1.5rem' }} />,
-                      '✅': <CheckCircleIcon sx={{ fontSize: '1.5rem' }} />,
+                      '🔥': <WhatshotIcon sx={{ fontSize: '1.2rem' }} />,
+                      '⏰': <ScheduleIcon sx={{ fontSize: '1.2rem' }} />,
+                      '✅': <CheckCircleIcon sx={{ fontSize: '1.2rem' }} />,
                     };
                     return (
                       <GlassPanel
                         key={stat.label}
                         variant="elevated"
                         sx={{
-                          p: 2,
-                          flex: '1 1 150px',
-                          minWidth: '150px',
+                          p: 1.5,
+                          flex: '1 1 120px',
+                          minWidth: '120px',
                           textAlign: 'center',
-                          borderTop: `3px solid ${stat.color}`,
+                          borderTop: `2px solid ${stat.color}`,
                           transition: 'transform 0.3s, box-shadow 0.3s',
                           '&:hover': {
                             transform: 'translateY(-5px)',
@@ -193,10 +193,10 @@ export default function Scrims() {
                         <Typography
                           variant="h3"
                           sx={{
-                            fontSize: '2rem',
+                            fontSize: '1.5rem',
                             fontWeight: 'bold',
                             color: stat.color,
-                            mb: 0.5,
+                            mb: 0.25,
                           }}>
                           <Box
                             sx={{

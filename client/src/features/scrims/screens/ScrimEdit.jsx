@@ -284,10 +284,58 @@ function ScrimEdit() {
       );
 
       if (updatedScrim) {
-        setCurrentAlert({
-          type: 'Success',
-          message: 'Scrim updated successfully!',
-        });
+        // Check if we need to generate a tournament code
+        // (when enabling tournament code for scrims with full teams where game already started)
+        if (
+          dataSending.useTournamentCode && 
+          !updatedScrim.riotTournament?.tournamentCode &&
+          updatedScrim.teamOne?.length === 5 && 
+          updatedScrim.teamTwo?.length === 5
+        ) {
+          // Check if game has already started
+          const gameStartTime = moment(updatedScrim.gameStartTime);
+          const now = moment();
+          const gameHasStarted = now.isAfter(gameStartTime);
+          
+          if (gameHasStarted) {
+            // For games that have already started with full teams,
+            // we need to wait for the backend to generate the code via WebSocket
+            setCurrentAlert({
+              type: 'Info',
+              message: 'Scrim updated! Tournament code is being generated. Please refresh the page in a few seconds.',
+            });
+            
+            // Force a refresh of the scrim data after a short delay
+            setTimeout(async () => {
+              try {
+                const refreshedScrim = await getScrimById(id);
+                if (refreshedScrim?.riotTournament?.tournamentCode) {
+                  setScrimData((prev) => ({
+                    ...prev,
+                    riotTournament: refreshedScrim.riotTournament,
+                    lobbyName: refreshedScrim.riotTournament.tournamentCode,
+                  }));
+                  setCurrentAlert({
+                    type: 'Success',
+                    message: `Tournament code generated: ${refreshedScrim.riotTournament.tournamentCode}`,
+                  });
+                }
+              } catch (error) {
+                console.error('Error refreshing scrim data:', error);
+              }
+            }, 3000);
+          } else {
+            setCurrentAlert({
+              type: 'Success',
+              message: 'Scrim updated! Tournament code will be generated when the game starts.',
+            });
+          }
+        } else {
+          setCurrentAlert({
+            type: 'Success',
+            message: 'Scrim updated successfully!',
+          });
+        }
         setUpdated(true);
         setIsUpdating(false);
         return;
@@ -398,7 +446,7 @@ function ScrimEdit() {
             <Typography
               variant="h1"
               align="center"
-              sx={{ mb: 4, color: '#fff', fontWeight: 'bold' }}>
+              sx={{ mb: 2, color: '#fff', fontWeight: 'bold', fontSize: { xs: '1.8rem', md: '2.5rem' } }}>
               ⚙️ Edit Scrim
             </Typography>
 
@@ -406,12 +454,12 @@ function ScrimEdit() {
               component="form"
               onSubmit={handleSubmit}
               sx={{ width: '100%', maxWidth: 1200 }}>
-              <Grid container spacing={3}>
+              <Grid container spacing={2}>
                 {/* Date & Time Section */}
                 <Grid item xs={12}>
                   <GlassPanel variant="blue">
                     <SectionHeader icon="⏰">Schedule</SectionHeader>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
                         <DatePicker
                           fullWidth
@@ -488,7 +536,7 @@ function ScrimEdit() {
                 <Grid item xs={12}>
                   <GlassPanel variant="elevated">
                     <SectionHeader icon="📝">Basic Information</SectionHeader>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} md={6}>
                         <GlassTextField
                           onChange={handleChange}
@@ -535,8 +583,25 @@ function ScrimEdit() {
                       control={
                         <Checkbox
                           checked={scrimData.useTournamentCode !== false}
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             const useTournament = e.target.checked;
+                            
+                            // If enabling tournament code and no code exists
+                            if (useTournament && !scrimData.riotTournament?.tournamentCode) {
+                              // Check if teams are full (countdown finished scenario)
+                              const teamsFull = scrimData.teamOne.length === 5 && scrimData.teamTwo.length === 5;
+                              
+                              if (teamsFull) {
+                                // Need to save the scrim first with useTournamentCode: true
+                                // to create tournament data on the backend
+                                setCurrentAlert({
+                                  type: 'Info',
+                                  message: 'Please save the scrim to generate a tournament code for full teams.',
+                                });
+                              }
+                            }
+                            
+                            // Update state
                             setScrimData((prev) => ({
                               ...prev,
                               useTournamentCode: useTournament,
@@ -566,7 +631,11 @@ function ScrimEdit() {
                       variant="body2"
                       sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
                       {scrimData.useTournamentCode !== false
-                        ? '✅ Tournament code will be auto-generated when the game starts with full teams'
+                        ? scrimData.riotTournament?.tournamentCode 
+                          ? '✅ Tournament code is active and ready'
+                          : scrimData.teamOne.length === 5 && scrimData.teamTwo.length === 5
+                            ? '⚠️ Teams are full - save changes to generate tournament code'
+                            : '✅ Tournament code will be auto-generated when the game starts with full teams'
                         : '⚠️ Players will need to manually create a custom lobby using the lobby name and password'}
                     </Typography>
 
@@ -664,7 +733,7 @@ function ScrimEdit() {
                 <Grid item xs={12}>
                   <GlassPanel variant="default">
                     <SectionHeader icon="⚙️">Game Configuration</SectionHeader>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} sm={4}>
                         <GlassSelect
                           name="region"
@@ -743,7 +812,7 @@ function ScrimEdit() {
                     <SectionHeader icon="🏁">
                       Game Results & Settings
                     </SectionHeader>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={2}>
                       <Grid item xs={12} sm={4}>
                         <GlassSelect
                           name="teamWon"
