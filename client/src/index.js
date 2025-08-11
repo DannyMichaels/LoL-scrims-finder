@@ -8,7 +8,6 @@ import reportWebVitals from './reportWebVitals';
 import ReactComment from './components/shared/ReactComment';
 import { creditsComment } from './creditsComment';
 import Favicon from 'react-favicon';
-import Logo from './assets/images/bootcamp_llc_media_kit/coin_logo_new2021shd.png';
 
 //  store
 import { Provider } from 'react-redux';
@@ -20,8 +19,6 @@ const store = configureStore();
 
 ReactDOM.render(
   <>
-    <Favicon url={Logo} />
-
     <Router>
       <Provider store={store}>
         {/* the only way I know to render a comment in react */}
