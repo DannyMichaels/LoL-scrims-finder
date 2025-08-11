@@ -60,3 +60,21 @@ export const getAdminDashboardStats = async () => {
     throw error;
   }
 };
+
+export const liftExpiredBans = async () => {
+  try {
+    const response = await api.post('/admin/lift-expired-bans');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getRecentActivities = async () => {
+  try {
+    const response = await api.get('/admin/recent-activities');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

@@ -3,6 +3,7 @@ const mongooseConnect = require('./db/connection');
 const { MONGODB_URI } = require('./utils/constants');
 const createSocket = require('./socket');
 const scrimScheduler = require('./services/scrimScheduler.services');
+const { initializeCronJobs } = require('./services/cronJobs.services');
 
 const PORT = process.env.PORT || 3000;
 
@@ -27,6 +28,9 @@ connection.once(`open`, async () => {
   
   // Initialize the scrim scheduler after DB connection
   await scrimScheduler.initializeScheduler(io);
+  
+  // Initialize cron jobs for automatic ban management
+  initializeCronJobs();
 });
 
 // Cleanup on server shutdown

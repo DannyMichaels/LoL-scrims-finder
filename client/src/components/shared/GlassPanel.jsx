@@ -13,6 +13,7 @@ const StyledGlassPanel = styled(Paper)(({ theme }) => ({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     border: '1px solid rgba(255, 255, 255, 0.15)',
   },
+  height: '100%',
 }));
 
 export default function GlassPanel({ children, sx, ...props }) {

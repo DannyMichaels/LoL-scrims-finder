@@ -118,7 +118,7 @@ export default function MoreOptionsModal() {
             Icon={BanIcon}
             onClick={() => {
               onClose();
-              history.push('/bans');
+              history.push('/admin/bans');
             }}
           />
         </AdminArea>

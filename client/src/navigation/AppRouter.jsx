@@ -21,7 +21,7 @@ const AppRouter = () => (
     <AdminRoute exact path="/admin/dashboard" component={AdminDashboard} />
     <AdminRoute exact path="/scrims/new" component={ScrimCreate} />
     <AdminRoute exact path="/scrims/:id/edit" component={ScrimEdit} />
-    <AdminRoute exact path={['/bans', '/ban-history']} component={BanHistory} />
+    <AdminRoute exact path={['/admin/bans', '/ban-history']} component={BanHistory} />
     <PrivateRoute exact path="/scrims/:id" component={ScrimDetail} />
     <PrivateRoute exact path="/settings" component={Settings} />
     <PrivateRoute exact path="/users/:name" component={UserProfile} />

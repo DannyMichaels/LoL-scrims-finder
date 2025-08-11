@@ -49,7 +49,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 
 // Services
-import { getAdminDashboardStats } from '../../services/admin.services';
+import {
+  getAdminDashboardStats,
+  liftExpiredBans,
+  getRecentActivities,
+} from '../../services/admin.services';
 
 const COLORS = {
   primary: '#2196F3',
@@ -97,47 +101,118 @@ const StatCard = ({ title, value, icon, color, change, subtitle }) => (
 );
 
 // Recent Activity Table Component
-const RecentActivityTable = ({ activities }) => (
+const RecentActivityTable = ({ activities, history }) => (
   <GlassPanel sx={{ p: 2, height: '100%' }}>
     <Typography variant="h6" gutterBottom>
       Recent Activity
     </Typography>
     <Divider sx={{ my: 2 }} />
     <Grid container direction="column" spacing={2}>
-      {activities?.slice(0, 10).map((activity, index) => (
-        <Grid item key={index}>
-          <Grid container alignItems="center" spacing={2}>
-            <Grid item>
-              <Avatar sx={{ width: 32, height: 32 }}>
-                {activity.type === 'scrim' && <GamesIcon />}
-                {activity.type === 'user' && <PersonIcon />}
-                {activity.type === 'ban' && <BlockIcon />}
-              </Avatar>
-            </Grid>
-            <Grid item xs>
-              <Typography variant="body2">{activity.description}</Typography>
-              <Typography variant="caption" color="textSecondary">
-                {new Date(activity.timestamp).toLocaleString()}
-              </Typography>
-            </Grid>
-            {activity.status && (
-              <Grid item>
-                <Chip
-                  label={activity.status}
-                  size="small"
-                  color={
-                    activity.status === 'active'
-                      ? 'success'
-                      : activity.status === 'pending'
-                      ? 'warning'
-                      : 'default'
-                  }
-                />
+      {activities?.slice(0, 10).map((activity, index) => {
+        const getClickHandler = () => {
+          if (activity.type === 'scrim' && activity.details?.scrimId) {
+            history.push(`/scrim-details/${activity.details.scrimId}`);
+          } else if (activity.type === 'user' && activity.details?.userName) {
+            history.push(
+              `/user-profile/${activity.details.userName}?region=${activity.details.region}`
+            );
+          } else if (
+            activity.type === 'ban' &&
+            activity.details?.userId &&
+            activity.details?.userName
+          ) {
+            history.push(`/user-profile/${activity.details.userName}`);
+          }
+        };
+
+        const getStatusColor = () => {
+          switch (activity.status) {
+            case 'active':
+              return 'success';
+            case 'completed':
+              return 'info';
+            case 'banned':
+              return 'error';
+            case 'lifted':
+              return 'warning';
+            case 'new':
+              return 'primary';
+            default:
+              return 'default';
+          }
+        };
+
+        return (
+          <Grid item key={index}>
+            <Tooltip
+              title={
+                activity.type === 'scrim'
+                  ? `Click to view scrim details`
+                  : activity.type === 'user'
+                  ? `Click to view ${activity.details?.userName}'s profile`
+                  : activity.type === 'ban'
+                  ? `${
+                      activity.details?.reason
+                        ? `Reason: ${activity.details.reason}`
+                        : 'Click to view user'
+                    }`
+                  : ''
+              }>
+              <Grid
+                container
+                alignItems="center"
+                spacing={2}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' },
+                  borderRadius: 1,
+                  p: 0.5,
+                }}
+                onClick={getClickHandler}>
+                <Grid item>
+                  <Avatar
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      bgcolor:
+                        activity.type === 'scrim'
+                          ? COLORS.primary
+                          : activity.type === 'user'
+                          ? COLORS.success
+                          : activity.type === 'ban'
+                          ? COLORS.error
+                          : COLORS.info,
+                    }}>
+                    {activity.type === 'scrim' && <GamesIcon />}
+                    {activity.type === 'user' && <PersonIcon />}
+                    {activity.type === 'ban' && <BlockIcon />}
+                  </Avatar>
+                </Grid>
+                <Grid item xs>
+                  <Typography variant="body2">
+                    {activity.description}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    {new Date(activity.timestamp).toLocaleString()}
+                    {activity.details?.region &&
+                      ` • ${activity.details.region}`}
+                    {activity.details?.rank && ` • ${activity.details.rank}`}
+                  </Typography>
+                </Grid>
+                {activity.status && (
+                  <Grid item>
+                    <Chip
+                      label={activity.status}
+                      size="small"
+                      color={getStatusColor()}
+                    />
+                  </Grid>
+                )}
               </Grid>
-            )}
+            </Tooltip>
           </Grid>
-        </Grid>
-      ))}
+        );
+      })}
     </Grid>
   </GlassPanel>
 );
@@ -148,6 +223,7 @@ export default function AdminDashboard() {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
+  const [recentActivities, setRecentActivities] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -166,8 +242,12 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setRefreshing(true);
-      const data = await getAdminDashboardStats();
-      setDashboardData(data);
+      const [statsData, activitiesData] = await Promise.all([
+        getAdminDashboardStats(),
+        getRecentActivities(),
+      ]);
+      setDashboardData(statsData);
+      setRecentActivities(activitiesData);
     } catch (error) {
       setCurrentAlert({
         type: 'Error',
@@ -294,7 +374,11 @@ export default function AdminDashboard() {
               value={dashboardData?.banStatistics?.activeBans || 0}
               icon={<BlockIcon />}
               color={COLORS.error}
-              subtitle={`Expired: ${dashboardData?.banStatistics?.expiredBans || 0} | Total: ${dashboardData?.banStatistics?.totalBannedUsers || 0}`}
+              subtitle={`Expired: ${
+                dashboardData?.banStatistics?.expiredBans || 0
+              } | Total: ${
+                dashboardData?.banStatistics?.totalBannedUsers || 0
+              }`}
             />
           </Grid>
         </Grid>
@@ -418,24 +502,26 @@ export default function AdminDashboard() {
                 <PieChart>
                   <Pie
                     data={[
-                      { 
-                        name: 'Active Bans', 
+                      {
+                        name: 'Active Bans',
                         value: dashboardData?.banStatistics?.activeBans || 0,
-                        color: COLORS.error 
+                        color: COLORS.error,
                       },
-                      { 
-                        name: 'Expired (Not Lifted)', 
+                      {
+                        name: 'Expired (Not Lifted)',
                         value: dashboardData?.banStatistics?.expiredBans || 0,
-                        color: COLORS.warning 
+                        color: COLORS.warning,
                       },
-                      { 
-                        name: 'Unbanned Users', 
-                        value: (dashboardData?.banStatistics?.totalBannedUsers || 0) - 
-                               (dashboardData?.banStatistics?.activeBans || 0) - 
-                               (dashboardData?.banStatistics?.expiredBans || 0),
-                        color: COLORS.success 
-                      }
-                    ].filter(item => item.value > 0)}
+                      {
+                        name: 'Unbanned Users',
+                        value:
+                          (dashboardData?.banStatistics?.totalBannedUsers ||
+                            0) -
+                          (dashboardData?.banStatistics?.activeBans || 0) -
+                          (dashboardData?.banStatistics?.expiredBans || 0),
+                        color: COLORS.success,
+                      },
+                    ].filter((item) => item.value > 0)}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -444,26 +530,30 @@ export default function AdminDashboard() {
                     fill="#8884d8"
                     dataKey="value">
                     {[
-                      { 
-                        name: 'Active Bans', 
+                      {
+                        name: 'Active Bans',
                         value: dashboardData?.banStatistics?.activeBans || 0,
-                        color: COLORS.error 
+                        color: COLORS.error,
                       },
-                      { 
-                        name: 'Expired (Not Lifted)', 
+                      {
+                        name: 'Expired (Not Lifted)',
                         value: dashboardData?.banStatistics?.expiredBans || 0,
-                        color: COLORS.warning 
+                        color: COLORS.warning,
                       },
-                      { 
-                        name: 'Unbanned Users', 
-                        value: (dashboardData?.banStatistics?.totalBannedUsers || 0) - 
-                               (dashboardData?.banStatistics?.activeBans || 0) - 
-                               (dashboardData?.banStatistics?.expiredBans || 0),
-                        color: COLORS.success 
-                      }
-                    ].filter(item => item.value > 0).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                      {
+                        name: 'Unbanned Users',
+                        value:
+                          (dashboardData?.banStatistics?.totalBannedUsers ||
+                            0) -
+                          (dashboardData?.banStatistics?.activeBans || 0) -
+                          (dashboardData?.banStatistics?.expiredBans || 0),
+                        color: COLORS.success,
+                      },
+                    ]
+                      .filter((item) => item.value > 0)
+                      .map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
                   </Pie>
                   <Tooltip />
                   <Legend />
@@ -471,11 +561,13 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
               <Divider sx={{ my: 2 }} />
               <Typography variant="body2" color="textSecondary">
-                Total Bans in History: {dashboardData?.banStatistics?.totalBans || 0}
+                Total Bans in History:{' '}
+                {dashboardData?.banStatistics?.totalBans || 0}
               </Typography>
               {dashboardData?.banStatistics?.expiredBans > 0 && (
                 <Typography variant="body2" color="warning.main" sx={{ mt: 1 }}>
-                  ⚠️ {dashboardData?.banStatistics?.expiredBans} ban(s) expired but not lifted
+                  ⚠️ {dashboardData?.banStatistics?.expiredBans} ban(s) expired
+                  but not lifted
                 </Typography>
               )}
             </GlassPanel>
@@ -483,7 +575,13 @@ export default function AdminDashboard() {
 
           {/* Quick Ban Actions */}
           <Grid item xs={12} md={8}>
-            <GlassPanel sx={{ p: 2 }}>
+            <GlassPanel
+              sx={{
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
               <Typography variant="h6" gutterBottom>
                 Ban Management
               </Typography>
@@ -496,24 +594,36 @@ export default function AdminDashboard() {
                 </Grid>
                 <Grid item xs={6} md={3}>
                   <Typography variant="body2" color="error.main">
-                    <strong>{dashboardData?.banStatistics?.activeBans || 0}</strong> Active Bans
+                    <strong>
+                      {dashboardData?.banStatistics?.activeBans || 0}
+                    </strong>{' '}
+                    Active Bans
                   </Typography>
                 </Grid>
                 <Grid item xs={6} md={3}>
                   <Typography variant="body2" color="warning.main">
-                    <strong>{dashboardData?.banStatistics?.expiredBans || 0}</strong> Expired (Need Lifting)
+                    <strong>
+                      {dashboardData?.banStatistics?.expiredBans || 0}
+                    </strong>{' '}
+                    Expired (Need Lifting)
                   </Typography>
                 </Grid>
                 <Grid item xs={6} md={3}>
                   <Typography variant="body2" color="success.main">
-                    <strong>{(dashboardData?.banStatistics?.totalBannedUsers || 0) - 
-                            (dashboardData?.banStatistics?.activeBans || 0) - 
-                            (dashboardData?.banStatistics?.expiredBans || 0)}</strong> Lifted
+                    <strong>
+                      {(dashboardData?.banStatistics?.totalBannedUsers || 0) -
+                        (dashboardData?.banStatistics?.activeBans || 0) -
+                        (dashboardData?.banStatistics?.expiredBans || 0)}
+                    </strong>{' '}
+                    Lifted
                   </Typography>
                 </Grid>
                 <Grid item xs={6} md={3}>
                   <Typography variant="body2" color="info.main">
-                    <strong>{dashboardData?.banStatistics?.totalBans || 0}</strong> Total Bans
+                    <strong>
+                      {dashboardData?.banStatistics?.totalBans || 0}
+                    </strong>{' '}
+                    Total Bans
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -531,19 +641,25 @@ export default function AdminDashboard() {
                     color="warning"
                     onClick={async () => {
                       try {
-                        // Call endpoint to lift expired bans
-                        const response = await fetch('/api/admin/lift-expired-bans', {
-                          method: 'POST',
-                          headers: {
-                            'Authorization': localStorage.getItem('token'),
-                            'Content-Type': 'application/json'
-                          }
-                        });
-                        if (response.ok) {
+                        setRefreshing(true);
+                        const response = await liftExpiredBans();
+                        if (response.success) {
+                          setCurrentAlert({
+                            type: 'Success',
+                            message:
+                              response.message ||
+                              'Expired bans have been lifted',
+                          });
                           fetchDashboardData();
                         }
                       } catch (error) {
                         console.error('Failed to lift expired bans:', error);
+                        setCurrentAlert({
+                          type: 'Error',
+                          message: 'Failed to lift expired bans',
+                        });
+                      } finally {
+                        setRefreshing(false);
                       }
                     }}
                     disabled={!dashboardData?.banStatistics?.expiredBans}>
@@ -554,7 +670,7 @@ export default function AdminDashboard() {
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={() => history.push('/admin/ban-history')}>
+                    onClick={() => history.push('/admin/bans')}>
                     View Ban History
                   </Button>
                 </Grid>
@@ -562,7 +678,7 @@ export default function AdminDashboard() {
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={() => history.push('/bans')}>
+                    onClick={() => history.push('/admin/bans')}>
                     Manage Bans
                   </Button>
                 </Grid>
@@ -576,31 +692,8 @@ export default function AdminDashboard() {
           {/* Recent Activity */}
           <Grid item xs={12} md={6}>
             <RecentActivityTable
-              activities={[
-                {
-                  type: 'scrim',
-                  description: 'New scrim created: "High Elo 5v5"',
-                  timestamp: new Date(),
-                  status: 'active',
-                },
-                {
-                  type: 'user',
-                  description: 'New user registered: TestPlayer123',
-                  timestamp: new Date(Date.now() - 3600000),
-                },
-                {
-                  type: 'ban',
-                  description: 'User banned: ToxicPlayer',
-                  timestamp: new Date(Date.now() - 7200000),
-                  status: 'banned',
-                },
-                {
-                  type: 'scrim',
-                  description: 'Scrim completed: "Gold/Plat Custom"',
-                  timestamp: new Date(Date.now() - 10800000),
-                  status: 'completed',
-                },
-              ]}
+              activities={recentActivities}
+              history={history}
             />
           </Grid>
 

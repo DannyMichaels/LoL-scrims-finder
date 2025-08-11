@@ -4,6 +4,7 @@ const Ban = require('../models/ban.model');
 const Scrim = require('../models/scrim.model');
 const { unbanUser: utilUnbanUser } = require('../utils/adminUtils');
 const { validateRank } = require('../utils/validators');
+const { manualLiftExpiredBans } = require('../services/cronJobs.services');
 
 const banUser = async (req, res) => {
   try {
@@ -189,6 +190,124 @@ const updateUserAsAdmin = async (req, res) => {
   }
 };
 
+// @route   GET /api/admin/recent-activities
+// @desc    Get recent activities for admin dashboard
+// @access  Admin only
+const getRecentActivities = async (req, res) => {
+  try {
+    const activities = [];
+    
+    // Get most recent scrims (regardless of time, just get the latest ones)
+    const recentScrims = await Scrim.find({})
+    .populate('createdBy', 'name')
+    .sort({ createdAt: -1 })
+    .limit(5);
+    
+    // Get most recent users
+    const recentUsers = await User.find({})
+    .select('name discord region rank createdAt summonerTagline')
+    .sort({ createdAt: -1 })
+    .limit(5);
+    
+    // Get most recent bans
+    const recentBans = await Ban.find({})
+    .populate('_user', 'name')
+    .populate('_bannedBy', 'name')
+    .sort({ createdAt: -1 })
+    .limit(5);
+    
+    // Get recently completed scrims (scrims that have started)
+    const completedScrims = await Scrim.find({
+      gameStartTime: { $lte: new Date() }
+    })
+    .populate('createdBy', 'name')
+    .sort({ gameStartTime: -1 })
+    .limit(5);
+    
+    // Format activities
+    recentScrims.forEach(scrim => {
+      activities.push({
+        type: 'scrim',
+        action: 'created',
+        description: `New scrim created: "${scrim.title}"`,
+        details: {
+          scrimId: scrim._id,
+          title: scrim.title,
+          createdBy: scrim.createdBy?.name || 'Unknown',
+          region: scrim.region,
+          gameMode: scrim.gameMode
+        },
+        timestamp: scrim.createdAt,
+        status: scrim.isActive ? 'active' : 'inactive'
+      });
+    });
+    
+    recentUsers.forEach(user => {
+      activities.push({
+        type: 'user',
+        action: 'registered',
+        description: `New user registered: ${user.name}`,
+        details: {
+          userId: user._id,
+          userName: user.name,
+          discord: user.discord,
+          region: user.region,
+          rank: user.rank
+        },
+        timestamp: user.createdAt,
+        status: 'new'
+      });
+    });
+    
+    recentBans.forEach(ban => {
+      activities.push({
+        type: 'ban',
+        action: ban.isActive ? 'banned' : 'unbanned',
+        description: `User ${ban.isActive ? 'banned' : 'unbanned'}: ${ban._user?.name || 'Unknown'}`,
+        details: {
+          banId: ban._id,
+          userId: ban._user?._id,
+          userName: ban._user?.name || 'Unknown',
+          bannedBy: ban._bannedBy?.name || 'System',
+          reason: ban.reason,
+          dateFrom: ban.dateFrom,
+          dateTo: ban.dateTo
+        },
+        timestamp: ban.createdAt,
+        status: ban.isActive ? 'banned' : 'lifted'
+      });
+    });
+    
+    completedScrims.forEach(scrim => {
+      if (scrim.gameStartTime < new Date()) {
+        activities.push({
+          type: 'scrim',
+          action: 'completed',
+          description: `Scrim completed: "${scrim.title}"`,
+          details: {
+            scrimId: scrim._id,
+            title: scrim.title,
+            createdBy: scrim.createdBy?.name || 'Unknown',
+            region: scrim.region
+          },
+          timestamp: scrim.gameStartTime,
+          status: 'completed'
+        });
+      }
+    });
+    
+    // Sort all activities by timestamp
+    activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    // Return top 20 most recent activities
+    res.json(activities.slice(0, 20));
+    
+  } catch (error) {
+    console.error('Error fetching recent activities:', error);
+    res.status(500).json({ error: 'Failed to fetch recent activities' });
+  }
+};
+
 // @route   GET /api/admin/dashboard-stats
 // @desc    Get dashboard statistics for admin
 // @access  Admin only
@@ -289,10 +408,45 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+// @route   POST /api/admin/lift-expired-bans
+// @desc    Manually lift all expired bans
+// @access  Admin only
+const liftExpiredBans = async (req, res) => {
+  try {
+    await manualLiftExpiredBans();
+    
+    // Get updated ban statistics
+    const currentDate = new Date();
+    const activeBans = await User.countDocuments({ 
+      'currentBan.isActive': true,
+      'currentBan.dateTo': { $gt: currentDate }
+    });
+    
+    const expiredBans = await User.countDocuments({
+      'currentBan.isActive': true,
+      'currentBan.dateTo': { $lte: currentDate }
+    });
+    
+    res.json({
+      success: true,
+      message: 'Expired bans have been lifted',
+      statistics: {
+        activeBans,
+        expiredBans
+      }
+    });
+  } catch (error) {
+    console.error('Error lifting expired bans:', error);
+    res.status(500).json({ error: 'Failed to lift expired bans' });
+  }
+};
+
 module.exports = {
   banUser,
   unbanUser,
   getAllBans,
   updateUserAsAdmin,
   getDashboardStats,
+  liftExpiredBans,
+  getRecentActivities,
 };
