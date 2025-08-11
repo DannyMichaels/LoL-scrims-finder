@@ -192,12 +192,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     if (casterEntered) {
       setCurrentAlert({
         type: 'Error',
-        message: (
-          <span>
-            cannot join team:&nbsp;
-            <strong>You're already a caster for this game!</strong>
-          </span>
-        ),
+        message: "Cannot join team: You're already a caster for this game!",
       });
       setButtonsDisabled(false);
       return;
@@ -278,12 +273,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     if (playerEntered) {
       setCurrentAlert({
         type: 'Error',
-        message: (
-          <span>
-            cannot join cast:&nbsp;
-            <strong>You're already a player in this game!</strong>
-          </span>
-        ),
+        message: "Cannot join cast: You're already a player in this game!",
       });
       setButtonsDisabled(false);
       return;
