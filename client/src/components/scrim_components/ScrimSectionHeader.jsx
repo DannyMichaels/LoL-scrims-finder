@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
+import Chip from '@mui/material/Chip';
 import AdminArea from './../shared/AdminArea';
 import MessengerButton from './../Messenger_components/MessengerButton';
 import AdminPlayerControls from './AdminPlayerControls';
@@ -26,9 +27,53 @@ import { getTeamBackgroundColor } from '../../utils/scrimMisc';
 import ShareIcon from '@mui/icons-material/Share';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { ROLE_IMAGES } from './../../utils/imageMaps';
+import { FaGlobeEurope, FaGlobeAmericas, FaGlobeAsia } from 'react-icons/fa';
+import { GiEarthAsiaOceania } from 'react-icons/gi';
 
 // services
 import { findScrimConversation } from '../../services/conversations.services';
+
+// Helper function to get region icon and color
+const getRegionConfig = (region) => {
+  const configs = {
+    NA: { icon: FaGlobeAmericas, label: 'North America', color: '#4CAF50' },
+    EUW: { icon: FaGlobeEurope, label: 'Europe West', color: '#2196F3' },
+    EUNE: {
+      icon: FaGlobeEurope,
+      label: 'Europe Nordic & East',
+      color: '#00BCD4',
+    },
+    KR: { icon: FaGlobeAsia, label: 'Korea', color: '#FF5722' },
+    JP: { icon: FaGlobeAsia, label: 'Japan', color: '#E91E63' },
+    OCE: { icon: GiEarthAsiaOceania, label: 'Oceania', color: '#9C27B0' },
+    BR: { icon: FaGlobeAmericas, label: 'Brazil', color: '#FFC107' },
+    LAS: {
+      icon: FaGlobeAmericas,
+      label: 'Latin America South',
+      color: '#FF9800',
+    },
+    LAN: {
+      icon: FaGlobeAmericas,
+      label: 'Latin America North',
+      color: '#FF6B35',
+    },
+    RU: { icon: FaGlobeEurope, label: 'Russia', color: '#673AB7' },
+    TR: { icon: FaGlobeEurope, label: 'Turkey', color: '#F44336' },
+    SG: { icon: FaGlobeAsia, label: 'Singapore', color: '#3F51B5' },
+    TH: { icon: FaGlobeAsia, label: 'Thailand', color: '#009688' },
+    TW: { icon: FaGlobeAsia, label: 'Taiwan', color: '#795548' },
+    VN: { icon: FaGlobeAsia, label: 'Vietnam', color: '#607D8B' },
+    PH: { icon: FaGlobeAsia, label: 'Philippines', color: '#CDDC39' },
+  };
+
+  return (
+    configs[region] || {
+      icon: FaGlobeAmericas,
+      label: region,
+      color: '#9E9E9E',
+    }
+  );
+};
 
 export default function ScrimSectionHeader({
   // props passed from ScrimSection.jsx
@@ -48,6 +93,8 @@ export default function ScrimSectionHeader({
   const classes = useScrimSectionStyles({ isBoxExpanded });
   const history = useHistory();
   const theme = useTheme();
+
+  const regionConfig = getRegionConfig(scrim.region);
   const dispatch = useDispatch();
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
   const showPlayers = useMediaQuery('(min-width:1000px)');
@@ -69,7 +116,7 @@ export default function ScrimSectionHeader({
           conversation,
           isOpen: true,
           scrimId: scrim._id,
-          extraTitle: `${scrim.title} (${scrim.region})`,
+          extraTitle: scrim.title,
         },
       });
       return;
@@ -114,20 +161,50 @@ export default function ScrimSectionHeader({
                 width: 'fit-content',
               }}
               to={`/scrims/${scrim._id}`}>
-              <Typography variant="h1" style={{ fontSize: '1.6rem' }}>
-                {/* if scrim has a title show title, else show createdby.name's scrim */}
-                {`${scrim.title ?? `${scrim.createdBy.name}'s Scrim`} (${
-                  scrim.region
-                })`}
-              </Typography>
-
-              {scrim.isPrivate && (
-                <Typography
-                  variant="h3"
-                  style={{ fontSize: '1.6rem', color: '#999' }}>
-                  &nbsp;private
-                </Typography>
-              )}
+              <Grid container alignItems="center" spacing={1}>
+                <Grid item>
+                  <Typography variant="h1" style={{ fontSize: '1.6rem' }}>
+                    {/* if scrim has a title show title, else show createdby.name's scrim */}
+                    {scrim.title ?? `${scrim.createdBy.name}'s Scrim`}
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Tooltip title={regionConfig.label} arrow placement="top">
+                    <Chip
+                      icon={<regionConfig.icon style={{ fontSize: '1rem' }} />}
+                      label={scrim.region}
+                      size="small"
+                      sx={{
+                        backgroundColor: `${regionConfig.color}20`,
+                        border: `1px solid ${regionConfig.color}60`,
+                        color: '#fff',
+                        fontWeight: 600,
+                        '& .MuiChip-icon': {
+                          color: regionConfig.color,
+                        },
+                        '&:hover': {
+                          backgroundColor: `${regionConfig.color}30`,
+                          border: `1px solid ${regionConfig.color}80`,
+                        },
+                      }}
+                    />
+                  </Tooltip>
+                </Grid>
+                {scrim.isPrivate && (
+                  <Grid item>
+                    <Chip
+                      label="Private"
+                      size="small"
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        color: '#999',
+                        fontWeight: 500,
+                      }}
+                    />
+                  </Grid>
+                )}
+              </Grid>
             </Link>
           </Tooltip>
         </Grid>

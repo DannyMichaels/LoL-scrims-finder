@@ -416,9 +416,22 @@ const updateScrim = async (req, res) => {
       return res.status(404).json({ error: 'Scrim not found' });
     }
 
-    // If game start time was updated, reschedule the Riot tournament initialization
-    if (req.body.gameStartTime && !scrim.riotTournament?.setupCompleted) {
+    // Reschedule tournament initialization if:
+    // 1. Game start time was updated, OR
+    // 2. useTournamentCode was toggled from false to true
+    const wasManualMode = oneScrim.useTournamentCode === false;
+    const nowTournamentMode = scrim.useTournamentCode !== false;
+    const toggledToTournament = wasManualMode && nowTournamentMode;
+    
+    if ((req.body.gameStartTime || toggledToTournament) && !scrim.riotTournament?.setupCompleted) {
       const io = req.app.get('io');
+      
+      // If toggling from manual to tournament mode, clear any existing tournament data
+      if (toggledToTournament) {
+        scrim.riotTournament = null;
+        await scrim.save();
+      }
+      
       scrimScheduler.rescheduleRiotTournament(scrim, io);
     }
 

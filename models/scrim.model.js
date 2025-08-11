@@ -84,6 +84,7 @@ const Scrim = new Schema(
     isPrivate: { type: Boolean, default: false }, // if it's private, only people with share link can see.
     isWithCasters: { type: Boolean, default: false }, // allow players to cast the scrim?
     maxCastersAllowedCount: { type: Number, default: 2, min: 0, max: 2 }, // if the scrim allows casters, how many do we want?
+    useTournamentCode: { type: Boolean, default: true }, // whether to use Riot tournament code or manual lobby
 
     _conversation: {
       // the chat room with all the messages related to the scrim

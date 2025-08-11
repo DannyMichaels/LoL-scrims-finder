@@ -72,9 +72,10 @@ export default function ScrimSectionMiddleAreaBox({
       gameStarted &&
       !scrim.riotTournament?.tournamentCode &&
       scrim.teamOne.length === 5 &&
-      scrim.teamTwo.length === 5
+      scrim.teamTwo.length === 5 &&
+      scrim.useTournamentCode !== false
     ) {
-      // Game just started, teams are full, waiting for tournament code
+      // Game just started, teams are full, waiting for tournament code (only if using tournament mode)
       setIsTransitioning(true);
       // Clear transitioning state after 5 seconds if no tournament code received
       const timeout = setTimeout(() => {
@@ -89,6 +90,7 @@ export default function ScrimSectionMiddleAreaBox({
     scrim.riotTournament?.tournamentCode,
     scrim.teamOne.length,
     scrim.teamTwo.length,
+    scrim.useTournamentCode,
   ]);
 
   return (
@@ -116,8 +118,8 @@ export default function ScrimSectionMiddleAreaBox({
                   {/* show lobby info only to players in lobby or admins */}
                   {playerEntered || casterEntered || isCurrentUserAdmin ? (
                     <>
-                      {/* Show loading state when transitioning */}
-                      {isTransitioning ? (
+                      {/* Show loading state when transitioning - only if using tournament code */}
+                      {isTransitioning && scrim.useTournamentCode !== false ? (
                         <Grid
                           item
                           container
@@ -143,7 +145,8 @@ export default function ScrimSectionMiddleAreaBox({
                             </Typography>
                           </Grid>
                         </Grid>
-                      ) : scrim.riotTournament?.tournamentCode ? (
+                      ) : scrim.useTournamentCode !== false &&
+                        scrim.riotTournament?.tournamentCode ? (
                         <>
                           <Grid item container direction="column" spacing={2}>
                             <Grid
@@ -238,7 +241,7 @@ export default function ScrimSectionMiddleAreaBox({
                             direction="row"
                             alignItems="center">
                             <Typography variant="h2">
-                              Lobby host / captain: {scrim.lobbyHost?.name}
+                              Lobby Captain: {scrim.lobbyHost?.name}
                             </Typography>
                             <Box marginRight={2} />
                             <Tooltip title="The lobby captain must create the custom lobby manually and select who won after the game">
@@ -263,7 +266,7 @@ export default function ScrimSectionMiddleAreaBox({
                           </Typography>
 
                           <Typography variant="h3">
-                            Lobby name: <br />{' '}
+                            Lobby name:{' '}
                             <Tooltip title="Copy lobby name to clipboard">
                               <span
                                 className="link"
@@ -275,7 +278,7 @@ export default function ScrimSectionMiddleAreaBox({
                                     message: 'Lobby name copied to clipboard',
                                   });
                                 }}>
-                                "{scrim.lobbyName}"
+                                {scrim.lobbyName}
                               </span>
                             </Tooltip>
                           </Typography>
@@ -374,20 +377,21 @@ export default function ScrimSectionMiddleAreaBox({
                   */}
               {/* POST GAME IMAGE SECTION */}
               {(scrim.lobbyHost?._id === currentUser?._id ||
-                isCurrentUserAdmin) && !scrim.postGameImage && (
-                <>
-                  {/* disabled for now until we get money for another image hosting solution... */}
-                  <Box marginTop={2} />
+                isCurrentUserAdmin) &&
+                !scrim.postGameImage && (
+                  <>
+                    {/* disabled for now until we get money for another image hosting solution... */}
+                    <Box marginTop={2} />
 
-                  {/* UPLOAD OR DELETE IMAGE */}
-                  <UploadPostGameImage
-                    isUploaded={!!scrim.postGameImage}
-                    scrim={scrim}
-                    socket={socket}
-                    setScrim={setScrim}
-                  />
-                </>
-              )}
+                    {/* UPLOAD OR DELETE IMAGE */}
+                    <UploadPostGameImage
+                      isUploaded={!!scrim.postGameImage}
+                      scrim={scrim}
+                      socket={socket}
+                      setScrim={setScrim}
+                    />
+                  </>
+                )}
               {scrim.postGameImage && (
                 <>
                   {/* View image button for everyone */}

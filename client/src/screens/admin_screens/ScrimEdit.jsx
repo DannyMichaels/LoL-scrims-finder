@@ -24,6 +24,11 @@ import Tooltip from '../../components/shared/Tooltip';
 import Loading from '../../components/shared/Loading';
 import DatePicker from '../../components/shared/DatePicker';
 import TimePicker from '../../components/shared/TimePicker';
+
+// icons
+import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
+import InfoIcon from '@mui/icons-material/Info';
 // Removed LobbyNameFieldOld - using simple TextField instead
 
 // utils
@@ -100,6 +105,7 @@ function ScrimEdit() {
           isWithCasters: oneScrim?.isWithCasters ?? false, // didn't exist in db in older versions
           maxCastersAllowedCount: oneScrim?.maxCastersAllowedCount ?? 2, // didn't exist in db in older versions
           riotTournament: oneScrim?.riotTournament ?? null,
+          useTournamentCode: oneScrim?.useTournamentCode ?? true, // Default to true for backward compatibility
         });
       } catch (error) {
         history.push('/');
@@ -260,6 +266,7 @@ function ScrimEdit() {
         ...scrimData,
         gameStartTime: moment(scrimData.gameStartTime).toISOString(),
         lobbyHost: await getLobbyHost(),
+        lobbyName: scrimData.lobbyName || scrimData.title, // Default to title if lobby name not provided
         // if user selected N//A send null for teamWon, else send the actual value and result to null if undefined
         teamWon:
           scrimData?.teamWon === 'N/A' ? null : scrimData?.teamWon ?? null,
@@ -460,9 +467,18 @@ function ScrimEdit() {
                   </Grid>
 
                   <Grid item>
-                    <FormHelperText className="text-white">
-                      Lobby Password
-                    </FormHelperText>
+                    <Grid container alignItems="center" spacing={1}>
+                      <Grid item>
+                        <FormHelperText className="text-white">
+                          Lobby Password
+                        </FormHelperText>
+                      </Grid>
+                      <Grid item>
+                        <Tooltip title="This password is used for manual lobby creation if tournament code generation fails">
+                          <InfoIcon style={{ fontSize: 16, color: '#999', cursor: 'help' }} />
+                        </Tooltip>
+                      </Grid>
+                    </Grid>
                     <TextField
                       onChange={handleChange}
                       required
@@ -475,74 +491,113 @@ function ScrimEdit() {
                 </Grid>
 
                 <Grid item>
-                  <FormHelperText className="text-white">
-                    {scrimData.riotTournament?.tournamentCode
-                      ? 'Tournament Code'
-                      : 'Lobby Name'}
-                  </FormHelperText>
-                  <Grid container alignItems="flex-end" spacing={1}>
-                    <Grid item>
-                      <TextField
-                        fullWidth
-                        variant="standard"
-                        name="lobbyName"
-                        value={scrimData.lobbyName || ''}
-                        onChange={handleChange}
-                        placeholder={
-                          scrimData.riotTournament?.tournamentCode
-                            ? 'Tournament code'
-                            : 'Enter custom lobby name'
-                        }
-                        required
-                        disabled={!!scrimData.riotTournament?.tournamentCode}
-                        InputProps={{
-                          style: scrimData.riotTournament?.tournamentCode
-                            ? { color: '#2196F3' }
-                            : {},
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={scrimData.useTournamentCode !== false}
+                        onChange={(e) => {
+                          const useTournament = e.target.checked;
+                          setScrimData((prev) => ({
+                            ...prev,
+                            useTournamentCode: useTournament,
+                            // When switching to manual, clear tournament data
+                            // When switching back to tournament, keep existing tournament data if any
+                            riotTournament: useTournament ? prev.riotTournament : null,
+                            // Reset lobbyName appropriately
+                            lobbyName: useTournament 
+                              ? (prev.riotTournament?.tournamentCode || prev.lobbyName || prev.title)
+                              : (prev.lobbyName || prev.title),
+                          }));
                         }}
+                        color="primary"
                       />
-                    </Grid>
-                    {scrimData.riotTournament?.tournamentCode && (
-                      <>
-                        <Grid item>
-                          <Tooltip title="Generate a new tournament code">
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              color="primary"
-                              onClick={handleRegenerateTournamentCode}>
-                              Regenerate
-                            </Button>
-                          </Tooltip>
-                        </Grid>
-                        <Grid item>
-                          <Tooltip title="Clear tournament code to use custom lobby name">
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              color="secondary"
-                              onClick={() => {
-                                setScrimData((prev) => ({
-                                  ...prev,
-                                  lobbyName: '',
-                                  riotTournament: null,
-                                }));
-                              }}>
-                              Clear
-                            </Button>
-                          </Tooltip>
-                        </Grid>
-                      </>
-                    )}
-                  </Grid>
-                  {scrimData.riotTournament?.tournamentCode && (
-                    <FormHelperText
-                      style={{ color: '#2196F3', fontSize: '0.7rem' }}>
-                      Using Riot Tournament Code - Clear to use custom lobby
-                      name
-                    </FormHelperText>
-                  )}
+                    }
+                    label="Use Riot Tournament Code (Auto-generated lobby)"
+                    labelPlacement="end"
+                  />
                 </Grid>
+
+                {/* Only show lobby name field if NOT using tournament code */}
+                {!scrimData.useTournamentCode && (
+                  <Grid item>
+                    <Grid container alignItems="center" spacing={1}>
+                      <Grid item>
+                        <FormHelperText className="text-white">
+                          Lobby Name
+                        </FormHelperText>
+                      </Grid>
+                      <Grid item>
+                        <Tooltip title="Manual lobby name for custom game creation. If empty, defaults to scrim title">
+                          <InfoIcon style={{ fontSize: 16, color: '#999', cursor: 'help' }} />
+                        </Tooltip>
+                      </Grid>
+                    </Grid>
+                    <TextField
+                      fullWidth
+                      variant="standard"
+                      name="lobbyName"
+                      value={scrimData.lobbyName || ''}
+                      onChange={handleChange}
+                      placeholder={`Enter custom lobby name (defaults to "${scrimData.title || 'Scrim Title'}")`}
+                    />
+                  </Grid>
+                )}
+
+                {/* Show tournament code info if using tournament code and code exists */}
+                {scrimData.useTournamentCode && scrimData.riotTournament?.tournamentCode && (
+                  <Grid item>
+                    <Grid container alignItems="center" spacing={1}>
+                      <Grid item>
+                        <FormHelperText className="text-white">
+                          Tournament Code
+                        </FormHelperText>
+                      </Grid>
+                    </Grid>
+                    <Grid container alignItems="flex-end" spacing={1}>
+                      <Grid item style={{ flex: 1 }}>
+                        <TextField
+                          fullWidth
+                          variant="standard"
+                          value={scrimData.riotTournament.tournamentCode}
+                          disabled
+                          InputProps={{
+                            style: { color: '#2196F3' }
+                          }}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <Tooltip title="Generate a new tournament code">
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="primary"
+                            onClick={handleRegenerateTournamentCode}>
+                            Regenerate
+                          </Button>
+                        </Tooltip>
+                      </Grid>
+                      <Grid item>
+                        <Tooltip title="Clear current tournament code">
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="secondary"
+                            onClick={() => {
+                              setScrimData((prev) => ({
+                                ...prev,
+                                riotTournament: null,
+                              }));
+                            }}>
+                            Clear
+                          </Button>
+                        </Tooltip>
+                      </Grid>
+                    </Grid>
+                    <FormHelperText style={{ color: '#2196F3', fontSize: '0.7rem' }}>
+                      Tournament code auto-generated
+                    </FormHelperText>
+                  </Grid>
+                )}
 
                 <Grid
                   item
@@ -732,22 +787,25 @@ function ScrimEdit() {
 
                 <Grid item>
                   <div className="page-break" />
-                  <Grid container spacing={2}>
+                  <Grid container direction="column" spacing={2}>
                     <Grid item>
-                      <Button variant="contained" color="primary" type="submit">
-                        Submit
+                      <Button 
+                        variant="contained" 
+                        color="primary" 
+                        type="submit"
+                        startIcon={<SaveIcon />}
+                        fullWidth
+                        size="large">
+                        Save Changes
                       </Button>
                     </Grid>
                     <Grid item>
                       <Button
                         variant="contained"
-                        sx={{
-                          backgroundColor: 'error.main',
-                          '&:hover': {
-                            backgroundColor: 'error.dark',
-                          },
-                          color: 'white',
-                        }}
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        fullWidth
+                        size="large"
                         onClick={handleDeleteScrim}>
                         Delete Scrim
                       </Button>

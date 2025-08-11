@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import useProfileAccountDetails from '../../hooks/useProfileAccountDetails';
 
 // components
@@ -19,6 +20,7 @@ export default function ProfileAccountDetails({
   userParticipatedScrims,
   stats,
 }) {
+  const history = useHistory();
   const userStats = useProfileAccountDetails(
     userParticipatedScrims,
     user,
@@ -42,6 +44,30 @@ export default function ProfileAccountDetails({
 
   const handleModalClose = () => {
     setOpenModal(null);
+  };
+
+  const handleUserUpdate = (updatedUser, fieldType) => {
+    // Update the user state first
+    setUser((prevState) => ({
+      ...prevState,
+      ...updatedUser,
+    }));
+
+    // If summoner name or tagline was changed, update the URL
+    if (fieldType === 'summonerName' || fieldType === 'tagline') {
+      const newName = updatedUser.name || user.name;
+      const newTagline = updatedUser.summonerTagline || user.summonerTagline;
+      const region = user.region;
+
+      // Build new URL path
+      let newPath = `/users/${encodeURIComponent(newName)}?region=${region}`;
+      if (newTagline) {
+        newPath += `&tagline=${encodeURIComponent(newTagline)}`;
+      }
+
+      // Replace the current URL to update the address bar
+      history.replace(newPath);
+    }
   };
 
   if (!user?._id) return null;
@@ -130,6 +156,38 @@ export default function ProfileAccountDetails({
           </Grid>
         ) : null}
 
+        <Grid item container component="li" alignItems="center" spacing={2}>
+          <Grid item>
+            <strong>Summoner Name:</strong>&nbsp;{user.name}
+          </Grid>
+
+          <AdminArea>
+            <Grid item>
+              <Tooltip title="Edit summoner name">
+                <IconButton size="small" onClick={() => handleModalOpen('summonerName')}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </AdminArea>
+        </Grid>
+
+        <Grid item container component="li" alignItems="center" spacing={2}>
+          <Grid item>
+            <strong>Tagline:</strong>&nbsp;{user.summonerTagline || 'Not set'}
+          </Grid>
+
+          <AdminArea>
+            <Grid item>
+              <Tooltip title="Edit tagline">
+                <IconButton size="small" onClick={() => handleModalOpen('tagline')}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </AdminArea>
+        </Grid>
+
         <Grid item container component="li" alignItems="center">
           <strong>Discord:</strong>&nbsp;{user.discord}
         </Grid>
@@ -145,9 +203,11 @@ export default function ProfileAccountDetails({
 
           <AdminArea>
             <Grid item>
-              <IconButton onClick={() => handleModalOpen('rank')}>
-                <EditIcon />
-              </IconButton>
+              <Tooltip title="Edit rank">
+                <IconButton size="small" onClick={() => handleModalOpen('rank')}>
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </Grid>
           </AdminArea>
         </Grid>
@@ -165,6 +225,29 @@ export default function ProfileAccountDetails({
         onClose={handleModalClose}
         user={user}
         setUser={setUser}
+        onUserUpdate={handleUserUpdate}
+      />
+
+      <EditUserModal
+        modalTitle={`Edit ${user?.name}'s Summoner Name`}
+        isOpen={openModal === 'summonerName'}
+        openModal={openModal}
+        onClose={handleModalClose}
+        user={user}
+        setUser={setUser}
+        fieldToEdit="summonerName"
+        onUserUpdate={handleUserUpdate}
+      />
+
+      <EditUserModal
+        modalTitle={`Edit ${user?.name}'s Tagline`}
+        isOpen={openModal === 'tagline'}
+        openModal={openModal}
+        onClose={handleModalClose}
+        user={user}
+        setUser={setUser}
+        fieldToEdit="tagline"
+        onUserUpdate={handleUserUpdate}
       />
     </>
   );

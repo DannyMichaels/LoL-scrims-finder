@@ -4,6 +4,7 @@ import useAlerts from '../../hooks/useAlerts';
 // components
 import { Modal } from '../shared/ModalComponents';
 import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
 import UserRankFields from '../shared/Form_components/UserRankFields';
 
 // services
@@ -16,6 +17,8 @@ export default function EditUserModal({
   modalTitle,
   user,
   setUser,
+  fieldToEdit,
+  onUserUpdate,
 }) {
   const initialRankDataState = {
     rankDivision: user?.rank?.replace(/[0-9]/g, '').trim(), // match letters, trim spaces.
@@ -23,17 +26,28 @@ export default function EditUserModal({
   };
 
   const [rankData, setRankData] = useState(initialRankDataState);
+  const [summonerName, setSummonerName] = useState(user?.name || '');
+  const [tagline, setTagline] = useState(user?.summonerTagline || '');
 
   const { setCurrentAlert } = useAlerts();
 
   const resetInputs = () => {
     setRankData(initialRankDataState);
+    setSummonerName(user?.name || '');
+    setTagline(user?.summonerTagline || '');
   };
 
   const onSaveClick = async () => {
-    const body = {
-      rank: createRankFromRankData(rankData),
-    };
+    let body = {};
+
+    if (fieldToEdit === 'summonerName') {
+      body.name = summonerName;
+    } else if (fieldToEdit === 'tagline') {
+      body.summonerTagline = tagline;
+    } else {
+      // Default to rank editing for backward compatibility
+      body.rank = createRankFromRankData(rankData);
+    }
 
     const updatedUser = await updateUserAsAdmin(
       user?._id,
@@ -45,6 +59,11 @@ export default function EditUserModal({
       ...prevState,
       ...updatedUser,
     }));
+
+    // Call onUserUpdate callback if provided (for URL updates)
+    if (onUserUpdate && fieldToEdit) {
+      onUserUpdate(updatedUser, fieldToEdit);
+    }
 
     onClose();
   };
@@ -59,13 +78,51 @@ export default function EditUserModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  // Update state when user prop changes
+  useEffect(() => {
+    setSummonerName(user?.name || '');
+    setTagline(user?.summonerTagline || '');
+  }, [user?.name, user?.summonerTagline]);
+
   const renderFieldsJSX = useMemo(() => {
     if (openModal === 'rank') {
       return <UserRankFields rankData={rankData} setRankData={setRankData} />;
     }
+    
+    if (openModal === 'summonerName') {
+      return (
+        <Grid item>
+          <TextField
+            label="Summoner Name"
+            value={summonerName}
+            onChange={(e) => setSummonerName(e.target.value)}
+            fullWidth
+            variant="outlined"
+            placeholder="Enter summoner name"
+            helperText="This will update the user's display name and summoner name"
+          />
+        </Grid>
+      );
+    }
+    
+    if (openModal === 'tagline') {
+      return (
+        <Grid item>
+          <TextField
+            label="Tagline"
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+            fullWidth
+            variant="outlined"
+            placeholder="Enter tagline (e.g., NA1, EUW)"
+            helperText="Riot's new tagline system identifier"
+          />
+        </Grid>
+      );
+    }
 
     return <></>;
-  }, [openModal, rankData, setRankData]);
+  }, [openModal, rankData, setRankData, summonerName, tagline]);
 
   if (!isOpen) return null;
 

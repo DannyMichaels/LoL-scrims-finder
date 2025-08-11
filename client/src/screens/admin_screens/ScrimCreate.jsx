@@ -18,6 +18,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Hidden from '@mui/material/Hidden';
 import Tooltip from '../../components/shared/Tooltip';
+import InfoIcon from '@mui/icons-material/Info';
 import {
   InnerColumn,
   PageContent,
@@ -47,6 +48,7 @@ function ScrimCreate() {
     isWithCasters: false,
     maxCastersAllowedCount: 2,
     lobbyName: '',
+    useTournamentCode: true, // Default to using tournament code
   });
 
   const [createdScrim, setCreatedScrim] = useState(null);
@@ -104,6 +106,7 @@ function ScrimCreate() {
         createdBy: currentUser?._id || currentUser, // Ensure we send the user or user ID
         adminKey: currentUser?.adminKey ?? '', // to verify if is admin (authorize creation).
         lobbyHost: scrimData.lobbyHost === 'random' ? null : currentUser._id,
+        lobbyName: scrimData.lobbyName || scrimData.title, // Default to title if lobby name not provided
         maxCastersAllowedCount: scrimData.isWithCasters
           ? scrimData.maxCastersAllowedCount
           : 0,
@@ -381,18 +384,63 @@ function ScrimCreate() {
                 alignItems="center"
                 sx={{ marginLeft: 'auto', marginRight: 'auto', marginTop: 2 }}
                 xs={12}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    variant="standard"
-                    name="lobbyName"
-                    label="Lobby Name"
-                    value={scrimData.lobbyName || ''}
-                    onChange={handleChange}
-                    placeholder="Enter custom lobby name"
-                    required
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={scrimData.useTournamentCode}
+                        onChange={(e) => {
+                          setScrimData((prev) => ({
+                            ...prev,
+                            useTournamentCode: e.target.checked,
+                          }));
+                        }}
+                        color="primary"
+                      />
+                    }
+                    label="Use Riot Tournament Code (Auto-generated lobby)"
+                    labelPlacement="end"
                   />
+                  <FormHelperText style={{ marginTop: -5 }}>
+                    {scrimData.useTournamentCode
+                      ? 'Tournament code will be auto-generated when the game starts with full teams'
+                      : 'Players will need to manually create a custom lobby using the lobby name and password'}
+                  </FormHelperText>
                 </Grid>
+
+                {/* Only show lobby name field if NOT using tournament code */}
+                {!scrimData.useTournamentCode && (
+                  <Grid item xs={12} sm={6}>
+                    <Grid container alignItems="flex-end" spacing={1}>
+                      <Grid item style={{ flex: 1 }}>
+                        <TextField
+                          fullWidth
+                          variant="standard"
+                          name="lobbyName"
+                          label="Lobby Name (Optional)"
+                          value={scrimData.lobbyName || ''}
+                          onChange={handleChange}
+                          placeholder={`Enter custom lobby name (defaults to "${
+                            scrimData.title || 'Scrim Title'
+                          }")`}
+                          helperText="Leave empty to use scrim title as lobby name"
+                        />
+                      </Grid>
+                      <Grid item>
+                        <Tooltip title="This lobby name is used for manual custom lobby creation. If left empty, it will default to the scrim title">
+                          <InfoIcon
+                            style={{
+                              fontSize: 20,
+                              color: '#999',
+                              cursor: 'help',
+                              marginBottom: 8,
+                            }}
+                          />
+                        </Tooltip>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                )}
               </Grid>
 
               <Grid item>

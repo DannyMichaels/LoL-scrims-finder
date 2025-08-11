@@ -168,6 +168,28 @@ const initializeRiotTournamentForScrim = async (scrimId, io) => {
       return;
     }
 
+    // Check if tournament code is disabled for this scrim
+    if (scrim.useTournamentCode === false) {
+      console.log(`Tournament code disabled for scrim ${scrimId}, using manual lobby`);
+      // Update status to active without generating tournament code
+      scrim.status = 'active';
+      scrim.statusUpdatedAt = new Date();
+      await scrim.save();
+      
+      // Send notifications to all participants
+      await sendScrimStartNotification(scrim, io);
+      
+      // Broadcast to clients that manual lobby should be used
+      if (io) {
+        io.to(`scrim_${scrimId}`).emit('tournamentSkipped', {
+          scrimId,
+          reason: 'Manual lobby mode',
+          message: 'Using manual lobby creation - no tournament code will be generated'
+        });
+      }
+      return;
+    }
+
     // Check if already initialized
     if (scrim.riotTournament?.setupCompleted) {
       console.log(`Tournament already initialized for scrim ${scrimId}`);
