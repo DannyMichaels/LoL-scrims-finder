@@ -34,12 +34,12 @@ const StyledGlassPanel = styled(Paper)(({ theme, variant = 'default' }) => {
   };
 
   return {
-    padding: theme.spacing(2),
+    padding: theme.spacing(1.5),
     backdropFilter: 'blur(10px)',
-    borderRadius: theme.spacing(1.5),
+    borderRadius: theme.spacing(1),
     transition: 'all 0.3s ease',
     height: '100%',
-    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.3)',
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.3)',
     ...variants[variant],
   };
 });

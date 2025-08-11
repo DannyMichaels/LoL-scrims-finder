@@ -7,7 +7,7 @@ import useTimeout from '@/hooks/useTimeout';
 import { useFetchScrims } from '@/features/scrims/hooks/useScrimsZustand';
 
 // this button is used in the navbar to re-fetch the scrims
-export default function RefreshScrimsButton() {
+export default function RefreshScrimsButton({ compact = false }) {
   const { fetchScrims } = useFetchScrims();
 
   const [disabled, setDisabled] = useState(false);
@@ -36,6 +36,27 @@ export default function RefreshScrimsButton() {
     },
     disabled ? disableMS : null
   );
+
+  if (compact) {
+    return (
+      <Tooltip title="Refresh scrims">
+        <IconButton 
+          disabled={disabled} 
+          onClick={handleRefresh}
+          size="small"
+          sx={{
+            p: 0.5,
+            color: disabled ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.7)',
+            '&:hover': {
+              color: disabled ? 'rgba(255, 255, 255, 0.3)' : '#2196F3',
+            },
+          }}
+        >
+          <RefreshIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    );
+  }
 
   return (
     <Tooltip title="Refresh scrims">

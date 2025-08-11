@@ -287,24 +287,25 @@ function ScrimEdit() {
         // Check if we need to generate a tournament code
         // (when enabling tournament code for scrims with full teams where game already started)
         if (
-          dataSending.useTournamentCode && 
+          dataSending.useTournamentCode &&
           !updatedScrim.riotTournament?.tournamentCode &&
-          updatedScrim.teamOne?.length === 5 && 
+          updatedScrim.teamOne?.length === 5 &&
           updatedScrim.teamTwo?.length === 5
         ) {
           // Check if game has already started
           const gameStartTime = moment(updatedScrim.gameStartTime);
           const now = moment();
           const gameHasStarted = now.isAfter(gameStartTime);
-          
+
           if (gameHasStarted) {
             // For games that have already started with full teams,
             // we need to wait for the backend to generate the code via WebSocket
             setCurrentAlert({
               type: 'Info',
-              message: 'Scrim updated! Tournament code is being generated. Please refresh the page in a few seconds.',
+              message:
+                'Scrim updated! Tournament code is being generated. Please refresh the page in a few seconds.',
             });
-            
+
             // Force a refresh of the scrim data after a short delay
             setTimeout(async () => {
               try {
@@ -327,7 +328,8 @@ function ScrimEdit() {
           } else {
             setCurrentAlert({
               type: 'Success',
-              message: 'Scrim updated! Tournament code will be generated when the game starts.',
+              message:
+                'Scrim updated! Tournament code will be generated when the game starts.',
             });
           }
         } else {
@@ -446,7 +448,12 @@ function ScrimEdit() {
             <Typography
               variant="h1"
               align="center"
-              sx={{ mb: 2, color: '#fff', fontWeight: 'bold', fontSize: { xs: '1.8rem', md: '2.5rem' } }}>
+              sx={{
+                mb: 2,
+                color: '#fff',
+                fontWeight: 'bold',
+                fontSize: { xs: '1.8rem', md: '2.5rem' },
+              }}>
               ⚙️ Edit Scrim
             </Typography>
 
@@ -585,22 +592,28 @@ function ScrimEdit() {
                           checked={scrimData.useTournamentCode !== false}
                           onChange={async (e) => {
                             const useTournament = e.target.checked;
-                            
+
                             // If enabling tournament code and no code exists
-                            if (useTournament && !scrimData.riotTournament?.tournamentCode) {
+                            if (
+                              useTournament &&
+                              !scrimData.riotTournament?.tournamentCode
+                            ) {
                               // Check if teams are full (countdown finished scenario)
-                              const teamsFull = scrimData.teamOne.length === 5 && scrimData.teamTwo.length === 5;
-                              
+                              const teamsFull =
+                                scrimData.teamOne.length === 5 &&
+                                scrimData.teamTwo.length === 5;
+
                               if (teamsFull) {
                                 // Need to save the scrim first with useTournamentCode: true
                                 // to create tournament data on the backend
                                 setCurrentAlert({
                                   type: 'Info',
-                                  message: 'Please save the scrim to generate a tournament code for full teams.',
+                                  message:
+                                    'Please save the scrim to generate a tournament code for full teams.',
                                 });
                               }
                             }
-                            
+
                             // Update state
                             setScrimData((prev) => ({
                               ...prev,
@@ -631,11 +644,12 @@ function ScrimEdit() {
                       variant="body2"
                       sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
                       {scrimData.useTournamentCode !== false
-                        ? scrimData.riotTournament?.tournamentCode 
+                        ? scrimData.riotTournament?.tournamentCode
                           ? '✅ Tournament code is active and ready'
-                          : scrimData.teamOne.length === 5 && scrimData.teamTwo.length === 5
-                            ? '⚠️ Teams are full - save changes to generate tournament code'
-                            : '✅ Tournament code will be auto-generated when the game starts with full teams'
+                          : scrimData.teamOne.length === 5 &&
+                            scrimData.teamTwo.length === 5
+                          ? '⚠️ Teams are full - save changes to generate tournament code'
+                          : '✅ Tournament code will be auto-generated when the game starts with full teams'
                         : '⚠️ Players will need to manually create a custom lobby using the lobby name and password'}
                     </Typography>
 

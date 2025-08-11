@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import useScrimStore from '@/features/scrims/stores/scrimStore';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -16,9 +16,10 @@ import Hidden from '@mui/material/Hidden';
 
 // utils
 import DatePicker from './../DatePicker';
+import { getRegionConfig } from '@/constants/scrimIcons';
 
 // the region and date filters
-export default function NavbarDropdowns() {
+export default function NavbarDropdowns({ compact = false }) {
   const { currentUser } = useSelector(({ auth }) => auth);
   const { scrimsDate, scrimsRegion, setScrimsDate, setScrimsRegion } =
     useScrimStore();
@@ -27,42 +28,94 @@ export default function NavbarDropdowns() {
 
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
-  let allRegions = ['NA', 'EUW', 'EUNE', 'LAN', 'OCE'];
-
-  let selectRegions = [
-    currentUser?.region,
-    ...allRegions.filter((r) => r !== currentUser?.region),
-  ];
+  const selectRegions = getRegionConfig(currentUser?.region);
 
   const onSelectRegion = (e) => {
     const region = e.target.value;
     setScrimsRegion(region);
   };
 
-  const debounceTimeoutRef = useRef(null);
+  const onSelectDate = (newDateValue) => {
+    // Only update if the date is valid and complete (MM/DD/YYYY format)
+    if (newDateValue && newDateValue.isValid && newDateValue.isValid()) {
+      setScrimsDate(newDateValue);
+    }
+  };
 
-  const onSelectDate = useCallback(
-    (newDateValue) => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-      
-      debounceTimeoutRef.current = setTimeout(() => {
-        setScrimsDate(newDateValue);
-      }, 300);
-    },
+  if (compact) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        <DatePicker
+          label="Date"
+          name="scrimsDate"
+          size="small"
+          variant="outlined"
+          value={moment(scrimsDate)}
+          onChange={onSelectDate}
+          slotProps={{
+            textField: {
+              size: 'small',
+              InputLabelProps: {
+                shrink: true,
+                style: { color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.75rem' },
+              },
+              sx: {
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',
+                  fontSize: '0.8rem',
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderRadius: '6px',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(33, 150, 243, 0.5)',
+                  },
+                },
+                '& .MuiInputBase-input': {
+                  color: '#fff',
+                  padding: '8px 12px',
+                },
+              },
+            },
+          }}
+        />
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
-
-  useEffect(() => {
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-    };
-  }, []);
+        <Select
+          variant="outlined"
+          value={scrimsRegion}
+          size="small"
+          onChange={onSelectRegion}
+          sx={{
+            minWidth: '70px',
+            height: '36px',
+            fontSize: '0.8rem',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: '6px',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(33, 150, 243, 0.5)',
+            },
+            '& .MuiSelect-select': {
+              color: '#fff',
+              padding: '8px 12px',
+            },
+            '& .MuiSelect-icon': {
+              color: 'rgba(255, 255, 255, 0.7)',
+            },
+          }}
+        >
+          {selectRegions.map((region, key) => (
+            <MenuItem value={region} key={key}>
+              {region}
+            </MenuItem>
+          ))}
+        </Select>
+      </Box>
+    );
+  }
 
   return (
     <Grid

@@ -35,12 +35,18 @@ import MenuIcon from '@mui/icons-material/Menu'; // burger icon
 import SchoolIcon from '@mui/icons-material/School';
 
 const useStyles = makeStyles((theme) => ({
-  offset: theme.mixins.offset,
-  toolbarDistance: theme.mixins.toolbar,
+  offset: {
+    ...theme.mixins.toolbar,
+    minHeight: '48px',
+  },
+  toolbarDistance: {
+    minHeight: '20px',
+  },
 
   toolbar: {
-    paddingTop: '30px',
-    paddingBottom: '20px',
+    paddingTop: '8px',
+    paddingBottom: '8px',
+    minHeight: '48px !important',
   },
 }));
 
@@ -73,193 +79,176 @@ export default function Navbar({
   return (
     <>
       <HideOnScroll>
-        <AppBar position="sticky">
-          <Toolbar className={classes.toolbar}>
+        <AppBar 
+          position="sticky"
+          sx={{
+            background: 'rgba(10, 14, 26, 0.85)',
+            backdropFilter: 'blur(20px)',
+            borderBottom: '1px solid rgba(33, 150, 243, 0.1)',
+          }}
+        >
+          <Toolbar 
+            className={classes.toolbar}
+            sx={{ minHeight: '64px !important' }}
+          >
             <InnerColumn>
-              <Grid
-                container
-                direction="column"
-                spacing={4}
-                alignItems="center">
-                <Grid
-                  item
-                  container
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="space-between">
-                  <Grid
-                    item
-                    container
-                    direction="row"
-                    alignItems="center"
-                    xs={6}
-                    sm={6}>
-                    <Grid
-                      item
-                      container
-                      alignItems="center"
-                      flexWrap="nowrap"
-                      spacing={1}>
-                      <Grid item>
-                        <Link
-                          to="/"
-                          className="link-2"
-                          style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <img
-                            src="/reluminate-logo.png"
-                            style={{
-                              width: '100%',
-                              maxWidth: '48px',
-                              minWidth: '32px',
-                              height: 'auto',
-                            }}
-                            alt="Reluminate.gg Logo"
-                          />
-                          <Hidden mdDown>
-                            <Typography
-                              component="h1"
-                              variant={matchesSm ? 'h3' : 'h1'}
-                              style={{
-                                fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
-                                fontWeight: 700,
-                                color: theme.palette.primary.main,
-                                transition: 'all 200ms ease-in-out',
-                                opacity: isSearchOpen ? '0' : '1',
-                                width: isSearchOpen ? '0' : 'auto',
-                                whiteSpace: 'nowrap',
-                              }}>
-                              RELUMINATE.GG
-                            </Typography>
-                          </Hidden>
-                        </Link>
-                      </Grid>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  gap: 2,
+                }}
+              >
+                {/* Left Section - Logo & Search */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
+                  <Link
+                    to="/"
+                    className="link-2"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'transform 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <img
+                      src="/reluminate-logo.png"
+                      style={{
+                        width: '36px',
+                        height: 'auto',
+                      }}
+                      alt="Reluminate.gg"
+                    />
+                    <Hidden mdDown>
+                      <Typography
+                        component="h1"
+                        sx={{
+                          fontSize: '1.3rem',
+                          fontWeight: 700,
+                          color: '#2196F3',
+                          whiteSpace: 'nowrap',
+                          background: 'linear-gradient(135deg, #2196F3, #64B5F6)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        RELUMINATE.GG
+                      </Typography>
+                    </Hidden>
+                  </Link>
 
-                      <Grid
-                        item
-                        container
-                        alignItems="center"
-                        flexWrap="nowrap">
-
-                        <ClickAwayListener
-                          onClickAway={() => {
-                            if (isSearchOpen) {
-                              setIsSearchOpen(false);
-                            }
-
-                            if (usersSearchValue) {
-                              dispatch({
-                                type: 'users/setSearch',
-                                payload: '',
-                              });
-                            }
-                          }}>
-                          <Box
-                            onClick={() => setIsSearchOpen(true)}
-                            marginLeft={2}
-                            style={{ transition: 'all 250ms ease-in-out' }}
-                            sx={{
-                              minWidth: 140,
-                              maxWidth: 300,
-                            }}>
-                            {usersLoaded && currentUser?.uid && (
-                              <UserSearchBar
-                                setIsSearchOpen={setIsSearchOpen}
-                                isSearchOpen={isSearchOpen}
-                              />
-                            )}
-                          </Box>
-                        </ClickAwayListener>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  <Grid
-                    item
-                    container
-                    xs={6}
-                    alignItems="center"
-                    spacing={2}
-                    direction="row"
-                    justifyContent="flex-end">
-                    {!currentUser?.uid && !noGuide && (
-                      <Grid item>
-                        <Tooltip title="Reluminate.gg Guide">
-                          <Button
-                            component={Link}
-                            to="/guide"
-                            variant="contained"
-                            startIcon={<SchoolIcon />}
-                            color="primary">
-                            Guide
-                          </Button>
-                        </Tooltip>
-                      </Grid>
-                    )}
-
-                    {/* if no user, show log in button */}
-                    {!currentUser?.uid && !noLogin && (
-                      <Grid item>
-                        <Button
-                          onClick={handleLogin}
-                          variant="contained"
-                          startIcon={<KeyIcon />}
-                          color="primary">
-                          Log In
-                        </Button>
-                      </Grid>
-                    )}
-
-                    {currentUser?.uid && (
-                      <Grid item style={{ marginTop: '6px' }}>
-                        {/* the MessangerButton component contains the button and the dropdown menu */}
-                        <MessengerButton
-                          isMessengerDropdownOpen={isMessengerDropdownOpen}
-                          setIsMessengerDropdownOpen={
-                            setIsMessengerDropdownOpen
-                          }
-                          isScrim={false}
-                          onClick={openMessengerDropdown}
+                  {/* Search Bar */}
+                  {usersLoaded && currentUser?.uid && (
+                    <ClickAwayListener
+                      onClickAway={() => {
+                        if (isSearchOpen) setIsSearchOpen(false);
+                        if (usersSearchValue) {
+                          dispatch({ type: 'users/setSearch', payload: '' });
+                        }
+                      }}
+                    >
+                      <Box
+                        onClick={() => setIsSearchOpen(true)}
+                        sx={{ minWidth: 120, maxWidth: 240 }}
+                      >
+                        <UserSearchBar
+                          setIsSearchOpen={setIsSearchOpen}
+                          isSearchOpen={isSearchOpen}
                         />
-                      </Grid>
-                    )}
+                      </Box>
+                    </ClickAwayListener>
+                  )}
+                </Box>
 
-                    {currentUser?.uid && <NotificationsButton />}
-
-                    {/* BURGER ICON */}
-                    {currentUser?.uid && (
-                      <Grid item>
-                        <Tooltip title="More options" placement="top">
-                          <IconButton
-                            // prevent active class from staying on button after clicking (was noticeable when pressing escape)
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => setIsDrawerOpen(true)}>
-                            <MenuIcon fontSize="large" />
-                          </IconButton>
-                        </Tooltip>
-                      </Grid>
-                    )}
-                  </Grid>
-                </Grid>
-                <br />
-
-                {/* checkboxes for hide/show scrims, repeating in drawer, need separate component */}
+                {/* Center Section - Controls (when expanded) */}
                 {!showLess && (
                   <Hidden lgDown>
-                    <Grid
-                      container
-                      alignItems="center"
-                      direction="row"
-                      justifyContent="space-between"
-                      item
-                      xs={12}>
-                      {showCheckboxes && <NavbarCheckboxes xs={7} />}
-
-                      {/* date filter and region filter */}
-                      {showDropdowns && <NavbarDropdowns />}
-                    </Grid>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 1.5,
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                    }}>
+                      {showCheckboxes && <NavbarCheckboxes compact />}
+                      {showDropdowns && <NavbarDropdowns compact />}
+                    </Box>
                   </Hidden>
                 )}
-              </Grid>
+
+                {/* Right Section - User Actions */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {!currentUser?.uid && !noGuide && (
+                    <Button
+                      component={Link}
+                      to="/guide"
+                      variant="outlined"
+                      size="small"
+                      startIcon={<SchoolIcon />}
+                      sx={{
+                        borderColor: 'rgba(33, 150, 243, 0.3)',
+                        color: '#2196F3',
+                        '&:hover': {
+                          borderColor: '#2196F3',
+                          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        },
+                      }}
+                    >
+                      <Hidden smDown>Guide</Hidden>
+                    </Button>
+                  )}
+
+                  {!currentUser?.uid && !noLogin && (
+                    <Button
+                      onClick={handleLogin}
+                      variant="contained"
+                      size="small"
+                      startIcon={<KeyIcon />}
+                      sx={{
+                        background: 'linear-gradient(135deg, #2196F3, #1976D2)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #64B5F6, #2196F3)',
+                        },
+                      }}
+                    >
+                      Log In
+                    </Button>
+                  )}
+
+                  {currentUser?.uid && (
+                    <>
+                      <MessengerButton
+                        isMessengerDropdownOpen={isMessengerDropdownOpen}
+                        setIsMessengerDropdownOpen={setIsMessengerDropdownOpen}
+                        isScrim={false}
+                        onClick={openMessengerDropdown}
+                      />
+                      <NotificationsButton />
+                      <Tooltip title="More options">
+                        <IconButton
+                          size="small"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setIsDrawerOpen(true)}
+                          sx={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            },
+                          }}
+                        >
+                          <MenuIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </>
+                  )}
+                </Box>
+              </Box>
             </InnerColumn>
           </Toolbar>
         </AppBar>

@@ -22,10 +22,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import WhatshotIcon from '@mui/icons-material/Whatshot';
-import ScheduleIcon from '@mui/icons-material/Schedule';
 import HistoryIcon from '@mui/icons-material/History';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import { SCRIM_TYPES, getScrimIcon } from '@/constants/scrimIcons';
 
 export default function Scrims() {
   const {
@@ -57,7 +57,6 @@ export default function Scrims() {
         showDropdowns
         showCheckboxes
       />
-      <div className="page-break" />
 
       <PageContent>
         {/* Welcome Header */}
@@ -89,19 +88,19 @@ export default function Scrims() {
             <Typography
               variant="h2"
               sx={{
-                fontWeight: 800,
-                fontSize: { xs: '1.5rem', md: '2rem' },
+                fontWeight: 700,
+                fontSize: { xs: '1.2rem', md: '1.5rem' },
                 background:
                   'linear-gradient(135deg, #fff 0%, #64B5F6 50%, #2196F3 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                textShadow: '0 0 40px rgba(33, 150, 243, 0.3)',
-                mb: 0.5,
+                textShadow: '0 0 30px rgba(33, 150, 243, 0.3)',
+                mb: 0.25,
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 2,
+                gap: 1,
               }}>
               <SportsEsportsIcon
                 sx={{
@@ -153,50 +152,44 @@ export default function Scrims() {
                     {
                       label: 'Playing Now',
                       value: currentScrims.length,
-                      color: '#4CAF50',
-                      icon: '🔥',
+                      type: SCRIM_TYPES.CURRENT,
                     },
                     {
                       label: 'Upcoming',
                       value: upcomingScrims.length,
-                      color: '#2196F3',
-                      icon: '⏰',
+                      type: SCRIM_TYPES.UPCOMING,
                     },
                     {
                       label: 'Completed',
                       value: previousScrims.length,
-                      color: '#9E9E9E',
-                      icon: '✅',
+                      type: SCRIM_TYPES.PREVIOUS,
                     },
                   ].map((stat) => {
-                    const iconComponents = {
-                      '🔥': <WhatshotIcon sx={{ fontSize: '1.2rem' }} />,
-                      '⏰': <ScheduleIcon sx={{ fontSize: '1.2rem' }} />,
-                      '✅': <CheckCircleIcon sx={{ fontSize: '1.2rem' }} />,
-                    };
+                    const iconConfig = getScrimIcon(stat.type);
+                    const IconComponent = iconConfig.icon;
                     return (
                       <GlassPanel
                         key={stat.label}
                         variant="elevated"
                         sx={{
-                          p: 1.5,
-                          flex: '1 1 120px',
-                          minWidth: '120px',
+                          p: 1,
+                          flex: '1 1 100px',
+                          minWidth: '100px',
                           textAlign: 'center',
-                          borderTop: `2px solid ${stat.color}`,
+                          borderTop: `2px solid ${iconConfig.color}`,
                           transition: 'transform 0.3s, box-shadow 0.3s',
                           '&:hover': {
                             transform: 'translateY(-5px)',
-                            boxShadow: `0 10px 30px ${stat.color}40`,
+                            boxShadow: `0 10px 30px ${iconConfig.color}40`,
                           },
                         }}>
                         <Typography
                           variant="h3"
                           sx={{
-                            fontSize: '1.5rem',
+                            fontSize: '1.2rem',
                             fontWeight: 'bold',
-                            color: stat.color,
-                            mb: 0.25,
+                            color: iconConfig.color,
+                            mb: 0,
                           }}>
                           <Box
                             sx={{
@@ -205,7 +198,7 @@ export default function Scrims() {
                               justifyContent: 'center',
                               gap: 1,
                             }}>
-                            {iconComponents[stat.icon]}
+                            <IconComponent sx={{ fontSize: '1.2rem' }} />
                             <span>{stat.value}</span>
                           </Box>
                         </Typography>
@@ -224,7 +217,7 @@ export default function Scrims() {
               {currentScrims.length > 0 ? (
                 <ScrimsColumn
                   headerText="Current Scrims"
-                  headerIcon={<WhatshotIcon sx={{ color: '#ff6b35' }} />}
+                  headerIcon={<WhatshotIcon sx={{ color: getScrimIcon(SCRIM_TYPES.CURRENT).color }} />}
                   scrims={currentScrims}
                   show={showCurrentScrims}
                 />
@@ -235,7 +228,7 @@ export default function Scrims() {
               {/* UPCOMING SCRIMS */}
               <ScrimsColumn
                 headerText="Upcoming Scrims"
-                headerIcon={<ScheduleIcon sx={{ color: '#2196F3' }} />}
+                headerIcon={<ScheduleIcon sx={{ color: getScrimIcon(SCRIM_TYPES.UPCOMING).color }} />}
                 altText="No upcoming scrims"
                 scrims={upcomingScrims}
                 show={showUpcomingScrims}
@@ -247,7 +240,7 @@ export default function Scrims() {
                 <ScrimsColumn
                   scrims={previousScrims}
                   headerText="Previous Scrims"
-                  headerIcon={<HistoryIcon sx={{ color: '#9E9E9E' }} />}
+                  headerIcon={<HistoryIcon sx={{ color: getScrimIcon(SCRIM_TYPES.PREVIOUS).color }} />}
                   show={showPreviousScrims}
                 />
               ) : null}

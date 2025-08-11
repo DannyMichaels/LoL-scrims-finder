@@ -205,7 +205,7 @@ export default function UserSearchBar({ isSearchOpen }) {
           className="nav__search-input"
           onChange={handleChange}
           value={userInput || ''}
-          placeholder="Search users (e.g. GitCat or GitCat#NA1)"
+          placeholder="Search users"
           endAdornment={
             <InputAdornment position="end">
               {userInput ? (

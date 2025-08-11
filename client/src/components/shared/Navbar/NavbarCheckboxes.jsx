@@ -6,15 +6,18 @@ import moment from 'moment';
 
 // components
 import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
 import Tooltip from '@/components/shared/Tooltip';
 import RefreshScrimsButton from '@/features/scrims/components/RefreshScrimsButton';
+import { SCRIM_TYPES, getScrimIconByFilter } from '@/constants/scrimIcons';
 
 /* Show scrims (current, previous, upcoming) buttons */
 
-export default function NavbarCheckboxes() {
+export default function NavbarCheckboxes({ compact = false }) {
   const theme = useTheme();
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
@@ -60,6 +63,87 @@ export default function NavbarCheckboxes() {
       setShowUpcomingScrims(checked);
     }
   };
+
+  if (compact) {
+    const checkboxConfigs = [
+      {
+        filterName: 'showPreviousScrims',
+        checked: showPreviousScrims,
+        disabled: false,
+        tooltipActive: 'Hide previous scrims',
+        tooltipInactive: 'Show previous scrims',
+      },
+      {
+        filterName: 'showUpcomingScrims', 
+        checked: showUpcomingScrims,
+        disabled: isPastDate,
+        tooltipActive: 'Hide upcoming scrims',
+        tooltipInactive: 'Show upcoming scrims',
+        tooltipDisabled: 'No upcoming scrims for past dates',
+      },
+      {
+        filterName: 'showCurrentScrims',
+        checked: showCurrentScrims,
+        disabled: false, 
+        tooltipActive: 'Hide current scrims',
+        tooltipInactive: 'Show current scrims',
+      },
+    ];
+
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <RefreshScrimsButton compact />
+        
+        {checkboxConfigs.map((config) => {
+          const iconConfig = getScrimIconByFilter(config.filterName);
+          if (!iconConfig) return null;
+          
+          const IconComponent = iconConfig.icon;
+          const isActive = config.checked;
+          
+          const tooltipTitle = config.disabled 
+            ? config.tooltipDisabled
+            : isActive 
+              ? config.tooltipActive 
+              : config.tooltipInactive;
+
+          return (
+            <Tooltip key={config.filterName} title={tooltipTitle}>
+              <IconButton
+                size="small"
+                disabled={config.disabled}
+                onClick={(e) => toggleShowScrims({
+                  target: {
+                    name: config.filterName, 
+                    checked: !config.checked
+                  }
+                })}
+                sx={{
+                  p: 0.5,
+                  color: isActive ? iconConfig.color : 'rgba(255, 255, 255, 0.4)',
+                  backgroundColor: isActive ? iconConfig.backgroundColor : 'transparent',
+                  '&:hover': {
+                    color: isActive ? iconConfig.colorHover : 'rgba(255, 255, 255, 0.6)',
+                    backgroundColor: isActive 
+                      ? iconConfig.backgroundColorHover 
+                      : 'rgba(255, 255, 255, 0.05)',
+                  },
+                  '&.Mui-disabled': {
+                    color: 'rgba(255, 255, 255, 0.2)',
+                    backgroundColor: 'transparent',
+                  },
+                  transition: 'all 0.2s ease',
+                  opacity: config.disabled ? 0.3 : 1,
+                }}
+              >
+                <IconComponent fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          );
+        })}
+      </Box>
+    );
+  }
 
   return (
     <Grid

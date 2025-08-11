@@ -7,18 +7,18 @@ export default function SectionHeader({ icon, children, sx, ...props }) {
     <Typography 
       variant="h2" 
       sx={{ 
-        mb: 3, 
+        mb: 2, 
         color: '#fff', 
         display: 'flex', 
         alignItems: 'center', 
-        gap: 1,
+        gap: 0.75,
         fontWeight: 600,
-        fontSize: '1.5rem',
+        fontSize: '1.2rem',
         ...sx 
       }} 
       {...props}
     >
-      {icon && <Box component="span" sx={{ fontSize: '1.2em' }}>{icon}</Box>}
+      {icon && <Box component="span" sx={{ fontSize: '1.1em' }}>{icon}</Box>}
       {children}
     </Typography>
   );
