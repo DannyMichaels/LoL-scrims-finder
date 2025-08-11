@@ -78,3 +78,12 @@ export const getRecentActivities = async () => {
     throw error;
   }
 };
+
+export const getServerStatus = async () => {
+  try {
+    const response = await api.get('/admin/server-status');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

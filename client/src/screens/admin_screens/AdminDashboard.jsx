@@ -53,6 +53,7 @@ import {
   getAdminDashboardStats,
   liftExpiredBans,
   getRecentActivities,
+  getServerStatus,
 } from '../../services/admin.services';
 
 const COLORS = {
@@ -101,121 +102,133 @@ const StatCard = ({ title, value, icon, color, change, subtitle }) => (
 );
 
 // Recent Activity Table Component
-const RecentActivityTable = ({ activities, history }) => (
-  <GlassPanel sx={{ p: 2, height: '100%' }}>
-    <Typography variant="h6" gutterBottom>
-      Recent Activity
-    </Typography>
-    <Divider sx={{ my: 2 }} />
-    <Grid container direction="column" spacing={2}>
-      {activities?.slice(0, 10).map((activity, index) => {
-        const getClickHandler = () => {
-          if (activity.type === 'scrim' && activity.details?.scrimId) {
-            history.push(`/scrim-details/${activity.details.scrimId}`);
-          } else if (activity.type === 'user' && activity.details?.userName) {
-            history.push(
-              `/user-profile/${activity.details.userName}?region=${activity.details.region}`
-            );
-          } else if (
-            activity.type === 'ban' &&
-            activity.details?.userId &&
-            activity.details?.userName
-          ) {
-            history.push(`/user-profile/${activity.details.userName}`);
-          }
-        };
-
-        const getStatusColor = () => {
-          switch (activity.status) {
-            case 'active':
-              return 'success';
-            case 'completed':
-              return 'info';
-            case 'banned':
-              return 'error';
-            case 'lifted':
-              return 'warning';
-            case 'new':
-              return 'primary';
-            default:
-              return 'default';
-          }
-        };
-
-        return (
-          <Grid item key={index}>
-            <Tooltip
-              title={
-                activity.type === 'scrim'
-                  ? `Click to view scrim details`
-                  : activity.type === 'user'
-                  ? `Click to view ${activity.details?.userName}'s profile`
-                  : activity.type === 'ban'
-                  ? `${
-                      activity.details?.reason
-                        ? `Reason: ${activity.details.reason}`
-                        : 'Click to view user'
-                    }`
-                  : ''
-              }>
-              <Grid
-                container
-                alignItems="center"
-                spacing={2}
-                sx={{
-                  cursor: 'pointer',
-                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' },
-                  borderRadius: 1,
-                  p: 0.5,
-                }}
-                onClick={getClickHandler}>
-                <Grid item>
-                  <Avatar
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      bgcolor:
-                        activity.type === 'scrim'
-                          ? COLORS.primary
-                          : activity.type === 'user'
-                          ? COLORS.success
-                          : activity.type === 'ban'
-                          ? COLORS.error
-                          : COLORS.info,
-                    }}>
-                    {activity.type === 'scrim' && <GamesIcon />}
-                    {activity.type === 'user' && <PersonIcon />}
-                    {activity.type === 'ban' && <BlockIcon />}
-                  </Avatar>
-                </Grid>
-                <Grid item xs>
-                  <Typography variant="body2">
-                    {activity.description}
-                  </Typography>
-                  <Typography variant="caption" color="textSecondary">
-                    {new Date(activity.timestamp).toLocaleString()}
-                    {activity.details?.region &&
-                      ` • ${activity.details.region}`}
-                    {activity.details?.rank && ` • ${activity.details.rank}`}
-                  </Typography>
-                </Grid>
-                {activity.status && (
-                  <Grid item>
-                    <Chip
-                      label={activity.status}
-                      size="small"
-                      color={getStatusColor()}
-                    />
-                  </Grid>
-                )}
-              </Grid>
-            </Tooltip>
+const RecentActivityTable = ({ activities, history }) => {
+  const hasActivities = activities && activities.length > 0;
+  
+  return (
+    <GlassPanel sx={{ p: 2, height: '100%' }}>
+      <Typography variant="h6" gutterBottom>
+        Recent Activity
+      </Typography>
+      <Divider sx={{ my: 2 }} />
+      <Grid container direction="column" spacing={2}>
+        {!hasActivities ? (
+          <Grid item>
+            <Typography variant="body2" color="textSecondary" align="center" sx={{ py: 4 }}>
+              No recent activities found
+            </Typography>
           </Grid>
-        );
-      })}
-    </Grid>
-  </GlassPanel>
-);
+        ) : (
+          activities.slice(0, 10).map((activity, index) => {
+            const getClickHandler = () => {
+              if (activity.type === 'scrim' && activity.details?.scrimId) {
+                history.push(`/scrims/${activity.details.scrimId}`);
+              } else if (activity.type === 'user' && activity.details?.userName) {
+                history.push(
+                  `/users/${activity.details.userName}?region=${activity.details.region}`
+                );
+              } else if (
+                activity.type === 'ban' &&
+                activity.details?.userId &&
+                activity.details?.userName
+              ) {
+                history.push(`/users/${activity.details.userName}`);
+              }
+            };
+
+            const getStatusColor = () => {
+              switch (activity.status) {
+                case 'active':
+                  return 'success';
+                case 'completed':
+                  return 'info';
+                case 'banned':
+                  return 'error';
+                case 'lifted':
+                  return 'warning';
+                case 'new':
+                  return 'primary';
+                default:
+                  return 'default';
+              }
+            };
+
+            return (
+              <Grid item key={index}>
+                <Tooltip
+                  title={
+                    activity.type === 'scrim'
+                      ? `Click to view scrim details`
+                      : activity.type === 'user'
+                      ? `Click to view ${activity.details?.userName}'s profile`
+                      : activity.type === 'ban'
+                      ? `${
+                          activity.details?.reason
+                            ? `Reason: ${activity.details.reason}`
+                            : 'Click to view user'
+                        }`
+                      : ''
+                  }>
+                  <Grid
+                    container
+                    alignItems="center"
+                    spacing={2}
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: 'rgba(255,255,255,0.05)' },
+                      borderRadius: 1,
+                      p: 0.5,
+                    }}
+                    onClick={getClickHandler}>
+                    <Grid item>
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          bgcolor:
+                            activity.type === 'scrim'
+                              ? COLORS.primary
+                              : activity.type === 'user'
+                              ? COLORS.success
+                              : activity.type === 'ban'
+                              ? COLORS.error
+                              : COLORS.info,
+                        }}>
+                        {activity.type === 'scrim' && <GamesIcon />}
+                        {activity.type === 'user' && <PersonIcon />}
+                        {activity.type === 'ban' && <BlockIcon />}
+                      </Avatar>
+                    </Grid>
+                    <Grid item xs>
+                      <Typography variant="body2">
+                        {activity.description}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {new Date(activity.timestamp).toLocaleString()}
+                        {activity.details?.region &&
+                          ` • ${activity.details.region}`}
+                        {activity.details?.rank && ` • ${activity.details.rank}`}
+                      </Typography>
+                    </Grid>
+                    {activity.status && (
+                      <Grid item>
+                        <Chip
+                          label={activity.status}
+                          size="small"
+                          color={getStatusColor()}
+                        />
+                      </Grid>
+                    )}
+                  </Grid>
+                </Tooltip>
+              </Grid>
+            );
+          })
+        )}
+      </Grid>
+    </GlassPanel>
+  );
+};
 
 export default function AdminDashboard() {
   const { currentUser, isCurrentUserAdmin } = useAuth();
@@ -224,7 +237,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
+  const [serverStatus, setServerStatus] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [userGrowthRange, setUserGrowthRange] = useState('6M');
 
   useEffect(() => {
     if (!isCurrentUserAdmin) {
@@ -242,13 +257,16 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setRefreshing(true);
-      const [statsData, activitiesData] = await Promise.all([
+      const [statsData, activitiesData, statusData] = await Promise.all([
         getAdminDashboardStats(),
-        getRecentActivities(),
+        getRecentActivities().catch(() => []),
+        getServerStatus().catch(() => null),
       ]);
       setDashboardData(statsData);
-      setRecentActivities(activitiesData);
+      setRecentActivities(activitiesData || []);
+      setServerStatus(statusData);
     } catch (error) {
+      console.error('Dashboard error:', error);
       setCurrentAlert({
         type: 'Error',
         message: 'Failed to load dashboard data',
@@ -267,15 +285,38 @@ export default function AdminDashboard() {
     return <Loading text="Loading Dashboard..." />;
   }
 
-  // Mock data for charts (replace with real data from backend)
-  const userGrowthData = [
-    { month: 'Jan', users: 450 },
-    { month: 'Feb', users: 520 },
-    { month: 'Mar', users: 580 },
-    { month: 'Apr', users: 690 },
-    { month: 'May', users: 750 },
-    { month: 'Jun', users: 820 },
-  ];
+  // Generate user growth data based on selected range
+  const getUserGrowthData = () => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    let monthsToShow = 6;
+    if (userGrowthRange === '3M') monthsToShow = 3;
+    if (userGrowthRange === '1Y') monthsToShow = 12;
+    
+    const data = [];
+    for (let i = monthsToShow - 1; i >= 0; i--) {
+      const monthIndex = (currentMonth - i + 12) % 12;
+      const year = currentMonth - i < 0 ? currentYear - 1 : currentYear;
+      const monthName = months[monthIndex];
+      const yearSuffix = year !== currentYear ? ` '${String(year).slice(-2)}` : '';
+      
+      // Mock data - in production this would come from backend
+      const baseUsers = dashboardData?.totalUsers || 500;
+      const growth = Math.floor(Math.random() * 50) + 20;
+      
+      data.push({
+        month: `${monthName}${yearSuffix}`,
+        users: Math.floor(baseUsers - (monthsToShow - i) * growth),
+        fullDate: `${monthName} ${year}`
+      });
+    }
+    return data;
+  };
+  
+  const userGrowthData = getUserGrowthData();
 
   const scrimActivityData = [
     { day: 'Mon', scrims: 45 },
@@ -287,7 +328,7 @@ export default function AdminDashboard() {
     { day: 'Sun', scrims: 88 },
   ];
 
-  const regionDistribution = [
+  const regionDistribution = dashboardData?.regionDistribution || [
     { name: 'NA', value: 35, color: COLORS.primary },
     { name: 'EUW', value: 30, color: COLORS.secondary },
     { name: 'EUNE', value: 15, color: COLORS.success },
@@ -295,7 +336,7 @@ export default function AdminDashboard() {
     { name: 'OCE', value: 8, color: COLORS.info },
   ];
 
-  const rankDistribution = [
+  const rankDistribution = dashboardData?.rankDistribution || [
     { rank: 'Iron', count: 50 },
     { rank: 'Bronze', count: 120 },
     { rank: 'Silver', count: 200 },
@@ -304,6 +345,22 @@ export default function AdminDashboard() {
     { rank: 'Diamond', count: 100 },
     { rank: 'Master+', count: 30 },
   ];
+  
+  // Helper function to get status icon and color
+  const getStatusDisplay = (status) => {
+    switch(status) {
+      case 'operational':
+        return { icon: <CheckCircleIcon />, color: 'success', label: 'Operational' };
+      case 'warning':
+        return { icon: <WarningIcon />, color: 'warning', label: 'Warning' };
+      case 'error':
+        return { icon: <ErrorIcon />, color: 'error', label: 'Error' };
+      case 'inactive':
+        return { icon: <ErrorIcon />, color: 'default', label: 'Inactive' };
+      default:
+        return { icon: <WarningIcon />, color: 'default', label: 'Unknown' };
+    }
+  };
 
   return (
     <>
@@ -342,7 +399,7 @@ export default function AdminDashboard() {
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Total Users"
-              value={dashboardData?.totalUsers || 2834}
+              value={dashboardData?.totalUsers || 0}
               icon={<PersonIcon />}
               color={COLORS.primary}
               change={12}
@@ -352,7 +409,7 @@ export default function AdminDashboard() {
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Total Scrims"
-              value={dashboardData?.totalScrims || 4608}
+              value={dashboardData?.totalScrims || 0}
               icon={<GamesIcon />}
               color={COLORS.secondary}
               change={8}
@@ -362,7 +419,7 @@ export default function AdminDashboard() {
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Active Today"
-              value={dashboardData?.activeToday || 145}
+              value={dashboardData?.activeToday || 0}
               icon={<GroupIcon />}
               color={COLORS.success}
               change={-5}
@@ -388,9 +445,28 @@ export default function AdminDashboard() {
           {/* User Growth Chart */}
           <Grid item xs={12} md={8}>
             <GlassPanel sx={{ p: 2 }}>
-              <Typography variant="h6" gutterBottom>
-                User Growth
-              </Typography>
+              <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                <Grid item>
+                  <Typography variant="h6">
+                    User Growth
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Grid container spacing={1}>
+                    {['3M', '6M', '1Y'].map((range) => (
+                      <Grid item key={range}>
+                        <Button
+                          size="small"
+                          variant={userGrowthRange === range ? 'contained' : 'outlined'}
+                          onClick={() => setUserGrowthRange(range)}
+                          sx={{ minWidth: 40 }}>
+                          {range}
+                        </Button>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Grid>
+              </Grid>
               <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={userGrowthData}>
                   <defs>
@@ -410,7 +486,11 @@ export default function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                   <XAxis dataKey="month" stroke="#999" />
                   <YAxis stroke="#999" />
-                  <Tooltip />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: 'none' }}
+                    formatter={(value) => [`${value} users`, 'Total Users']}
+                    labelFormatter={(label) => `Period: ${label}`}
+                  />
                   <Area
                     type="monotone"
                     dataKey="users"
@@ -441,7 +521,7 @@ export default function AdminDashboard() {
                     fill="#8884d8"
                     dataKey="value">
                     {regionDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell key={`cell-${index}`} fill={entry.color || COLORS.primary} />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -705,78 +785,98 @@ export default function AdminDashboard() {
               </Typography>
               <Divider sx={{ my: 2 }} />
               <Grid container direction="column" spacing={2}>
-                <Grid item>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center">
-                    <Grid item xs>
-                      <Typography variant="body2">Database</Typography>
+                {serverStatus?.services ? (
+                  <>
+                    <Grid item>
+                      <Grid
+                        container
+                        justifyContent="space-between"
+                        alignItems="center">
+                        <Grid item xs>
+                          <Typography variant="body2">Database</Typography>
+                          {serverStatus.services.database?.latency && (
+                            <Typography variant="caption" color="textSecondary">
+                              Latency: {serverStatus.services.database.latency}
+                            </Typography>
+                          )}
+                        </Grid>
+                        <Grid item>
+                          <Chip
+                            icon={getStatusDisplay(serverStatus.services.database?.status).icon}
+                            label={getStatusDisplay(serverStatus.services.database?.status).label}
+                            color={getStatusDisplay(serverStatus.services.database?.status).color}
+                            size="small"
+                          />
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid item>
-                      <Chip
-                        icon={<CheckCircleIcon />}
-                        label="Operational"
-                        color="success"
-                        size="small"
-                      />
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center">
-                    <Grid item xs>
-                      <Typography variant="body2">WebSocket Server</Typography>
-                    </Grid>
-                    <Grid item>
-                      <Chip
-                        icon={<CheckCircleIcon />}
-                        label="Connected"
-                        color="success"
-                        size="small"
-                      />
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center">
-                    <Grid item xs>
-                      <Typography variant="body2">Riot API</Typography>
+                      <Grid
+                        container
+                        justifyContent="space-between"
+                        alignItems="center">
+                        <Grid item xs>
+                          <Typography variant="body2">WebSocket Server</Typography>
+                          {serverStatus.services.websocket?.connections !== undefined && (
+                            <Typography variant="caption" color="textSecondary">
+                              {serverStatus.services.websocket.connections} connections
+                            </Typography>
+                          )}
+                        </Grid>
+                        <Grid item>
+                          <Chip
+                            icon={getStatusDisplay(serverStatus.services.websocket?.status).icon}
+                            label={getStatusDisplay(serverStatus.services.websocket?.status).label}
+                            color={getStatusDisplay(serverStatus.services.websocket?.status).color}
+                            size="small"
+                          />
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid item>
-                      <Chip
-                        icon={<WarningIcon />}
-                        label="Rate Limited"
-                        color="warning"
-                        size="small"
-                      />
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item>
-                  <Grid
-                    container
-                    justifyContent="space-between"
-                    alignItems="center">
-                    <Grid item xs>
-                      <Typography variant="body2">Email Service</Typography>
+                      <Grid
+                        container
+                        justifyContent="space-between"
+                        alignItems="center">
+                        <Grid item xs>
+                          <Typography variant="body2">Riot API</Typography>
+                        </Grid>
+                        <Grid item>
+                          <Chip
+                            icon={getStatusDisplay(serverStatus.services.riotApi?.status).icon}
+                            label={getStatusDisplay(serverStatus.services.riotApi?.status).label}
+                            color={getStatusDisplay(serverStatus.services.riotApi?.status).color}
+                            size="small"
+                          />
+                        </Grid>
+                      </Grid>
                     </Grid>
                     <Grid item>
-                      <Chip
-                        icon={<CheckCircleIcon />}
-                        label="Active"
-                        color="success"
-                        size="small"
-                      />
+                      <Grid
+                        container
+                        justifyContent="space-between"
+                        alignItems="center">
+                        <Grid item xs>
+                          <Typography variant="body2">Email Service</Typography>
+                        </Grid>
+                        <Grid item>
+                          <Chip
+                            icon={getStatusDisplay(serverStatus.services.emailService?.status).icon}
+                            label={getStatusDisplay(serverStatus.services.emailService?.status).label}
+                            color={getStatusDisplay(serverStatus.services.emailService?.status).color}
+                            size="small"
+                          />
+                        </Grid>
+                      </Grid>
                     </Grid>
+                  </>
+                ) : (
+                  <Grid item>
+                    <Typography variant="body2" color="textSecondary" align="center">
+                      Unable to fetch server status
+                    </Typography>
                   </Grid>
-                </Grid>
+                )}
               </Grid>
 
               <Divider sx={{ my: 2 }} />
@@ -789,7 +889,7 @@ export default function AdminDashboard() {
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={() => history.push('/admin/scrims/create')}>
+                    onClick={() => history.push('/scrims/new')}>
                     Create Scrim
                   </Button>
                 </Grid>
@@ -797,7 +897,7 @@ export default function AdminDashboard() {
                   <Button
                     variant="outlined"
                     size="small"
-                    onClick={() => history.push('/admin/ban-history')}>
+                    onClick={() => history.push('/admin/bans')}>
                     Ban History
                   </Button>
                 </Grid>

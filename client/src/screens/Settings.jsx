@@ -61,6 +61,7 @@ export default function Settings() {
 
   const [userData, setUserData] = useState({
     name: currentUser?.name, // LoL summoner name
+    summonerTagline: currentUser?.summonerTagline || '',
     discord: currentUser?.discord,
     adminKey: currentUser?.adminKey ?? '',
     region: currentUser?.region ?? 'NA',
@@ -235,7 +236,7 @@ export default function Settings() {
                   <TextField
                     type="text"
                     name="name"
-                    style={{ width: 230 }}
+                    style={{ width: 180 }}
                     variant="filled"
                     value={userData.name || ''}
                     onKeyPress={(e) => {
@@ -244,6 +245,25 @@ export default function Settings() {
                     }}
                     onChange={handleChange}
                     label="Summoner Name"
+                    required
+                  />
+                </Grid>
+
+                {/* TAGLINE */}
+                <Grid item>
+                  <TextField
+                    type="text"
+                    name="summonerTagline"
+                    style={{ width: 100 }}
+                    variant="filled"
+                    value={userData.summonerTagline || ''}
+                    onKeyPress={(e) => {
+                      // only allow alphanumeric characters
+                      if (!/^[0-9a-zA-Z\b]+$/.test(e.key)) e.preventDefault();
+                    }}
+                    onChange={handleChange}
+                    label="Tagline"
+                    inputProps={{ maxLength: 5 }}
                     required
                   />
                 </Grid>
@@ -257,7 +277,7 @@ export default function Settings() {
                     style={{ width: 230 }}
                     value={userData.discord || ''}
                     onChange={handleChange}
-                    label="Discord (name and #)"
+                    label="Discord Username"
                     required
                   />
                 </Grid>

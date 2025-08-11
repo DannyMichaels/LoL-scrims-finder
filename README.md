@@ -121,6 +121,7 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - user stats now get calculated from back-end instead in profile page
 - user exp in user profile is now a progress bar instead of a static number
 - user profile page now uses charts.
+- added an admin dashboard with charts, stats and recent activities
 
 ---
 

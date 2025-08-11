@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import Loading from '../components/shared/Loading';
@@ -20,7 +19,10 @@ const AdminRoute = ({ component: Component, ...rest }) => {
             <Redirect
               to={{
                 pathname: '/signup',
-                state: { from: props.location, message: 'Please login to continue' }
+                state: {
+                  from: props.location,
+                  message: 'Please login to continue',
+                },
               }}
             />
           );
@@ -32,10 +34,10 @@ const AdminRoute = ({ component: Component, ...rest }) => {
             <Redirect
               to={{
                 pathname: '/',
-                state: { 
-                  from: props.location, 
-                  message: 'You do not have permission to access this page' 
-                }
+                state: {
+                  from: props.location,
+                  message: 'You do not have permission to access this page',
+                },
               }}
             />
           );

@@ -5,6 +5,8 @@ const Scrim = require('../models/scrim.model');
 const { unbanUser: utilUnbanUser } = require('../utils/adminUtils');
 const { validateRank } = require('../utils/validators');
 const { manualLiftExpiredBans } = require('../services/cronJobs.services');
+const mongoose = require('mongoose');
+const axios = require('axios');
 
 const banUser = async (req, res) => {
   try {
@@ -441,6 +443,188 @@ const liftExpiredBans = async (req, res) => {
   }
 };
 
+// @route   GET /api/admin/server-status
+// @desc    Get real-time server status
+// @access  Admin only
+const getServerStatus = async (req, res) => {
+  try {
+    const status = {
+      database: {
+        name: 'MongoDB',
+        status: 'unknown',
+        details: null,
+        latency: null
+      },
+      websocket: {
+        name: 'WebSocket Server',
+        status: 'unknown',
+        details: null,
+        connections: 0
+      },
+      emailService: {
+        name: 'Email Service',
+        status: 'unknown',
+        details: null
+      },
+      riotApi: {
+        name: 'Riot API',
+        status: 'unknown',
+        details: null,
+        rateLimit: null
+      },
+      server: {
+        name: 'Express Server',
+        status: 'operational',
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        nodeVersion: process.version
+      }
+    };
+
+    // Check MongoDB connection
+    try {
+      const dbState = mongoose.connection.readyState;
+      const startTime = Date.now();
+      
+      if (dbState === 1) {
+        // Ping the database to check latency
+        await mongoose.connection.db.admin().ping();
+        const latency = Date.now() - startTime;
+        
+        status.database.status = 'operational';
+        status.database.details = 'Connected and responsive';
+        status.database.latency = `${latency}ms`;
+      } else if (dbState === 2) {
+        status.database.status = 'connecting';
+        status.database.details = 'Connecting to database';
+      } else if (dbState === 0) {
+        status.database.status = 'error';
+        status.database.details = 'Disconnected from database';
+      } else {
+        status.database.status = 'error';
+        status.database.details = 'Unknown connection state';
+      }
+    } catch (error) {
+      status.database.status = 'error';
+      status.database.details = error.message;
+    }
+
+    // Check WebSocket (Socket.io) status
+    try {
+      const io = req.app.get('io');
+      if (io) {
+        const sockets = await io.fetchSockets();
+        status.websocket.status = 'operational';
+        status.websocket.connections = sockets.length;
+        status.websocket.details = `${sockets.length} active connections`;
+      } else {
+        status.websocket.status = 'error';
+        status.websocket.details = 'Socket.io not initialized';
+      }
+    } catch (error) {
+      status.websocket.status = 'error';
+      status.websocket.details = error.message;
+    }
+
+    // Check Email Service (mock check - replace with actual email service check)
+    try {
+      // In a real scenario, you'd check your email service (SendGrid, AWS SES, etc.)
+      // For now, we'll just check if email config exists
+      if (process.env.EMAIL_SERVICE_KEY) {
+        status.emailService.status = 'operational';
+        status.emailService.details = 'Email service configured';
+      } else {
+        status.emailService.status = 'inactive';
+        status.emailService.details = 'Email service not configured';
+      }
+    } catch (error) {
+      status.emailService.status = 'error';
+      status.emailService.details = error.message;
+    }
+
+    // Check Riot API status
+    try {
+      // Check if we have an API key
+      if (process.env.RIOT_API_KEY) {
+        // Make a simple request to Riot API status endpoint
+        const riotResponse = await axios.get(
+          'https://na1.api.riotgames.com/lol/status/v4/platform-data',
+          {
+            headers: {
+              'X-Riot-Token': process.env.RIOT_API_KEY
+            },
+            timeout: 5000
+          }
+        ).catch(err => {
+          if (err.response?.status === 429) {
+            return { status: 429, data: { message: 'Rate limited' } };
+          }
+          throw err;
+        });
+
+        if (riotResponse.status === 200) {
+          status.riotApi.status = 'operational';
+          status.riotApi.details = 'API key valid and working';
+        } else if (riotResponse.status === 429) {
+          status.riotApi.status = 'warning';
+          status.riotApi.details = 'Rate limited';
+          status.riotApi.rateLimit = 'Exceeded';
+        }
+      } else {
+        status.riotApi.status = 'inactive';
+        status.riotApi.details = 'API key not configured';
+      }
+    } catch (error) {
+      if (error.response?.status === 403) {
+        status.riotApi.status = 'error';
+        status.riotApi.details = 'Invalid API key';
+      } else if (error.response?.status === 429) {
+        status.riotApi.status = 'warning';
+        status.riotApi.details = 'Rate limited';
+      } else {
+        status.riotApi.status = 'error';
+        status.riotApi.details = error.message || 'Connection failed';
+      }
+    }
+
+    // Calculate overall health
+    const services = [status.database, status.websocket, status.emailService, status.riotApi, status.server];
+    const operationalCount = services.filter(s => s.status === 'operational').length;
+    const warningCount = services.filter(s => s.status === 'warning').length;
+    const errorCount = services.filter(s => s.status === 'error').length;
+
+    let overallStatus = 'operational';
+    if (errorCount > 0) {
+      overallStatus = 'partial';
+    }
+    if (errorCount >= 3) {
+      overallStatus = 'degraded';
+    }
+    if (status.database.status === 'error' || status.server.status === 'error') {
+      overallStatus = 'critical';
+    }
+
+    res.json({
+      overall: overallStatus,
+      services: status,
+      summary: {
+        operational: operationalCount,
+        warning: warningCount,
+        error: errorCount,
+        total: services.length
+      },
+      timestamp: new Date()
+    });
+
+  } catch (error) {
+    console.error('Error checking server status:', error);
+    res.status(500).json({ 
+      error: 'Failed to check server status',
+      overall: 'error'
+    });
+  }
+};
+
 module.exports = {
   banUser,
   unbanUser,
@@ -449,4 +633,5 @@ module.exports = {
   getDashboardStats,
   liftExpiredBans,
   getRecentActivities,
+  getServerStatus,
 };
