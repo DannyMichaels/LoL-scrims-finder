@@ -94,7 +94,11 @@ export default function useSummonerProfile(
   summonerTagline,
   region
 ) {
-  const { data, error, isLoading } = useSWR(
+  const {
+    data,
+    error,
+    isValidating = true,
+  } = useSWR(
     summonerName && region && summonerTagline
       ? `${summonerName}::${summonerTagline || ''}::${region}`
       : null,
@@ -116,7 +120,7 @@ export default function useSummonerProfile(
       rank: null,
       tier: null,
     },
-    isLoading,
+    isLoading: isValidating,
     error,
   };
 }

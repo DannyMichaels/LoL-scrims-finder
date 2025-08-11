@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import CircularProgress from '@mui/material/CircularProgress';
+import Skeleton from '@mui/material/Skeleton';
 import useSummonerProfile from '../../hooks/useSummonerProfile';
 
 export default function ProfileImage({
@@ -15,9 +15,35 @@ export default function ProfileImage({
 
   if (isLoading) {
     return (
-      <div style={{ marginRight: '20px' }}>
-        <CircularProgress size={80} />
-      </div>
+      <SkeletonContainer>
+        <Skeleton
+          variant="rounded"
+          width={100}
+          height={100}
+          sx={{
+            borderRadius: '20px',
+            bgcolor: 'rgba(255, 255, 255, 0.08)',
+            '&::after': {
+              background:
+                'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent)',
+            },
+          }}
+        />
+        <SkeletonLevel>
+          <Skeleton
+            variant="text"
+            width={44}
+            height={24}
+            sx={{
+              bgcolor: 'rgba(234, 189, 86, 0.1)',
+              '&::after': {
+                background:
+                  'linear-gradient(90deg, transparent, rgba(234, 189, 86, 0.05), transparent)',
+              },
+            }}
+          />
+        </SkeletonLevel>
+      </SkeletonContainer>
     );
   }
 
@@ -89,4 +115,22 @@ const Level = styled.span`
   color: rgb(234, 189, 86);
   background: url(https://s-lol-web.op.gg/static/images/site/summoner/bg-levelbox.png)
     0% 0% / 100%;
+`;
+
+const SkeletonContainer = styled.div`
+  display: inline-block;
+  width: 100px;
+  vertical-align: top;
+  margin-left: 10px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+  position: relative;
+`;
+
+const SkeletonLevel = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: -14px;
+  margin-left: -22px;
 `;

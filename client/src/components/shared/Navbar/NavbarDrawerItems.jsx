@@ -17,6 +17,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
+import Skeleton from '@mui/material/Skeleton';
 
 // icons
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -47,7 +48,7 @@ export default function NavbarDrawerItems({ showCheckboxes, setIsDrawerOpen }) {
   const history = useHistory();
 
   // Fetch summoner profile data for avatar
-  const { profileData } = useSummonerProfile(
+  const { profileData, isLoading: isProfileLoading } = useSummonerProfile(
     currentUser?.summonerName || currentUser?.name,
     currentUser?.summonerTagline,
     currentUser?.region
@@ -103,16 +104,30 @@ export default function NavbarDrawerItems({ showCheckboxes, setIsDrawerOpen }) {
               },
             }}>
             <ListItemIcon>
-              <Avatar
-                src={profileData?.profileIcon}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  bgcolor: 'primary.main',
-                  fontWeight: 'bold',
-                }}>
-                {currentUser?.name?.charAt(0).toUpperCase()}
-              </Avatar>
+              {isProfileLoading ? (
+                <Skeleton
+                  variant="circular"
+                  width={40}
+                  height={40}
+                  sx={{
+                    bgcolor: 'rgba(255, 255, 255, 0.08)',
+                    '&::after': {
+                      background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent)',
+                    },
+                  }}
+                />
+              ) : (
+                <Avatar
+                  src={profileData?.profileIcon}
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    bgcolor: 'primary.main',
+                    fontWeight: 'bold',
+                  }}>
+                  {currentUser?.name?.charAt(0).toUpperCase()}
+                </Avatar>
+              )}
             </ListItemIcon>
             <Box sx={{ ml: 1, flex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
