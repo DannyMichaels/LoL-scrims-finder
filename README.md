@@ -139,15 +139,38 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 ## Back-end
 
 Back-end is made using `Express` & `Node.js`, with `Mongoose` to connect to the `MongoDB` database.
-There are a few .env variables you need to set-up.
 
-```
-X_API_KEY=api_key_here
-SECRET_OR_KEY=secret_or_key_here
-ADMIN_KEY=admin_key_here
+### Environment Variables
 
-S3_ACCESS_KEY_ID=value
-S3_SECRET_ACCESS_KEY=value
+Create a `.env` file in the root directory with the following variables:
+
+```bash
+# Database
+PROD_MONGODB=mongodb_connection_string
+
+# Authentication & Security
+SECRET_OR_KEY=jwt_secret_key
+JWT_EXPIRATION=7d
+X_API_KEY=api_key_for_internal_auth
+ADMIN_KEY=admin_key_for_admin_routes
+
+# Riot Games API
+RIOT_API_KEY=your_riot_api_key
+RIOT_TOURNAMENT_STUB=false  # Set to true for testing with stub API
+
+# AWS S3 / DigitalOcean Spaces (for image uploads)
+S3_ACCESS_KEY_ID=your_access_key
+S3_SECRET_ACCESS_KEY=your_secret_key
+S3_BUCKET_NAME=your_bucket_name
+S3_ENDPOINT=endpoint_url  # e.g., nyc3.digitaloceanspaces.com for DO Spaces
+AWS_REGION=us-east-1  # Optional, defaults to us-east-1
+
+# API Configuration
+API_URL=https://your-api-url.com
+NODE_ENV=production  # or development
+
+# Optional - IP Data for geolocation
+IPDATA_API_KEY=your_ipdata_api_key  # Optional, for IP geolocation
 ```
 
 There are 2 models currently, the `User` and the `Scrim` models.

@@ -84,7 +84,7 @@ export default function ScrimSectionExpander({
 
 const StyledDivider = styled.div`
   position: relative;
-  width: 98%;
+  width: 100%;
   max-width: 1100px;
   display: flex;
   justify-content: center;
@@ -114,11 +114,11 @@ const StyledDivider = styled.div`
     min-height: 36px;
     max-width: 46px;
     max-height: 46px;
-    background: #2196F3;
+    background: #2196f3;
     backdrop-filter: blur(10px);
     padding-left: 0.8rem;
     padding-right: 0.8rem;
-    border: 1px solid #1976D2;
+    border: 1px solid #1976d2;
     transform: translateY(50%);
     align-items: center;
     appearance: none;
@@ -139,14 +139,14 @@ const StyledDivider = styled.div`
     }
 
     &:hover {
-      background: #1976D2;
-      border: 1px solid #1565C0;
+      background: #1976d2;
+      border: 1px solid #1565c0;
       transform: translateY(50%) scale(1.1);
       box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
     }
 
     .modal__expandIcon {
-      color: #FFFFFF;
+      color: #ffffff;
     }
   }
 `;

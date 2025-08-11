@@ -44,7 +44,6 @@ const useStyles = makeStyles({
 
 //  this is the area that contains the countdown timer for the scrim section and the other details.
 export default function ScrimSectionMiddleAreaBox({
-  imageUploaded,
   scrim,
   gameStarted,
   setGameStarted,
@@ -375,45 +374,61 @@ export default function ScrimSectionMiddleAreaBox({
                   */}
               {/* POST GAME IMAGE SECTION */}
               {(scrim.lobbyHost?._id === currentUser?._id ||
-                isCurrentUserAdmin) && (
+                isCurrentUserAdmin) && !scrim.postGameImage && (
                 <>
                   {/* disabled for now until we get money for another image hosting solution... */}
                   <Box marginTop={2} />
 
                   {/* UPLOAD OR DELETE IMAGE */}
                   <UploadPostGameImage
-                    isUploaded={imageUploaded}
+                    isUploaded={!!scrim.postGameImage}
                     scrim={scrim}
                     socket={socket}
                     setScrim={setScrim}
                   />
                 </>
               )}
-              {imageUploaded && (
-                <Grid
-                  item
-                  container
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  spacing={2}>
-                  <Grid item>
-                    <Typography variant="h3">
-                      Post-game image uploaded!
-                    </Typography>
+              {scrim.postGameImage && (
+                <>
+                  {/* View image button for everyone */}
+                  <Grid
+                    item
+                    container
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    spacing={2}>
+                    <Grid item>
+                      <Typography variant="h3">
+                        Post-game image uploaded!
+                      </Typography>
+                    </Grid>
+                    <Grid item container spacing={1} style={{ width: 'auto' }}>
+                      <Grid item>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          component="a"
+                          href={scrim.postGameImage?.location}
+                          rel="noreferrer"
+                          target="_blank">
+                          View Image
+                        </Button>
+                      </Grid>
+                      {/* Admin delete button */}
+                      {isCurrentUserAdmin && (
+                        <Grid item>
+                          <UploadPostGameImage
+                            isUploaded={!!scrim.postGameImage}
+                            scrim={scrim}
+                            socket={socket}
+                            setScrim={setScrim}
+                          />
+                        </Grid>
+                      )}
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      component="a"
-                      href={scrim.postGameImage?.location}
-                      rel="noreferrer"
-                      target="_blank">
-                      View Image
-                    </Button>
-                  </Grid>
-                </Grid>
+                </>
               )}
             </>
           ) : (

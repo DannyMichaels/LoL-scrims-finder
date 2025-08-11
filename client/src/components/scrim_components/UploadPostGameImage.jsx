@@ -155,17 +155,7 @@ export default function UploadPostGameImage({
       </Grid>
       <Grid item>
         <Tooltip
-          title={
-            <Typography
-              style={{
-                fontSize: 'clamp(0.8rem, 4vw, 1rem)',
-                fontWeight: 700,
-              }}
-              variant="body2">
-              Validate winner by uploading end of game results. <br />
-              <strong style={{ color: 'red' }}>* image format only</strong>
-            </Typography>
-          }
+          title="Validate winner by uploading end of game results (image format only)"
           placement="top">
           <Button
             variant="contained"

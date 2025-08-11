@@ -54,7 +54,6 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   const [playerEntered, setPlayerEntered] = useState(false);
   const [casterEntered, setCasterEntered] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const [imageUploaded, setImageUploaded] = useState(false);
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const [swapPlayers, setSwapPlayers] = useState({
     playerOne: null,
@@ -135,16 +134,6 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     setCasterEntered(casterInGame);
   }, [scrim, currentUser]);
 
-  // Check for uploaded images
-  useEffect(() => {
-    if (!scrim) return;
-
-    const teamImages = [
-      ...(scrim.teamOneImages || []),
-      ...(scrim.teamTwoImages || []),
-    ];
-    setImageUploaded(teamImages.length > 0);
-  }, [scrim]);
 
   // Handle player swapping
   useEffect(() => {
@@ -384,7 +373,6 @@ export default function ScrimSection({ scrimData, isInDetail }) {
               />
 
               <ScrimSectionMiddleAreaBox
-                imageUploaded={imageUploaded}
                 scrim={scrim}
                 setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
                 gameStarted={gameStarted === scrim._id}

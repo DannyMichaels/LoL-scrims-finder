@@ -168,15 +168,19 @@ export default function ScrimTeamList({
                   style={{
                     // fallback for non-supporting browsers
                     backgroundColor: isLobbyHost
-                      ? gameStarted && '#7f53ac'
+                      ? gameStarted && 'rgba(127, 83, 172, 0.3)'
                       : background.normal,
 
                     // if game has started, but the game didn't end, and the player is the lobby host, make his background green.
                     // we don't care if the guy is the lobby host if game ended.
                     backgroundImage: isLobbyHost
                       ? gameStarted &&
-                        'linear-gradient(315deg, #7f53ac 0%, #647dee 74%)'
+                        'linear-gradient(315deg, rgba(127, 83, 172, 0.4) 0%, rgba(100, 125, 238, 0.4) 74%)'
                       : background.gradient,
+                    
+                    // Add glassmorphic effect when there's a winner
+                    backdropFilter: winnerTeam ? 'blur(10px)' : 'none',
+                    border: winnerTeam ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
                   }}>
                   <ListItemAvatar>
                     <Avatar

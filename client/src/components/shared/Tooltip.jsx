@@ -1,31 +1,13 @@
-import makeStyles from '@mui/styles/makeStyles';
 import Tooltip from '@mui/material/Tooltip';
 
-const useStyles = makeStyles((theme) => ({
-  arrow: {
-    color: '#fff !important',
-  },
-  tooltip: {
-    color: '#000 !important',
-    fontSize: ({ fontSize }) =>
-      fontSize
-        ? `${fontSize} !important`
-        : 'clamp(0.8rem, 4vw, 1rem) !important',
-    border: '1px solid #fff',
-    fontWeight: ({ fontWeight }) =>
-      fontWeight ? `${fontWeight} !important` : '700 !important',
-    backgroundColor: '#fff !important',
-    boxShadow: '1px 2px 4px 1px #999 !important',
-  },
-}));
-
+// Custom Tooltip now just uses the MUI Tooltip with theme styles
+// The theme handles all styling consistently
 export default function CustomTooltip(props) {
-  const classes = useStyles(props);
-  // takes title prop to display text
+  // Pass through all props to MUI Tooltip
+  // Theme styles from appTheme.js will be applied automatically
   return (
     <Tooltip
       arrow
-      classes={classes}
       placement={props.placement ?? 'top'}
       {...props}
     />

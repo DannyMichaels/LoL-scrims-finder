@@ -14,14 +14,14 @@ export const getTeamBackgroundColor = (teamName, winnerTeamName) => {
   if (!winnerTeamName) return initialState;
 
   const greenResult = {
-    normal: '#63d471',
-    gradient: 'linear-gradient(315deg, #63d471 0%, #233329 74%)',
+    normal: 'rgba(99, 212, 113, 0.2)',
+    gradient: 'linear-gradient(315deg, rgba(99, 212, 113, 0.3) 0%, rgba(35, 51, 41, 0.3) 74%)',
   };
 
   const redResult = {
     gradient:
-      'linear-gradient(315deg, rgb(224, 69, 95) 0%, rgb(68, 0, 11) 74%)',
-    normal: '#e0455f',
+      'linear-gradient(315deg, rgba(224, 69, 95, 0.3) 0%, rgba(68, 0, 11, 0.3) 74%)',
+    normal: 'rgba(224, 69, 95, 0.2)',
   };
 
   return teamName === winnerTeamName ? greenResult : redResult;

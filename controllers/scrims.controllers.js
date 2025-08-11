@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 // models
 const Scrim = require('../models/scrim.model');
@@ -1304,7 +1305,8 @@ const removeImageFromScrim = async (req, res) => {
     };
 
     // delete image in S3
-    await s3Bucket.deleteObject(params).promise();
+    const deleteCommand = new DeleteObjectCommand(params);
+    await s3Bucket.send(deleteCommand);
 
     // delete it from the scrim object in the mongoose database
     const scrim = await Scrim.findByIdAndUpdate(id, dataSending, { new: true })

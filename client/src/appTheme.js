@@ -178,6 +178,29 @@ export const appTheme = createTheme({
       },
     },
 
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: 'rgba(18, 24, 38, 0.95)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(33, 150, 243, 0.3)',
+          color: '#fff',
+          fontSize: '0.875rem',
+          fontWeight: 500,
+          padding: '8px 12px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+        },
+        arrow: {
+          color: 'rgba(18, 24, 38, 0.95)',
+          '&::before': {
+            border: '1px solid rgba(33, 150, 243, 0.3)',
+            backgroundColor: 'rgba(18, 24, 38, 0.95)',
+          },
+        },
+      },
+    },
+
     MuiStepper: {
       styleOverrides: {
         root: {
