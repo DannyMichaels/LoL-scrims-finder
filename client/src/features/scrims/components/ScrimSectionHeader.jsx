@@ -7,7 +7,6 @@ import { useScrimSectionStyles } from '@/features/scrims/styles/ScrimSection.sty
 import { useDispatch } from 'react-redux';
 
 // components
-import Moment from 'react-moment';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -17,7 +16,6 @@ import Box from '@mui/material/Box';
 import AdminArea from '@/features/admin/components/AdminArea';
 import MessengerButton from '@/features/messenger/components/MessengerButton';
 import AdminPlayerControls from './AdminPlayerControls';
-import GlassPanel from '@/components/shared/GlassPanel';
 
 // utils
 import 'moment-timezone';

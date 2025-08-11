@@ -8,7 +8,6 @@ import { useDispatch } from 'react-redux';
 
 // Mui components
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -65,7 +64,6 @@ export default function Navbar({
   const classes = useStyles();
 
   const theme = useTheme();
-  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { usersLoaded, usersSearchValue } = useUsers();
   const { currentUser } = useAuth();

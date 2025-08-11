@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useScrimStore from '@/features/scrims/stores/scrimStore';
-import moment from 'moment';
 import { isPastDate as isDateInPast } from '@/utils/timezone';
 
 // components
@@ -14,7 +13,7 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@/components/shared/Tooltip';
 import RefreshScrimsButton from '@/features/scrims/components/RefreshScrimsButton';
-import { SCRIM_TYPES, getScrimIconByFilter } from '@/constants/scrimIcons';
+import { getScrimIconByFilter } from '@/constants/scrimIcons';
 
 /* Show scrims (current, previous, upcoming) buttons */
 
