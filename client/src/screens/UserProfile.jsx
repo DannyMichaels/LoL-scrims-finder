@@ -164,10 +164,10 @@ export default function UserProfile() {
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>{userData?.name} | Bootcamp LoL Scrim Gym</title>
+        <title>{userData?.name} | Reluminate.gg</title>
         <meta
           name="description"
-          content={`Visit ${userData?.name}'s Profile at Bootcamp LoL Scrim Gym!`}
+          content={`Visit ${userData?.name}'s Profile at Reluminate.gg - Lighting up the rift!`}
         />
       </Helmet>
 

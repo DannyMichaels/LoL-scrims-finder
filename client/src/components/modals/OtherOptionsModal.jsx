@@ -102,7 +102,7 @@ export default function MoreOptionsModal() {
         </AdminArea>
 
         <IconGroup
-          tooltipTitle="Scrim Gym Simplified"
+          tooltipTitle="Reluminate.gg Guide"
           title="Guide"
           Icon={SchoolIcon}
           onClick={() => {

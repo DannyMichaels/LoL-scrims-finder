@@ -13,6 +13,7 @@ import Loading from '../components/shared/Loading';
 import Navbar from '../components/shared/Navbar/Navbar';
 import Tooltip from '../components/shared/Tooltip';
 import ScrimsColumn from '../components/scrim_components/ScrimsColumn';
+import GlassPanel from '../components/shared/GlassPanel';
 
 // icons
 import HelpIcon from '@mui/icons-material/Help';
@@ -86,40 +87,56 @@ export default function Scrims() {
           ) : (
             // if filteredScrims.length is <= 0
             <InnerColumn>
-              <Grid
-                container
-                direction="row"
-                alignItems="center"
-                justifyContent="center">
-                <Typography
-                  align="center"
-                  variant="h1"
-                  component="h1"
-                  className="text-white">
-                  No scrims found in {scrimsRegion}
-                </Typography>
-                <Box marginRight={2} />
-                <Box style={{ cursor: 'help' }}>
-                  <Tooltip
-                    title={
-                      <>
-                        use the Region dropdown in the
-                        {matchesLg ? (
-                          <Grid item container alignItems="center">
-                            "More Options" ( <MenuIcon fontSize="small" /> )
-                            menu
-                          </Grid>
-                        ) : (
-                          ' Navbar/Header'
-                        )}
-                        &nbsp;to change the region
-                      </>
-                    }
-                    placement="top">
-                    <HelpIcon fontSize="large" />
-                  </Tooltip>
-                </Box>
-              </Grid>
+              <GlassPanel
+                variant="blue"
+                sx={{
+                  p: 4,
+                  textAlign: 'center',
+                  minHeight: '200px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Grid
+                  container
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center">
+                  <Typography
+                    align="center"
+                    variant="h1"
+                    component="h1"
+                    sx={{
+                      fontWeight: 700,
+                      background: 'linear-gradient(135deg, #64B5F6 0%, #2196F3 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}>
+                    No scrims found in {scrimsRegion}
+                  </Typography>
+                  <Box marginRight={2} />
+                  <Box style={{ cursor: 'help' }}>
+                    <Tooltip
+                      title={
+                        <>
+                          use the Region dropdown in the
+                          {matchesLg ? (
+                            <Grid item container alignItems="center">
+                              "More Options" ( <MenuIcon fontSize="small" /> )
+                              menu
+                            </Grid>
+                          ) : (
+                            ' Navbar/Header'
+                          )}
+                          &nbsp;to change the region
+                        </>
+                      }
+                      placement="top">
+                      <HelpIcon fontSize="large" sx={{ color: '#64B5F6' }} />
+                    </Tooltip>
+                  </Box>
+                </Grid>
+              </GlassPanel>
             </InnerColumn>
           )}
         </div>

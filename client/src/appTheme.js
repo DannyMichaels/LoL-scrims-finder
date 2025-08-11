@@ -1,17 +1,35 @@
 import { createTheme } from '@mui/material/styles';
 
 export const COLORS = {
+  // Primary blues from Reluminate.gg
+  PRIMARY_BLUE: '#2196F3',
+  LIGHT_BLUE: '#64B5F6',
+  DARK_BLUE: '#1976D2',
+  DARKER_BLUE: '#0D47A1',
+  
+  // Dark backgrounds
+  DARK_BG: '#0a0e1a',
+  DARK_SURFACE: '#121826',
+  DARK_ELEVATED: '#1a2234',
+  
+  // Glass effects for dark theme
+  GLASS_DARK: 'rgba(255, 255, 255, 0.05)',
+  GLASS_DARK_HOVER: 'rgba(255, 255, 255, 0.08)',
+  GLASS_BLUE: 'rgba(33, 150, 243, 0.1)',
+  GLASS_BLUE_HOVER: 'rgba(33, 150, 243, 0.15)',
+  
+  // Text colors
+  TEXT_PRIMARY: '#FFFFFF',
+  TEXT_SECONDARY: 'rgba(255, 255, 255, 0.7)',
+  TEXT_DISABLED: 'rgba(255, 255, 255, 0.5)',
+  
+  // Legacy colors (for gradual migration)
   DARK: '#101820',
-  DARK_TRANSPARENT: 'rgba(0, 0, 0, 0.61)', // dark filter to darken bg image
-
-  DK_BLUE: 'rgba(18,25,35)',
-  DK_BLUE_TRANSPARENT: 'rgba(18,25,35,.85)', // dark filter to darken bg image
-
+  DK_BLUE_TRANSPARENT: 'rgba(18,25,35,.85)',
   EGGSHELL_WHITE: '#d1dcde',
   BROWN: '#573625',
-
-  GREY_DEFAULT: '#303030',
-  GREY_PAPER: '#424242',
+  GREY_DEFAULT: '#0a0e1a',
+  GREY_PAPER: '#121826',
 };
 
 export const appTheme = createTheme({
@@ -29,30 +47,45 @@ export const appTheme = createTheme({
     mode: 'dark',
 
     primary: {
-      main: COLORS.EGGSHELL_WHITE,
-      contrastText: COLORS.BROWN,
-      linkColor: '#fff',
+      main: COLORS.PRIMARY_BLUE,
+      light: COLORS.LIGHT_BLUE,
+      dark: COLORS.DARK_BLUE,
+      contrastText: '#FFFFFF',
     },
 
     secondary: {
-      main: COLORS.BROWN,
-      linkColor: COLORS.DARK,
-      contrastText: '#fff',
+      main: COLORS.LIGHT_BLUE,
+      light: '#90CAF9',
+      dark: COLORS.PRIMARY_BLUE,
+      contrastText: '#FFFFFF',
     },
 
     background: {
-      default: COLORS.GREY_DEFAULT,
-      paper: COLORS.GREY_PAPER,
+      default: COLORS.DARK_BG,
+      paper: COLORS.DARK_SURFACE,
+    },
+
+    text: {
+      primary: COLORS.TEXT_PRIMARY,
+      secondary: COLORS.TEXT_SECONDARY,
+    },
+
+    error: {
+      main: '#f44336',
+    },
+
+    success: {
+      main: '#4CAF50',
     },
   },
+
   typography: {
-    // Use the system font instead of the default Roboto font.
     fontFamily: ['Montserrat', 'sans-serif'].join(','),
 
     h1: {
-      color: '#fff',
-      fontSize: '2em',
-      fontWeight: 'bold',
+      color: COLORS.TEXT_PRIMARY,
+      fontSize: '2.5rem',
+      fontWeight: 700,
       marginTop: '0.67em',
       marginBottom: '0.67em',
       marginLeft: 0,
@@ -60,82 +93,159 @@ export const appTheme = createTheme({
     },
 
     h2: {
-      fontSize: '1.5em',
-      fontWeight: 'bold',
+      fontSize: '2rem',
+      fontWeight: 600,
       marginBlockStart: '0.83em',
       marginBlockEnd: '0.83em',
-      color: '#fff',
+      color: COLORS.TEXT_PRIMARY,
     },
 
     span: {
-      color: '#fff',
+      color: COLORS.TEXT_PRIMARY,
     },
 
     h3: {
       display: 'block',
-      fontSize: '1.17em',
+      fontSize: '1.5rem',
       marginTop: '1em',
       marginBottom: '1em',
       marginLeft: 0,
       marginRight: 0,
-      fontWeight: 'bold',
+      fontWeight: 600,
+      color: COLORS.TEXT_PRIMARY,
     },
 
     h5: {
-      fontSize: '0.83em',
-      fontWeight: 'bold',
+      fontSize: '1rem',
+      fontWeight: 600,
       lineHeight: '1.4',
-      color: '#000',
+      color: COLORS.TEXT_PRIMARY,
     },
 
     p: {
-      color: 'green',
-      fontWeight: 600,
+      color: COLORS.TEXT_PRIMARY,
+      fontWeight: 400,
       display: 'block',
       marginBlockStart: '1em',
       marginBlockEnd: '1em',
       marginInlineStart: '0px',
       marginInlineEnd: '0px',
-      fontSize: '22px',
+      fontSize: '1rem',
+    },
+
+    body1: {
+      color: COLORS.TEXT_PRIMARY,
+    },
+
+    body2: {
+      color: COLORS.TEXT_SECONDARY,
     },
   },
 
-  // https://mui.com/customization/theme-components/
   components: {
-    // Name of the component
     MuiButton: {
       styleOverrides: {
-        // Name of the slot
         root: {
-          // Some CSS
           fontSize: '1rem',
           fontWeight: 600,
+          borderRadius: '8px',
+          textTransform: 'none',
+          padding: '10px 20px',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 12px rgba(33, 150, 243, 0.3)',
+          },
+        },
+        contained: {
+          boxShadow: '0 2px 8px rgba(33, 150, 243, 0.2)',
+        },
+        containedPrimary: {
+          background: `linear-gradient(135deg, ${COLORS.PRIMARY_BLUE} 0%, ${COLORS.DARK_BLUE} 100%)`,
+          '&:hover': {
+            background: `linear-gradient(135deg, ${COLORS.LIGHT_BLUE} 0%, ${COLORS.PRIMARY_BLUE} 100%)`,
+          },
         },
       },
     },
 
-    // step component in signup page
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          backgroundColor: COLORS.DARK_SURFACE,
+        },
+      },
+    },
+
     MuiStepper: {
       styleOverrides: {
         root: {
-          backgroundColor: COLORS.DK_BLUE,
-          boxShadow: '1px 0px 7px 1px #fff',
+          backgroundColor: COLORS.DARK_SURFACE,
+          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.3)',
           padding: '20px',
-          borderRadius: '4px',
+          borderRadius: '12px',
+          border: '1px solid rgba(33, 150, 243, 0.2)',
         },
       },
     },
 
-    // Navbar styles
     MuiAppBar: {
       styleOverrides: {
         root: {
           top: '0',
           zIndex: '5',
-          borderBottom: '1px solid white',
-          background: '#101820 !important', // fallback for no rgba support
-          backgroundColor: `${COLORS.DK_BLUE_TRANSPARENT} !important`,
-          backdropFilter: 'blur(8px)',
+          borderBottom: '1px solid rgba(33, 150, 243, 0.2)',
+          background: 'transparent',
+          backgroundColor: 'rgba(18, 24, 38, 0.7)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: '0 2px 20px rgba(0, 0, 0, 0.3)',
+        },
+      },
+    },
+
+    MuiCheckbox: {
+      styleOverrides: {
+        root: {
+          color: COLORS.PRIMARY_BLUE,
+          '&.Mui-checked': {
+            color: COLORS.PRIMARY_BLUE,
+          },
+        },
+      },
+    },
+
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'rgba(33, 150, 243, 0.3)',
+            },
+            '&:hover fieldset': {
+              borderColor: COLORS.PRIMARY_BLUE,
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: COLORS.PRIMARY_BLUE,
+            },
+          },
+          '& .MuiInputBase-input': {
+            color: COLORS.TEXT_PRIMARY,
+          },
+          '& .MuiInputLabel-root': {
+            color: COLORS.TEXT_SECONDARY,
+          },
+        },
+      },
+    },
+
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: COLORS.DARK_ELEVATED,
+          border: '1px solid rgba(33, 150, 243, 0.2)',
+          color: COLORS.TEXT_PRIMARY,
         },
       },
     },

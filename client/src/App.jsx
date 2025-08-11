@@ -52,7 +52,7 @@ function App() {
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>Bootcamp LoL Scrim Gym</title>
+        <title>Reluminate.gg</title>
         <meta name="description" content="Find LoL Custom Lobbies!" />
       </Helmet>
 

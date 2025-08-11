@@ -9,29 +9,38 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
     maxWidth: '1100px',
     marginRight: 'auto',
     marginLeft: 'auto',
+    marginBottom: '30px', // Add space for the button
+    position: 'relative',
 
     backgroundImage: ({ scrim }) =>
       scrim?.teamWon
         ? `url(${scrim.postGameImage?.location || HappyTeam})`
         : `url(${BgGIF})`,
 
-    transition: 'background-image 250ms ease-in-out',
+    transition: 'all 0.3s ease',
 
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',
-    border: '1px solid white',
+    border: '1px solid rgba(33, 150, 243, 0.3)',
+    borderRadius: theme.spacing(1),
+    overflow: 'visible', // Allow button to show outside
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+  },
 
+  scrimBoxInner: {
+    overflow: 'hidden', // Content overflow hidden here
+    borderRadius: theme.spacing(1),
     paddingBottom: ({ isBoxExpanded }) => (isBoxExpanded ? '20px' : 'inherit'),
   },
 
   scrimSectionHeader: {
-    background: '#101820 !important', // fallback
-    backgroundColor: 'rgba(18,25,35,.85) !important',
-    padding: '10px',
+    background: 'rgba(18, 24, 38, 0.9)',
+    backgroundColor: 'rgba(18, 24, 38, 0.9) !important',
+    padding: '16px',
 
-    backdropFilter: ({ isBoxExpanded }) =>
-      isBoxExpanded ? 'blur(8px)' : 'blur(2.5px)',
+    backdropFilter: 'blur(10px)',
+    borderBottom: '1px solid rgba(33, 150, 243, 0.3)',
 
     minHeight: '250px',
   },
@@ -66,23 +75,28 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
 
   teamListHeader: {
     color: '#fff !important',
-    background: '#101820 !important', // fallback
-    backgroundColor: 'rgba(18,25,35, .85) !important',
-    backdropFilter: 'blur(8px)',
+    background: 'rgba(33, 150, 243, 0.15)',
+    backgroundColor: 'rgba(33, 150, 243, 0.15) !important',
+    backdropFilter: 'blur(10px)',
+    borderBottom: '1px solid rgba(33, 150, 243, 0.3)',
   },
 
   teamList: {
     width: '100%',
     maxWidth: '36ch',
-    background: '#101820 !important', // fallback
-    backgroundColor: 'rgba(18,25,35, .85) !important',
-    backdropFilter: 'blur(20px)',
+    background: 'rgba(18, 24, 38, 0.85)',
+    backgroundColor: 'rgba(18, 24, 38, 0.85) !important',
+    backdropFilter: 'blur(15px)',
+    border: '1px solid rgba(33, 150, 243, 0.2)',
+    borderRadius: theme.spacing(1),
 
-    transition: 'all 250ms ease-in-out',
+    transition: 'all 0.3s ease',
     paddingBottom: '0 !important', // defaults to 8px
 
     '&:hover': {
-      backgroundColor: 'rgba(18,25,35) !important',
+      backgroundColor: 'rgba(18, 24, 38, 0.95) !important',
+      border: '1px solid rgba(33, 150, 243, 0.4)',
+      boxShadow: '0 4px 12px rgba(33, 150, 243, 0.2)',
     },
     '@media screen and (max-width: 630px)': {
       maxWidth: '100%',

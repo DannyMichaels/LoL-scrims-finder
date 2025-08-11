@@ -22,16 +22,23 @@ import InfoIcon from '@mui/icons-material/Info';
 import { makeStyles } from '@mui/styles';
 import { copyTextToClipboard } from './../../utils/copyToClipboard';
 import pluralize from 'pluralize';
-import { COLORS } from './../../appTheme';
 
 // Removed direct service import - using store instead
 
 const useStyles = makeStyles({
   infoBoxRoot: {
-    backgroundColor: COLORS.DK_BLUE_TRANSPARENT,
-    padding: '10px',
-    borderRadius: '4px',
-    backdropFilter: 'blur(8px)',
+    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+    padding: '16px',
+    borderRadius: '8px',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(33, 150, 243, 0.3)',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+    '&:hover': {
+      backgroundColor: 'rgba(33, 150, 243, 0.15)',
+      border: '1px solid rgba(33, 150, 243, 0.4)',
+      boxShadow: '0 4px 12px rgba(33, 150, 243, 0.2)',
+    },
   },
 });
 

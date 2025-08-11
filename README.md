@@ -123,6 +123,10 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - user profile page now uses charts.
 - added an admin dashboard with charts, stats and recent activities
 
+## 8/11/2025
+
+- UI redesign/update with new color scheme and glassmorphic UI, rebranded to reluminate.gg
+
 ---
 
 <br />

@@ -239,7 +239,7 @@ export default function SignUp() {
         <PageSection>
           <InnerColumn>
             <Typography variant="h1">
-              Welcome to Bootcamp LoL Scrim Gym, please fill in your details
+              Welcome to Reluminate.gg, please fill in your details
             </Typography>
 
             <Grid container item direction="column" md={12}>

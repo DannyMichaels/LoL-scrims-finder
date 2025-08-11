@@ -127,14 +127,17 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
 
 const useStyles = makeStyles({
   timer: {
-    background: 'white',
-    color: '#000',
+    background: 'rgba(33, 150, 243, 0.1)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(33, 150, 243, 0.3)',
+    color: '#fff',
     fontSize: '22px',
     display: 'flex',
     textAlign: 'center',
-    borderRadius: '3px',
+    borderRadius: '8px',
     justifyContent: 'center',
     padding: '20px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
     '@supports (gap: 10px)': {
       gap: '10px',
     },
@@ -149,8 +152,9 @@ const useStyles = makeStyles({
 
   timerText: {
     fontWeight: 600,
-    color: 'green',
+    color: '#64B5F6',
     fontSize: '22px !important',
+    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
   },
 });
 

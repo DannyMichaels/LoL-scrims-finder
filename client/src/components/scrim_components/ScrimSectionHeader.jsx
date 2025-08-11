@@ -191,16 +191,22 @@ export default function ScrimSectionHeader({
             <Grid item>
               <Tooltip arrow placement="top" title="Admin only: delete scrim">
                 <Button
-                  color="secondary"
+                  sx={{
+                    bgcolor: 'error.main',
+                    '&:hover': {
+                      bgcolor: 'error.dark',
+                    },
+                    color: 'white',
+                  }}
                   variant="contained"
                   onClick={handleDeleteScrim}>
-                  Close event
+                  Delete
                 </Button>
               </Tooltip>
             </Grid>
 
             <Grid item>
-              <AdminPlayerControls 
+              <AdminPlayerControls
                 scrim={scrim}
                 setScrim={setScrim}
                 socket={socket}

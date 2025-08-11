@@ -30,7 +30,6 @@ import NotificationsButton from './NotificationsButton';
 import MessengerButton from '../../Messenger_components/MessengerButton';
 
 // icons
-import Logo from '../../../assets/images/bootcamp_llc_media_kit/coin_logo_new2021.png';
 import KeyIcon from '@mui/icons-material/VpnKey';
 import MenuIcon from '@mui/icons-material/Menu'; // burger icon
 import SchoolIcon from '@mui/icons-material/School';
@@ -105,16 +104,33 @@ export default function Navbar({
                         <Link
                           to="/"
                           className="link-2"
-                          style={{ display: 'flex', alignItems: 'center' }}>
+                          style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <img
-                            src={Logo}
+                            src="/reluminate-logo.png"
                             style={{
                               width: '100%',
-                              maxWidth: '80px',
-                              minWidth: '40px',
+                              maxWidth: '48px',
+                              minWidth: '32px',
+                              height: 'auto',
                             }}
-                            alt="Logo"
+                            alt="Reluminate.gg Logo"
                           />
+                          <Hidden mdDown>
+                            <Typography
+                              component="h1"
+                              variant={matchesSm ? 'h3' : 'h1'}
+                              style={{
+                                fontSize: 'clamp(1.2rem, 4vw, 1.8rem)',
+                                fontWeight: 700,
+                                color: theme.palette.primary.main,
+                                transition: 'all 200ms ease-in-out',
+                                opacity: isSearchOpen ? '0' : '1',
+                                width: isSearchOpen ? '0' : 'auto',
+                                whiteSpace: 'nowrap',
+                              }}>
+                              RELUMINATE.GG
+                            </Typography>
+                          </Hidden>
                         </Link>
                       </Grid>
 
@@ -123,21 +139,6 @@ export default function Navbar({
                         container
                         alignItems="center"
                         flexWrap="nowrap">
-                        <Hidden mdDown>
-                          <Typography
-                            component="h1"
-                            variant={matchesSm ? 'h3' : 'h1'}
-                            style={{
-                              fontSize: 'clamp(1rem, 4vw, 1.3rem)',
-                              transition: 'all 200ms ease-in-out',
-                              opacity: isSearchOpen ? '0' : '1',
-                              width: isSearchOpen ? '0' : 'auto',
-                              whiteSpace: 'nowrap',
-                            }}
-                            className="text-white">
-                            Bootcamp LoL Scrim Gym
-                          </Typography>
-                        </Hidden>
 
                         <ClickAwayListener
                           onClickAway={() => {
@@ -182,7 +183,7 @@ export default function Navbar({
                     justifyContent="flex-end">
                     {!currentUser?.uid && !noGuide && (
                       <Grid item>
-                        <Tooltip title="Scrim Gym Simplified">
+                        <Tooltip title="Reluminate.gg Guide">
                           <Button
                             component={Link}
                             to="/guide"

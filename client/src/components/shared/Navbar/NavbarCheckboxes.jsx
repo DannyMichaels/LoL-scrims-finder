@@ -1,6 +1,8 @@
+import { useEffect, useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
 import useScrimStore from '../../../stores/scrimStore';
+import moment from 'moment';
 
 // components
 import Grid from '@mui/material/Grid';
@@ -24,8 +26,23 @@ export default function NavbarCheckboxes() {
     showUpcomingScrims,
     setShowPreviousScrims,
     setShowCurrentScrims,
-    setShowUpcomingScrims
+    setShowUpcomingScrims,
+    scrimsDate
   } = useScrimStore();
+
+  // Check if the selected date is in the past
+  const isPastDate = useMemo(() => {
+    const today = moment().startOf('day');
+    const selectedDate = moment(scrimsDate).startOf('day');
+    return selectedDate.isBefore(today);
+  }, [scrimsDate]);
+
+  // Auto-toggle off upcoming scrims for past dates
+  useEffect(() => {
+    if (isPastDate && showUpcomingScrims) {
+      setShowUpcomingScrims(false);
+    }
+  }, [isPastDate, showUpcomingScrims, setShowUpcomingScrims]);
 
   const toggleShowScrims = (e) => {
     const { name, checked } = e.target;
@@ -77,7 +94,9 @@ export default function NavbarCheckboxes() {
 
         <Tooltip
           title={
-            showUpcomingScrims ? 'Hide upcoming scrims' : 'Show upcoming scrims'
+            isPastDate 
+              ? 'No upcoming scrims for past dates' 
+              : (showUpcomingScrims ? 'Hide upcoming scrims' : 'Show upcoming scrims')
           }>
           <FormControlLabel
             control={
@@ -86,10 +105,12 @@ export default function NavbarCheckboxes() {
                 color="primary"
                 onChange={toggleShowScrims}
                 name="showUpcomingScrims"
+                disabled={isPastDate}
               />
             }
             label="Upcoming scrims"
             labelPlacement="bottom"
+            sx={isPastDate ? { opacity: 0.5 } : {}}
           />
         </Tooltip>
 

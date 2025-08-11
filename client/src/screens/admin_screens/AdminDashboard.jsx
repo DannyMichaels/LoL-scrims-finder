@@ -534,10 +534,10 @@ export default function AdminDashboard() {
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>Admin Dashboard | Bootcamp LoL Scrim Gym</title>
+        <title>Admin Dashboard | Reluminate.gg</title>
         <meta
           name="description"
-          content="Admin Dashboard for Bootcamp LoL Scrim Gym"
+          content="Admin Dashboard for Reluminate.gg"
         />
       </Helmet>
 

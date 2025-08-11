@@ -5,7 +5,6 @@ import { useState, useCallback } from 'react';
 import Tooltip from '../shared/Tooltip';
 
 // utils
-import { COLORS } from './../../appTheme';
 import styled from '@emotion/styled'; // decided to use styled components because this is too much css
 
 // icons
@@ -92,35 +91,34 @@ const StyledDivider = styled.div`
   box-shadow: none;
   margin: auto;
   box-sizing: inherit;
+  z-index: 10;
   &.collapsed {
-    border-bottom: 2px solid #404040;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
     height: 6em;
     margin-top: -6em;
-    background-image: -webkit-gradient(
-      linear,
-      left bottom,
-      left top,
-      from(#181818),
-      color-stop(20%, rgba(24, 24, 24, 0.7)),
-      color-stop(30%, rgba(24, 24, 24, 0.4)),
-      color-stop(50%, transparent)
+    background-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8),
+      rgba(0, 0, 0, 0.6) 20%,
+      rgba(0, 0, 0, 0.3) 40%,
+      transparent 70%
     );
+    border-radius: 0 0 8px 8px;
   }
 
   .scrim__expand--expandButton {
     position: absolute;
     bottom: 0;
-    min-width: 32px;
-    min-height: 32px;
-    max-width: 42px;
-    max-height: 42px;
-    border-width: 2px;
-    background-color: ${COLORS.DK_BLUE_TRANSPARENT};
-    backdrop-filter: blur(8px);
+    min-width: 36px;
+    min-height: 36px;
+    max-width: 46px;
+    max-height: 46px;
+    background: #2196F3;
+    backdrop-filter: blur(10px);
     padding-left: 0.8rem;
     padding-right: 0.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    border: 1px solid #1976D2;
     transform: translateY(50%);
     align-items: center;
     appearance: none;
@@ -131,18 +129,24 @@ const StyledDivider = styled.div`
     padding: 0.8rem;
     user-select: none;
     border-radius: 50%;
-    transition: all 250ms ease-in-out;
+    transition: all 0.3s ease;
+    z-index: 11;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
 
     &:focus {
       outline: none;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
     }
 
     &:hover {
-      filter: contrast(0.6);
+      background: #1976D2;
+      border: 1px solid #1565C0;
+      transform: translateY(50%) scale(1.1);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
     }
 
     .modal__expandIcon {
-      color: #fff;
+      color: #FFFFFF;
     }
   }
 `;

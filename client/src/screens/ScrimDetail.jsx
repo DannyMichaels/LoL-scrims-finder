@@ -73,14 +73,13 @@ export default function ScrimDetail() {
       <Helmet>
         <meta charSet="utf-8" />
         <title>
-          {scrim?.title ?? `${scrim.createdBy.name}'s Scrim`} | Bootcamp LoL
-          Scrim Gym
+          {scrim?.title ?? `${scrim.createdBy.name}'s Scrim`} | Reluminate.gg
         </title>
         <meta
           name="description"
           content={`Visit ${
             scrim?.title ?? 'this scrim'
-          } at Bootcamp LoL Scrim Gym!`}
+          } at Reluminate.gg - Lighting up the rift!`}
         />
       </Helmet>
 

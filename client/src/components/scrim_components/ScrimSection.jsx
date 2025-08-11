@@ -354,79 +354,81 @@ export default function ScrimSection({ scrimData, isInDetail }) {
   return (
     <PageSection aria-label="scrim section">
       <div className={classes.scrimBox} ref={scrimBoxRef}>
-        <ScrimSectionHeader
-          scrim={scrim}
-          setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
-          socket={socket}
-          joinCast={joinCast}
-          leaveCast={leaveCast}
-          handleDeleteScrim={handleDeleteScrim}
-          gameEnded={gameEnded}
-          casterEntered={casterEntered}
-          buttonsDisabled={buttonsDisabled}
-          isBoxExpanded={isBoxExpanded}
-          isInDetail={isInDetail}
-        />
+        <div className={classes.scrimBoxInner}>
+          <ScrimSectionHeader
+            scrim={scrim}
+            setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
+            socket={socket}
+            joinCast={joinCast}
+            leaveCast={leaveCast}
+            handleDeleteScrim={handleDeleteScrim}
+            gameEnded={gameEnded}
+            casterEntered={casterEntered}
+            buttonsDisabled={buttonsDisabled}
+            isBoxExpanded={isBoxExpanded}
+            isInDetail={isInDetail}
+          />
 
-        {isBoxExpanded && (
-          <div className={classes.teamsContainer}>
-            <ScrimTeamList
-              teamData={{
-                teamRoles: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
-                teamName: 'teamOne',
-                teamTitleName: 'Team One (Blue Side)',
-                teamArray: teamOne,
-              }}
-              scrim={scrim}
-              setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
-              socket={socket}
-              playerEntered={playerEntered}
-              casterEntered={casterEntered}
-              gameStarted={gameStarted === scrim._id}
-              buttonsDisabled={buttonsDisabled}
-              setButtonsDisabled={setButtonsDisabled}
-              setSwapPlayers={setSwapPlayers}
-              joinGame={joinGame}
-              leaveGame={leaveGame}
-              handleMovePlayer={handleMovePlayer}
-              kickPlayer={kickPlayer}
-            />
+          {isBoxExpanded && (
+            <div className={classes.teamsContainer}>
+              <ScrimTeamList
+                teamData={{
+                  teamRoles: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
+                  teamName: 'teamOne',
+                  teamTitleName: 'Team One (Blue Side)',
+                  teamArray: teamOne,
+                }}
+                scrim={scrim}
+                setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
+                socket={socket}
+                playerEntered={playerEntered}
+                casterEntered={casterEntered}
+                gameStarted={gameStarted === scrim._id}
+                buttonsDisabled={buttonsDisabled}
+                setButtonsDisabled={setButtonsDisabled}
+                setSwapPlayers={setSwapPlayers}
+                joinGame={joinGame}
+                leaveGame={leaveGame}
+                handleMovePlayer={handleMovePlayer}
+                kickPlayer={kickPlayer}
+              />
 
-            <ScrimSectionMiddleAreaBox
-              imageUploaded={imageUploaded}
-              scrim={scrim}
-              setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
-              gameStarted={gameStarted === scrim._id}
-              setGameStarted={setGameStarted}
-              gameEnded={gameEnded}
-              playerEntered={playerEntered}
-              casterEntered={casterEntered}
-              socket={socket}
-            />
+              <ScrimSectionMiddleAreaBox
+                imageUploaded={imageUploaded}
+                scrim={scrim}
+                setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
+                gameStarted={gameStarted === scrim._id}
+                setGameStarted={setGameStarted}
+                gameEnded={gameEnded}
+                playerEntered={playerEntered}
+                casterEntered={casterEntered}
+                socket={socket}
+              />
 
-            <ScrimTeamList
-              teamData={{
-                teamRoles: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
-                teamName: 'teamTwo',
-                teamTitleName: 'Team Two (Red Side)',
-                teamArray: teamTwo,
-              }}
-              scrim={scrim}
-              setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
-              socket={socket}
-              playerEntered={playerEntered}
-              casterEntered={casterEntered}
-              gameStarted={gameStarted === scrim._id}
-              buttonsDisabled={buttonsDisabled}
-              setButtonsDisabled={setButtonsDisabled}
-              setSwapPlayers={setSwapPlayers}
-              joinGame={joinGame}
-              leaveGame={leaveGame}
-              handleMovePlayer={handleMovePlayer}
-              kickPlayer={kickPlayer}
-            />
-          </div>
-        )}
+              <ScrimTeamList
+                teamData={{
+                  teamRoles: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
+                  teamName: 'teamTwo',
+                  teamTitleName: 'Team Two (Red Side)',
+                  teamArray: teamTwo,
+                }}
+                scrim={scrim}
+                setScrim={(updatedScrim) => setScrim(scrimId, updatedScrim)}
+                socket={socket}
+                playerEntered={playerEntered}
+                casterEntered={casterEntered}
+                gameStarted={gameStarted === scrim._id}
+                buttonsDisabled={buttonsDisabled}
+                setButtonsDisabled={setButtonsDisabled}
+                setSwapPlayers={setSwapPlayers}
+                joinGame={joinGame}
+                leaveGame={leaveGame}
+                handleMovePlayer={handleMovePlayer}
+                kickPlayer={kickPlayer}
+              />
+            </div>
+          )}
+        </div>
 
         {!isInDetail && (
           <ScrimSectionExpander

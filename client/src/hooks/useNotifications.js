@@ -67,7 +67,7 @@ export default function useNotifications() {
           
           const notification = new Notification(notificationTitle, {
             body: notificationBody,
-            icon: '/coin_logo_new2021.png',
+            icon: '/reluminate-logo.png',
             tag: `notification-${Date.now()}`,
             requireInteraction: false,
           });
@@ -118,7 +118,7 @@ export default function useNotifications() {
       if ('Notification' in window && Notification.permission === 'granted') {
         const notification = new Notification('Scrim Starting!', {
           body: data.message,
-          icon: '/coin_logo_new2021.png',
+          icon: '/reluminate-logo.png',
           tag: `scrim-${data.scrimId}`,
           requireInteraction: false,
         });

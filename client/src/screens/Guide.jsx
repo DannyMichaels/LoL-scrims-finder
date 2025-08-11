@@ -9,16 +9,16 @@ export default function Guide() {
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>Guide | Bootcamp LoL Scrim Gym</title>
-        <meta name="description" content="Scrim Gym Simplified!" />
+        <title>Guide | Reluminate.gg</title>
+        <meta name="description" content="Reluminate.gg - Lighting up the rift!" />
         <meta
           property="og:title"
-          content="Guide | Bootcamp LoL Scrim Gym"
+          content="Guide | Reluminate.gg"
           data-rh="true"
         />
         <meta
           property="og:description"
-          content="Scrim Gym Simplified!"
+          content="Reluminate.gg - Lighting up the rift!"
           data-rh="true"
         />
       </Helmet>
