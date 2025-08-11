@@ -62,11 +62,25 @@ export default function AdminPlayerControls({
     if (!searchValue || searchValue.length < 2) return [];
 
     return allUsers
-      .filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchValue.toLowerCase()) &&
-          user.region === scrim.region // Filter by same region
-      )
+      .filter((user) => {
+        // Must be same region
+        if (user.region !== scrim.region) return false;
+        
+        // Check if input contains # for Riot ID search
+        if (searchValue.includes('#')) {
+          const [searchName, searchTagline] = searchValue.split('#');
+          const nameMatch = user.name.toLowerCase().includes(searchName.toLowerCase());
+          const taglineMatch = searchTagline 
+            ? user.summonerTagline?.toLowerCase().includes(searchTagline.toLowerCase())
+            : true;
+          return nameMatch && taglineMatch;
+        }
+        
+        // Otherwise search by name or tagline separately
+        const nameMatch = user.name.toLowerCase().includes(searchValue.toLowerCase());
+        const taglineMatch = user.summonerTagline?.toLowerCase().includes(searchValue.toLowerCase());
+        return nameMatch || taglineMatch;
+      })
       .slice(0, 10); // Limit results
   }, [allUsers, searchValue, scrim.region]);
 
@@ -202,7 +216,7 @@ export default function AdminPlayerControls({
                   <TextField
                     {...params}
                     label="Search Users"
-                    placeholder="Type player name..."
+                    placeholder="Type player name or GameName#Tagline..."
                     fullWidth
                     margin="normal"
                   />
@@ -219,7 +233,12 @@ export default function AdminPlayerControls({
                       alt={option.rank || 'Unranked'}
                     />
                     <Box>
-                      <Typography variant="body1">{option.name}</Typography>
+                      <Typography variant="body1">
+                        {option.name}
+                        {option.summonerTagline && (
+                          <span style={{ color: '#999', fontSize: '0.9em' }}>#{option.summonerTagline}</span>
+                        )}
+                      </Typography>
                       <Typography variant="caption" color="text.secondary">
                         {option.region} • {option.rank || 'Unranked'}
                         {option.discord && ` • ${option.discord}`}
@@ -241,7 +260,12 @@ export default function AdminPlayerControls({
                     Selected Player:
                   </Typography>
                   <Typography variant="body2">
-                    <strong>{selectedUser.name}</strong> ({selectedUser.region})
+                    <strong>
+                      {selectedUser.name}
+                      {selectedUser.summonerTagline && (
+                        <span style={{ color: '#666', fontWeight: 'normal' }}>#{selectedUser.summonerTagline}</span>
+                      )}
+                    </strong> ({selectedUser.region})
                     - {selectedUser.rank || 'Unranked'}
                     {selectedUser.discord && ` • ${selectedUser.discord}`}
                   </Typography>
@@ -302,11 +326,10 @@ export default function AdminPlayerControls({
             {/* User Search */}
             <Autocomplete
               options={filteredUsers}
-              getOptionLabel={(option) =>
-                `${option.name} (${option.region}) - ${
-                  option.rank || 'Unranked'
-                }`
-              }
+              getOptionLabel={(option) => {
+                const tagline = option.summonerTagline ? `#${option.summonerTagline}` : '';
+                return `${option.name}${tagline} (${option.region}) - ${option.rank || 'Unranked'}`;
+              }}
               value={selectedUser}
               onChange={(event, newValue) => setSelectedUser(newValue)}
               inputValue={searchValue}
@@ -320,7 +343,7 @@ export default function AdminPlayerControls({
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  placeholder="Type player name..."
+                  placeholder="Type player name or GameName#Tagline..."
                   fullWidth
                   margin="normal"
                 />
@@ -399,7 +422,12 @@ export default function AdminPlayerControls({
                   Selected Player:
                 </Typography>
                 <Typography variant="body2">
-                  <strong>{selectedUser.name}</strong> ({selectedUser.region}) -{' '}
+                  <strong>
+                    {selectedUser.name}
+                    {selectedUser.summonerTagline && (
+                      <span style={{ color: '#666', fontWeight: 'normal' }}>#{selectedUser.summonerTagline}</span>
+                    )}
+                  </strong> ({selectedUser.region}) -{' '}
                   {selectedUser.rank || 'Unranked'}
                   {selectedUser.discord && ` • ${selectedUser.discord}`}
                 </Typography>

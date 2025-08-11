@@ -266,7 +266,7 @@ export default function Settings() {
                       const value = e.target.value.replace('#', '');
                       handleChange({
                         ...e,
-                        target: { ...e.target, value }
+                        target: { ...e.target, name: 'summonerTagline', value }
                       });
                     }}
                     label="Tagline"

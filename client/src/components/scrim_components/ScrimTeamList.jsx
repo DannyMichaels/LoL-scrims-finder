@@ -192,8 +192,8 @@ export default function ScrimTeamList({
                         <Tooltip
                           title={
                             isOnline
-                              ? `${userInfo?.name} is online`
-                              : `${userInfo?.name} is offline`
+                              ? `${userInfo?.name}${userInfo?.summonerTagline ? `#${userInfo.summonerTagline}` : ''} is online`
+                              : `${userInfo?.name}${userInfo?.summonerTagline ? `#${userInfo.summonerTagline}` : ''} is offline`
                           }>
                           <div
                             className={classes.onlineCircle}
@@ -205,10 +205,24 @@ export default function ScrimTeamList({
                         <Tooltip title={`Visit ${userInfo?.name}'s profile`}>
                           <Link
                             className="link"
-                            to={`/users/${userInfo?.name}?region=${userInfo?.region}`}>
+                            to={`/users/${userInfo?.name}?region=${userInfo?.region}${userInfo?.summonerTagline ? `&tagline=${userInfo.summonerTagline}` : ''}`}>
                             {isSmScreen
-                              ? userInfo?.name
-                              : truncate(userInfo?.name, 11)}
+                              ? (
+                                <>
+                                  {userInfo?.name}
+                                  {userInfo?.summonerTagline && (
+                                    <span style={{ color: '#999', fontSize: '0.9em' }}>#{userInfo.summonerTagline}</span>
+                                  )}
+                                </>
+                              )
+                              : (
+                                <>
+                                  {truncate(userInfo?.name, 11)}
+                                  {userInfo?.summonerTagline && (
+                                    <span style={{ color: '#999', fontSize: '0.9em' }}>#{truncate(userInfo.summonerTagline, 3)}</span>
+                                  )}
+                                </>
+                              )}
                           </Link>
                         </Tooltip>
 
@@ -304,7 +318,7 @@ export default function ScrimTeamList({
                       !gameEnded && (
                         <AdminArea>
                           <Tooltip
-                            title={`Kick ${encode(userInfo?.name)}`}
+                            title={`Kick ${encode(userInfo?.name)}${userInfo?.summonerTagline ? `#${encode(userInfo.summonerTagline)}` : ''}`}
                             className={classes.iconButton}>
                             <span>
                               <IconButton
@@ -314,7 +328,7 @@ export default function ScrimTeamList({
                                   let yes = window.confirm(
                                     `Are you sure you want to kick ${encode(
                                       userInfo?.name
-                                    )}?`
+                                    )}${userInfo?.summonerTagline ? `#${encode(userInfo.summonerTagline)}` : ''}?`
                                   );
                                   if (!yes) return;
                                   kickPlayerFromGame(playerAssigned, teamName);

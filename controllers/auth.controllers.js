@@ -380,6 +380,15 @@ const updateUser = async (req, res) => {
       }
     }
 
+    // Validate tagline if provided
+    if (req.body.summonerTagline !== undefined && req.body.summonerTagline !== '') {
+      if (!validateSummonerTagline(req.body.summonerTagline)) {
+        return res.status(400).json({
+          error: 'Error: Invalid tagline format. Must be 2-5 alphanumeric characters without #.',
+        });
+      }
+    }
+
     const isAdmin = req.body.adminKey === KEYS.ADMIN_KEY;
 
     const payload = {
