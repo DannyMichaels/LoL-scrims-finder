@@ -145,68 +145,70 @@ export default function ScrimSectionHeader({
         alignItems="center"
         justifyContent="space-between">
         <Grid item sm={6}>
-          <Tooltip
-            arrow
-            placement="top"
-            title="Redirect to scrim page"
-            open={!isInDetail && isHover}>
-            <Link
-              onMouseEnter={() => setIsHover(true)}
-              onMouseLeave={() => setIsHover(false)}
-              className="link"
-              style={{
-                textDecorationColor: '#000',
-                display: 'flex',
-                alignItems: 'center',
-                width: 'fit-content',
-              }}
-              to={`/scrims/${scrim._id}`}>
-              <Grid container alignItems="center" spacing={1}>
-                <Grid item>
-                  <Typography variant="h1" style={{ fontSize: '1.6rem' }}>
+          <Grid container alignItems="center" spacing={1}>
+            <Grid item>
+              <Tooltip
+                arrow
+                placement="top"
+                title="Redirect to scrim page"
+                open={!isInDetail && isHover}>
+                <Link
+                  onMouseEnter={() => setIsHover(true)}
+                  onMouseLeave={() => setIsHover(false)}
+                  className="link"
+                  style={{
+                    textDecorationColor: '#000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: 'fit-content',
+                  }}
+                  to={`/scrims/${scrim._id}`}>
+                  <Typography variant="h1" style={{ fontSize: '1.5rem' }}>
                     {/* if scrim has a title show title, else show createdby.name's scrim */}
                     {scrim.title ?? `${scrim.createdBy.name}'s Scrim`}
                   </Typography>
-                </Grid>
-                <Grid item>
-                  <Tooltip title={regionConfig.label} arrow placement="top">
-                    <Chip
-                      icon={<regionConfig.icon style={{ fontSize: '1rem' }} />}
-                      label={scrim.region}
-                      size="small"
-                      sx={{
-                        backgroundColor: `${regionConfig.color}20`,
-                        border: `1px solid ${regionConfig.color}60`,
-                        color: '#fff',
-                        fontWeight: 600,
-                        '& .MuiChip-icon': {
-                          color: regionConfig.color,
-                        },
-                        '&:hover': {
-                          backgroundColor: `${regionConfig.color}30`,
-                          border: `1px solid ${regionConfig.color}80`,
-                        },
-                      }}
-                    />
-                  </Tooltip>
-                </Grid>
-                {scrim.isPrivate && (
-                  <Grid item>
-                    <Chip
-                      label="Private"
-                      size="small"
-                      sx={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        color: '#999',
-                        fontWeight: 500,
-                      }}
-                    />
-                  </Grid>
-                )}
+                </Link>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Tooltip title={regionConfig.label} arrow placement="top">
+                <Chip
+                  icon={<regionConfig.icon style={{ fontSize: '1.2rem' }} />}
+                  label={scrim.region}
+                  size="medium"
+                  sx={{
+                    backgroundColor: `${regionConfig.color}20`,
+                    border: `1px solid ${regionConfig.color}60`,
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    height: '32px',
+                    '& .MuiChip-icon': {
+                      color: regionConfig.color,
+                    },
+                    '&:hover': {
+                      backgroundColor: `${regionConfig.color}30`,
+                      border: `1px solid ${regionConfig.color}80`,
+                    },
+                  }}
+                />
+              </Tooltip>
+            </Grid>
+            {scrim.isPrivate && (
+              <Grid item>
+                <Chip
+                  label="Private"
+                  size="small"
+                  sx={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: '#999',
+                    fontWeight: 500,
+                  }}
+                />
               </Grid>
-            </Link>
-          </Tooltip>
+            )}
+          </Grid>
         </Grid>
         <Grid
           item

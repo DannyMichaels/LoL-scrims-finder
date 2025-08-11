@@ -13,6 +13,14 @@ import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import GlassPanel from '../../components/shared/GlassPanel';
+import SectionHeader from '../../components/shared/SectionHeader';
+import {
+  GlassTextField,
+  GlassSelect,
+} from '../../components/shared/GlassInput';
 import {
   PageContent,
   PageSection,
@@ -393,427 +401,503 @@ function ScrimEdit() {
       <PageContent>
         <PageSection>
           <InnerColumn>
-            <form
+            <Typography
+              variant="h1"
+              align="center"
+              sx={{ mb: 4, color: '#fff', fontWeight: 'bold' }}>
+              ⚙️ Edit Scrim
+            </Typography>
+
+            <Box
+              component="form"
               onSubmit={handleSubmit}
-              style={{
-                width: '100%',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }}>
-              <Grid
-                mt={2}
-                container
-                direction="column"
-                alignItems="center"
-                spacing={4}
-                style={{
-                  marginLeft: 'auto',
-                  marginRight: 'auto',
-                  width: '100%',
-                }}>
-                <Grid
-                  container
-                  justifyContent="center"
-                  alignItems="center"
-                  spacing={2}>
-                  <Grid item xs={8} sm={3} md={2}>
-                    <DatePicker
-                      fullWidth
-                      label={
-                        <span className="text-white">Game Start Date</span>
-                      }
-                      variant="standard"
-                      onChange={handleChangeDate}
-                      required
-                      name="gameStartDate"
-                      value={scrimData.gameStartTime}
-                    />
-                  </Grid>
-                  <Grid item xs={8} sm={3} md={2}>
-                    <TimePicker
-                      fullWidth
-                      label={
-                        <span className="text-white">Game Start Time</span>
-                      }
-                      onChange={handleChangeTime}
-                      required
-                      name="gameStartTime"
-                      variant="standard"
-                      value={scrimData?.gameStartTime}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Grid
-                  mt={2}
-                  container
-                  direction="column"
-                  alignItems="center"
-                  justifyContent="center"
-                  spacing={2}>
-                  <Grid item>
-                    <FormHelperText className="text-white">
-                      Scrim Title
-                    </FormHelperText>
-                    <TextField
-                      onChange={handleChange}
-                      required
-                      type="text"
-                      name="title"
-                      variant="standard"
-                      value={scrimData.title}
-                      helperText={`Example: ${scrimData?.createdBy?.name}'s Scrim`}
-                    />
-                  </Grid>
-
-                  <Grid item>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item>
-                        <FormHelperText className="text-white">
-                          Lobby Password
-                        </FormHelperText>
-                      </Grid>
-                      <Grid item>
-                        <Tooltip title="This password is used for manual lobby creation if tournament code generation fails">
-                          <InfoIcon style={{ fontSize: 16, color: '#999', cursor: 'help' }} />
-                        </Tooltip>
-                      </Grid>
-                    </Grid>
-                    <TextField
-                      onChange={handleChange}
-                      required
-                      type="text"
-                      name="lobbyPassword"
-                      variant="standard"
-                      value={scrimData.lobbyPassword}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Grid item>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={scrimData.useTournamentCode !== false}
-                        onChange={(e) => {
-                          const useTournament = e.target.checked;
-                          setScrimData((prev) => ({
-                            ...prev,
-                            useTournamentCode: useTournament,
-                            // When switching to manual, clear tournament data
-                            // When switching back to tournament, keep existing tournament data if any
-                            riotTournament: useTournament ? prev.riotTournament : null,
-                            // Reset lobbyName appropriately
-                            lobbyName: useTournament 
-                              ? (prev.riotTournament?.tournamentCode || prev.lobbyName || prev.title)
-                              : (prev.lobbyName || prev.title),
-                          }));
-                        }}
-                        color="primary"
-                      />
-                    }
-                    label="Use Riot Tournament Code (Auto-generated lobby)"
-                    labelPlacement="end"
-                  />
-                </Grid>
-
-                {/* Only show lobby name field if NOT using tournament code */}
-                {!scrimData.useTournamentCode && (
-                  <Grid item>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item>
-                        <FormHelperText className="text-white">
-                          Lobby Name
-                        </FormHelperText>
-                      </Grid>
-                      <Grid item>
-                        <Tooltip title="Manual lobby name for custom game creation. If empty, defaults to scrim title">
-                          <InfoIcon style={{ fontSize: 16, color: '#999', cursor: 'help' }} />
-                        </Tooltip>
-                      </Grid>
-                    </Grid>
-                    <TextField
-                      fullWidth
-                      variant="standard"
-                      name="lobbyName"
-                      value={scrimData.lobbyName || ''}
-                      onChange={handleChange}
-                      placeholder={`Enter custom lobby name (defaults to "${scrimData.title || 'Scrim Title'}")`}
-                    />
-                  </Grid>
-                )}
-
-                {/* Show tournament code info if using tournament code and code exists */}
-                {scrimData.useTournamentCode && scrimData.riotTournament?.tournamentCode && (
-                  <Grid item>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item>
-                        <FormHelperText className="text-white">
-                          Tournament Code
-                        </FormHelperText>
-                      </Grid>
-                    </Grid>
-                    <Grid container alignItems="flex-end" spacing={1}>
-                      <Grid item style={{ flex: 1 }}>
-                        <TextField
+              sx={{ width: '100%', maxWidth: 1200 }}>
+              <Grid container spacing={3}>
+                {/* Date & Time Section */}
+                <Grid item xs={12}>
+                  <GlassPanel variant="blue">
+                    <SectionHeader icon="⏰">Schedule</SectionHeader>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <DatePicker
                           fullWidth
-                          variant="standard"
-                          value={scrimData.riotTournament.tournamentCode}
-                          disabled
-                          InputProps={{
-                            style: { color: '#2196F3' }
+                          label={
+                            <span style={{ color: '#fff' }}>
+                              Game Start Date
+                            </span>
+                          }
+                          variant="outlined"
+                          onChange={handleChangeDate}
+                          required
+                          name="gameStartDate"
+                          value={scrimData.gameStartTime}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                              backdropFilter: 'blur(10px)',
+                              borderRadius: '12px',
+                              '& fieldset': {
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                              },
+                              '&:hover fieldset': {
+                                borderColor: 'rgba(33, 150, 243, 0.5)',
+                              },
+                            },
+                            '& .MuiInputBase-input': {
+                              color: '#fff',
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: 'rgba(255, 255, 255, 0.8)',
+                            },
                           }}
                         />
                       </Grid>
-                      <Grid item>
-                        <Tooltip title="Generate a new tournament code">
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="primary"
-                            onClick={handleRegenerateTournamentCode}>
-                            Regenerate
-                          </Button>
-                        </Tooltip>
-                      </Grid>
-                      <Grid item>
-                        <Tooltip title="Clear current tournament code">
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="secondary"
-                            onClick={() => {
-                              setScrimData((prev) => ({
-                                ...prev,
-                                riotTournament: null,
-                              }));
-                            }}>
-                            Clear
-                          </Button>
-                        </Tooltip>
-                      </Grid>
-                    </Grid>
-                    <FormHelperText style={{ color: '#2196F3', fontSize: '0.7rem' }}>
-                      Tournament code auto-generated
-                    </FormHelperText>
-                  </Grid>
-                )}
-
-                <Grid
-                  item
-                  container
-                  direction="row"
-                  alignItems="center"
-                  justifyContent="center"
-                  spacing={2}>
-                  <Grid item xs={12} sm={2} md={2}>
-                    <Select
-                      label="region"
-                      name="region"
-                      value={scrimData.region}
-                      className="text-white"
-                      onChange={handleChange}
-                      fullWidth
-                      variant="standard">
-                      {['NA', 'EUW', 'EUNE', 'LAN', 'OCE'].map(
-                        (region, key) => (
-                          <MenuItem value={region} key={key}>
-                            {region}
-                          </MenuItem>
-                        )
-                      )}
-                    </Select>
-
-                    <FormHelperText className="text-white">
-                      Scrim region
-                    </FormHelperText>
-                  </Grid>
-
-                  <Grid item>
-                    <Select
-                      variant="standard"
-                      name="_lobbyHost"
-                      onChange={handleChange}
-                      value={scrimData._lobbyHost || RANDOM_HOST_CODE}>
-                      {/* check that names aren't repeating */}
-                      {[RANDOM_HOST_CODE, ...idsArr].map((id, key) => {
-                        if (id === RANDOM_HOST_CODE)
-                          return (
-                            <MenuItem
-                              value={RANDOM_HOST_CODE}
-                              key={RANDOM_HOST_CODE}>
-                              Random Host!
-                            </MenuItem>
-                          );
-
-                        if (id === currentUser?._id) {
-                          return (
-                            <MenuItem value={id} key={key}>
-                              I will host!
-                            </MenuItem>
-                          );
-                        }
-
-                        return (
-                          <MenuItem value={id} key={key}>
-                            {usersArr.find((user) => user?._id === id)?.name}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                    <FormHelperText className="text-white">
-                      Lobby host
-                    </FormHelperText>
-                  </Grid>
-
-                  {scrimData.isWithCasters && (
-                    <Grid item xs={12} sm={2} md={2}>
-                      <Select
-                        variant="standard"
-                        label="Max casters allowed"
-                        name="maxCastersAllowedCount"
-                        value={scrimData.maxCastersAllowedCount}
-                        className="text-white"
-                        onChange={handleChange}
-                        fullWidth>
-                        {[1, 2].map((value, key) => (
-                          <MenuItem value={value} key={key}>
-                            {value}
-                          </MenuItem>
-                        ))}
-                      </Select>
-
-                      <FormHelperText className="text-white">
-                        Max casters count
-                      </FormHelperText>
-                    </Grid>
-                  )}
-                </Grid>
-
-                <Grid
-                  item
-                  container
-                  alignItems="center"
-                  justifyContent="center"
-                  spacing={2}
-                  direction="row">
-                  <Grid item>
-                    <FormHelperText className="text-white">
-                      Who Won?
-                    </FormHelperText>
-                    <Select
-                      variant="standard"
-                      name="teamWon"
-                      value={scrimData.teamWon || 'N/A'}
-                      onChange={handleChange}>
-                      {['teamOne', 'teamTwo', 'N/A'].map((team, key) => {
-                        const teamAliases = {
-                          teamOne: 'Team 1 (Blue Side)',
-                          teamTwo: 'Team 2 (Red Side)',
-                          'N/A': 'N/A',
-                        };
-
-                        return (
-                          <MenuItem value={team} key={key}>
-                            {teamAliases[team]}
-                          </MenuItem>
-                        );
-                      })}
-                    </Select>
-                  </Grid>
-                  <Grid item>
-                    <FormControlLabel
-                      control={
-                        <Tooltip title="Is the scrim private?" placement="top">
-                          <Checkbox
-                            color="primary"
-                            checked={scrimData.isPrivate}
-                            onChange={() => {
-                              setScrimData((prevState) => ({
-                                ...prevState,
-                                isPrivate: !prevState.isPrivate,
-                              }));
-                            }}
-                            name="isPrivate"
-                          />
-                        </Tooltip>
-                      }
-                      label={
-                        <p
-                          style={{
-                            fontSize: '0.75rem',
-                            marginBottom: 0,
-                            marginTop: '19px',
-                          }}>
-                          Private
-                        </p>
-                      }
-                      labelPlacement="top"
-                    />
-                  </Grid>
-
-                  <Grid item>
-                    <FormControlLabel
-                      control={
-                        <Tooltip
-                          title={
-                            scrimData.isWithCasters
-                              ? 'Disallow casting'
-                              : 'Allow casting'
+                      <Grid item xs={12} sm={6}>
+                        <TimePicker
+                          fullWidth
+                          label={
+                            <span style={{ color: '#fff' }}>
+                              Game Start Time
+                            </span>
                           }
-                          placement="top">
-                          <Checkbox
-                            color="primary"
-                            checked={scrimData.isWithCasters}
-                            onChange={handleChange}
-                            name="isWithCasters"
-                          />
-                        </Tooltip>
-                      }
-                      label={
-                        <p
-                          style={{
-                            fontSize: '0.75rem',
-                            marginBottom: 0,
-                            marginTop: '19px',
-                          }}>
-                          With casters
-                        </p>
-                      }
-                      labelPlacement="top"
-                    />
-                  </Grid>
+                          variant="outlined"
+                          onChange={handleChangeTime}
+                          required
+                          name="gameStartTime"
+                          value={scrimData?.gameStartTime}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                              backdropFilter: 'blur(10px)',
+                              borderRadius: '12px',
+                              '& fieldset': {
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                              },
+                              '&:hover fieldset': {
+                                borderColor: 'rgba(33, 150, 243, 0.5)',
+                              },
+                            },
+                            '& .MuiInputBase-input': {
+                              color: '#fff',
+                            },
+                            '& .MuiInputLabel-root': {
+                              color: 'rgba(255, 255, 255, 0.8)',
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </GlassPanel>
                 </Grid>
 
-                <Grid item>
-                  <div className="page-break" />
-                  <Grid container direction="column" spacing={2}>
-                    <Grid item>
-                      <Button 
-                        variant="contained" 
-                        color="primary" 
-                        type="submit"
-                        startIcon={<SaveIcon />}
-                        fullWidth
-                        size="large">
-                        Save Changes
-                      </Button>
+                {/* Basic Information Section */}
+                <Grid item xs={12}>
+                  <GlassPanel variant="elevated">
+                    <SectionHeader icon="📝">Basic Information</SectionHeader>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} md={6}>
+                        <GlassTextField
+                          onChange={handleChange}
+                          required
+                          name="title"
+                          label="Scrim Title"
+                          value={scrimData.title}
+                          helperText={`📢 Example: ${scrimData?.createdBy?.name}'s Scrim`}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} md={6}>
+                        <GlassTextField
+                          onChange={handleChange}
+                          required
+                          name="lobbyPassword"
+                          label="Lobby Password"
+                          value={scrimData.lobbyPassword}
+                          helperText="🔑 Fallback password for manual lobby creation"
+                          InputProps={{
+                            endAdornment: (
+                              <Tooltip title="This password is used for manual lobby creation if tournament code generation fails">
+                                <InfoIcon
+                                  sx={{
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    cursor: 'help',
+                                  }}
+                                />
+                              </Tooltip>
+                            ),
+                          }}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        startIcon={<DeleteIcon />}
-                        fullWidth
-                        size="large"
-                        onClick={handleDeleteScrim}>
-                        Delete Scrim
-                      </Button>
+                  </GlassPanel>
+                </Grid>
+
+                {/* Tournament Settings Section */}
+                <Grid item xs={12}>
+                  <GlassPanel variant="elevated">
+                    <SectionHeader icon="🏆">Tournament Settings</SectionHeader>
+
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={scrimData.useTournamentCode !== false}
+                          onChange={(e) => {
+                            const useTournament = e.target.checked;
+                            setScrimData((prev) => ({
+                              ...prev,
+                              useTournamentCode: useTournament,
+                              riotTournament: useTournament
+                                ? prev.riotTournament
+                                : null,
+                              lobbyName: useTournament
+                                ? prev.riotTournament?.tournamentCode ||
+                                  prev.lobbyName ||
+                                  prev.title
+                                : prev.lobbyName || prev.title,
+                            }));
+                          }}
+                          color="primary"
+                          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                        />
+                      }
+                      label={
+                        <Typography sx={{ color: '#fff', fontSize: '1rem' }}>
+                          🎯 Use Riot Tournament Code (Auto-generated lobby)
+                        </Typography>
+                      }
+                      sx={{ mb: 2 }}
+                    />
+
+                    <Typography
+                      variant="body2"
+                      sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3 }}>
+                      {scrimData.useTournamentCode !== false
+                        ? '✅ Tournament code will be auto-generated when the game starts with full teams'
+                        : '⚠️ Players will need to manually create a custom lobby using the lobby name and password'}
+                    </Typography>
+
+                    {/* Only show lobby name field if NOT using tournament code */}
+                    {!scrimData.useTournamentCode && (
+                      <Box>
+                        <Typography
+                          variant="h3"
+                          sx={{ mb: 2, color: '#fff', fontSize: '1.2rem' }}>
+                          Custom Lobby Settings
+                        </Typography>
+                        <GlassTextField
+                          name="lobbyName"
+                          label="Lobby Name (Optional)"
+                          value={scrimData.lobbyName || ''}
+                          onChange={handleChange}
+                          placeholder={`Defaults to "${
+                            scrimData.title || 'Scrim Title'
+                          }" if empty`}
+                          helperText="💡 Leave empty to use scrim title as lobby name"
+                          InputProps={{
+                            endAdornment: (
+                              <Tooltip title="Manual lobby name for custom game creation. If left empty, it will default to the scrim title">
+                                <InfoIcon
+                                  sx={{
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                    cursor: 'help',
+                                  }}
+                                />
+                              </Tooltip>
+                            ),
+                          }}
+                        />
+                      </Box>
+                    )}
+
+                    {/* Show tournament code info if using tournament code and code exists */}
+                    {scrimData.useTournamentCode &&
+                      scrimData.riotTournament?.tournamentCode && (
+                        <Box>
+                          <Typography
+                            variant="h3"
+                            sx={{ mb: 2, color: '#fff', fontSize: '1.2rem' }}>
+                            Tournament Code
+                          </Typography>
+                          <Grid container alignItems="flex-end" spacing={2}>
+                            <Grid item style={{ flex: 1 }}>
+                              <GlassTextField
+                                value={scrimData.riotTournament.tournamentCode}
+                                disabled
+                                label="Active Tournament Code"
+                                InputProps={{
+                                  style: {
+                                    color: '#2196F3',
+                                    fontWeight: 'bold',
+                                  },
+                                }}
+                              />
+                            </Grid>
+                            <Grid item>
+                              <Tooltip title="Generate a new tournament code">
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  color="primary"
+                                  onClick={handleRegenerateTournamentCode}
+                                  sx={{
+                                    borderColor: 'rgba(33, 150, 243, 0.5)',
+                                    color: '#2196F3',
+                                    '&:hover': {
+                                      borderColor: '#2196F3',
+                                      backgroundColor:
+                                        'rgba(33, 150, 243, 0.1)',
+                                    },
+                                  }}>
+                                  🔄 Regenerate
+                                </Button>
+                              </Tooltip>
+                            </Grid>
+                          </Grid>
+                          <FormHelperText
+                            sx={{
+                              color: '#2196F3',
+                              fontSize: '0.8rem',
+                              mt: 1,
+                            }}>
+                            ✨ Tournament code auto-generated
+                          </FormHelperText>
+                        </Box>
+                      )}
+                  </GlassPanel>
+                </Grid>
+
+                {/* Game Configuration Section */}
+                <Grid item xs={12}>
+                  <GlassPanel variant="default">
+                    <SectionHeader icon="⚙️">Game Configuration</SectionHeader>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={4}>
+                        <GlassSelect
+                          name="region"
+                          value={scrimData.region}
+                          onChange={handleChange}
+                          helperText="🌍 Scrim Region">
+                          {['NA', 'EUW', 'EUNE', 'LAN', 'OCE'].map(
+                            (region, key) => (
+                              <MenuItem value={region} key={key}>
+                                {region}
+                              </MenuItem>
+                            )
+                          )}
+                        </GlassSelect>
+                      </Grid>
+
+                      <Grid item xs={12} sm={4}>
+                        <GlassSelect
+                          name="_lobbyHost"
+                          onChange={handleChange}
+                          value={scrimData._lobbyHost || RANDOM_HOST_CODE}
+                          helperText="👤 Lobby Host">
+                          {[RANDOM_HOST_CODE, ...idsArr].map((id, key) => {
+                            if (id === RANDOM_HOST_CODE)
+                              return (
+                                <MenuItem
+                                  value={RANDOM_HOST_CODE}
+                                  key={RANDOM_HOST_CODE}>
+                                  🎲 Random Host!
+                                </MenuItem>
+                              );
+
+                            if (id === currentUser?._id) {
+                              return (
+                                <MenuItem value={id} key={key}>
+                                  🎮 I will host!
+                                </MenuItem>
+                              );
+                            }
+
+                            return (
+                              <MenuItem value={id} key={key}>
+                                👤{' '}
+                                {
+                                  usersArr.find((user) => user?._id === id)
+                                    ?.name
+                                }
+                              </MenuItem>
+                            );
+                          })}
+                        </GlassSelect>
+                      </Grid>
+
+                      {scrimData.isWithCasters && (
+                        <Grid item xs={12} sm={4}>
+                          <GlassSelect
+                            name="maxCastersAllowedCount"
+                            value={scrimData.maxCastersAllowedCount}
+                            onChange={handleChange}
+                            helperText="🎤 Max Casters">
+                            {[1, 2].map((value, key) => (
+                              <MenuItem value={value} key={key}>
+                                {value} Caster{value > 1 ? 's' : ''}
+                              </MenuItem>
+                            ))}
+                          </GlassSelect>
+                        </Grid>
+                      )}
                     </Grid>
-                  </Grid>
+                  </GlassPanel>
+                </Grid>
+
+                {/* Game Results & Settings Section */}
+                <Grid item xs={12}>
+                  <GlassPanel variant="default">
+                    <SectionHeader icon="🏁">
+                      Game Results & Settings
+                    </SectionHeader>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={4}>
+                        <GlassSelect
+                          name="teamWon"
+                          value={scrimData.teamWon || 'N/A'}
+                          onChange={handleChange}
+                          helperText="🏆 Winner">
+                          {['teamOne', 'teamTwo', 'N/A'].map((team, key) => {
+                            const teamAliases = {
+                              teamOne: '🔵 Team 1 (Blue Side)',
+                              teamTwo: '🔴 Team 2 (Red Side)',
+                              'N/A': '❓ N/A',
+                            };
+                            return (
+                              <MenuItem value={team} key={key}>
+                                {teamAliases[team]}
+                              </MenuItem>
+                            );
+                          })}
+                        </GlassSelect>
+                      </Grid>
+
+                      <Grid item xs={12} sm={8}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            gap: 2,
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            mt: 1,
+                          }}>
+                          <FormControlLabel
+                            control={
+                              <Tooltip
+                                title="Is the scrim private?"
+                                placement="top">
+                                <Checkbox
+                                  color="primary"
+                                  checked={scrimData.isPrivate}
+                                  onChange={() => {
+                                    setScrimData((prevState) => ({
+                                      ...prevState,
+                                      isPrivate: !prevState.isPrivate,
+                                    }));
+                                  }}
+                                  name="isPrivate"
+                                  sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                                />
+                              </Tooltip>
+                            }
+                            label={
+                              <Typography
+                                sx={{ color: '#fff', fontSize: '0.9rem' }}>
+                                🔒 Private
+                              </Typography>
+                            }
+                          />
+                          <FormControlLabel
+                            control={
+                              <Tooltip
+                                title={
+                                  scrimData.isWithCasters
+                                    ? 'Disallow casting'
+                                    : 'Allow casting'
+                                }
+                                placement="top">
+                                <Checkbox
+                                  color="primary"
+                                  checked={scrimData.isWithCasters}
+                                  onChange={handleChange}
+                                  name="isWithCasters"
+                                  sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                                />
+                              </Tooltip>
+                            }
+                            label={
+                              <Typography
+                                sx={{ color: '#fff', fontSize: '0.9rem' }}>
+                                🎤 With Casters
+                              </Typography>
+                            }
+                          />
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </GlassPanel>
+                </Grid>
+
+                {/* Action Buttons */}
+                <Grid item xs={12}>
+                  <GlassPanel variant="blue" sx={{ textAlign: 'center' }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="submit"
+                          startIcon={<SaveIcon />}
+                          fullWidth
+                          size="large"
+                          sx={{
+                            py: 1.5,
+                            fontSize: '1.1rem',
+                            borderRadius: 2,
+                            background:
+                              'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                            boxShadow: '0 3px 20px rgba(33, 150, 243, 0.4)',
+                            '&:hover': {
+                              background:
+                                'linear-gradient(45deg, #1976D2 30%, #03A9F4 90%)',
+                              boxShadow: '0 5px 30px rgba(33, 150, 243, 0.6)',
+                              transform: 'translateY(-2px)',
+                            },
+                            transition: 'all 0.3s ease',
+                          }}>
+                          💾 Save Changes
+                        </Button>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          startIcon={<DeleteIcon />}
+                          fullWidth
+                          size="large"
+                          onClick={handleDeleteScrim}
+                          sx={{
+                            py: 1.5,
+                            fontSize: '1.1rem',
+                            borderRadius: 2,
+                            background:
+                              'linear-gradient(45deg, #f44336 30%, #e91e63 90%)',
+                            boxShadow: '0 3px 20px rgba(244, 67, 54, 0.4)',
+                            '&:hover': {
+                              background:
+                                'linear-gradient(45deg, #d32f2f 30%, #c2185b 90%)',
+                              boxShadow: '0 5px 30px rgba(244, 67, 54, 0.6)',
+                              transform: 'translateY(-2px)',
+                            },
+                            transition: 'all 0.3s ease',
+                          }}>
+                          🗑️ Delete Scrim
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </GlassPanel>
                 </Grid>
               </Grid>
-            </form>
+            </Box>
           </InnerColumn>
         </PageSection>
       </PageContent>

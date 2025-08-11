@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import useScrimStore from '../../../stores/scrimStore';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -39,14 +39,30 @@ export default function NavbarDropdowns() {
     setScrimsRegion(region);
   };
 
+  const debounceTimeoutRef = useRef(null);
+
   const onSelectDate = useCallback(
     (newDateValue) => {
-      setScrimsDate(newDateValue);
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      
+      debounceTimeoutRef.current = setTimeout(() => {
+        setScrimsDate(newDateValue);
+      }, 300);
     },
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Grid
