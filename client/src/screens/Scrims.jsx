@@ -108,7 +108,8 @@ export default function Scrims() {
                     component="h1"
                     sx={{
                       fontWeight: 700,
-                      background: 'linear-gradient(135deg, #64B5F6 0%, #2196F3 100%)',
+                      background:
+                        'linear-gradient(135deg, #64B5F6 0%, #2196F3 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                     }}>
@@ -128,7 +129,9 @@ export default function Scrims() {
                           ) : (
                             ' Navbar/Header'
                           )}
-                          &nbsp;to change the region
+                          &nbsp;to change the region.
+                          <br />
+                          or the Scrims Date filter to change the date
                         </>
                       }
                       placement="top">

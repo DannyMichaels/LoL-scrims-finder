@@ -113,4 +113,11 @@ router.patch(
   controllers.adminFillRandomPositions
 ); // PATCH
 
+router.post(
+  '/scrims/:id/regenerate-tournament-code',
+  passport.authenticate('jwt', { session: false }),
+  admin,
+  controllers.regenerateTournamentCode
+); // POST
+
 module.exports = router;

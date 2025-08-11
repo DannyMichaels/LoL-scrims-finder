@@ -7,6 +7,7 @@ const Conversation = require('../models/conversation.model');
 
 // services
 const scrimScheduler = require('../services/scrimScheduler.services');
+const riotServices = require('../services/riot.services');
 
 // utils
 const generatePassword = require('../utils/generatePassword');
@@ -1729,6 +1730,154 @@ const adminFillRandomPositions = async (req, res) => {
   }
 };
 
+const regenerateTournamentCode = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Find the scrim
+    const scrim = await Scrim.findById(id)
+      .populate('createdBy', populateUser)
+      .populate('casters', populateUser)
+      .populate('lobbyHost', populateUser)
+      .populate(populateTeam('teamOne'))
+      .populate(populateTeam('teamTwo'));
+    
+    if (!scrim) {
+      return res.status(404).json({ error: 'Scrim not found' });
+    }
+    
+    // Check if teams are full
+    const teamsFull = scrim.teamOne.length === 5 && scrim.teamTwo.length === 5;
+    
+    if (!teamsFull) {
+      return res.status(400).json({ 
+        error: 'Cannot regenerate tournament code - teams must be full (10 players)' 
+      });
+    }
+    
+    // Check if scrim already has tournament data
+    if (!scrim.riotTournament?.tournamentId) {
+      return res.status(400).json({ 
+        error: 'No existing tournament data found. Cannot regenerate code.' 
+      });
+    }
+    
+    try {
+      // Use the existing tournament ID to generate a new code
+      // We reuse the same tournament but create a new code
+      const tournamentCodes = await riotServices.createTournamentCode(
+        scrim.riotTournament.tournamentId,
+        scrim.region.toUpperCase(),
+        {
+          count: 1,
+          metadata: `scrim_${id}_regenerated_${Date.now()}`,
+          teamSize: 5,
+          pickType: 'TOURNAMENT_DRAFT',
+          spectatorType: 'ALL',
+        }
+      );
+      
+      const newTournamentCode = tournamentCodes[0];
+      
+      // Update the scrim with the new tournament code
+      const updatedScrim = await Scrim.findByIdAndUpdate(
+        id,
+        {
+          'riotTournament.tournamentCode': newTournamentCode,
+          'riotTournament.regeneratedAt': new Date(),
+          lobbyName: newTournamentCode
+        },
+        { new: true }
+      )
+        .populate('createdBy', populateUser)
+        .populate('casters', populateUser)
+        .populate('lobbyHost', populateUser)
+        .populate(populateTeam('teamOne'))
+        .populate(populateTeam('teamTwo'));
+      
+      // Emit socket event to update connected clients
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('tournamentRegenerated', {
+          scrimId: id,
+          tournamentCode: newTournamentCode,
+          riotTournament: updatedScrim.riotTournament
+        });
+      }
+      
+      console.log(`Tournament code regenerated for scrim ${id}: ${newTournamentCode}`);
+      
+      return res.status(200).json({
+        message: 'Tournament code regenerated successfully',
+        riotTournament: updatedScrim.riotTournament,
+        scrim: updatedScrim
+      });
+      
+    } catch (riotError) {
+      console.error('Riot API error:', riotError);
+      
+      // If Riot API fails, try to create a completely new tournament setup
+      console.log('Attempting to create new tournament setup...');
+      
+      try {
+        const tournamentData = await riotServices.setupRiotTournamentForScrim({
+          region: scrim.region,
+          title: scrim.title || `Scrim ${id}`,
+          _id: id
+        });
+        
+        // Update the scrim with completely new tournament data
+        const updatedScrim = await Scrim.findByIdAndUpdate(
+          id,
+          {
+            riotTournament: {
+              ...tournamentData,
+              regeneratedAt: new Date(),
+              previousCode: scrim.riotTournament?.tournamentCode
+            },
+            lobbyName: tournamentData.tournamentCode
+          },
+          { new: true }
+        )
+          .populate('createdBy', populateUser)
+          .populate('casters', populateUser)
+          .populate('lobbyHost', populateUser)
+          .populate(populateTeam('teamOne'))
+          .populate(populateTeam('teamTwo'));
+        
+        // Emit socket event
+        const io = req.app.get('io');
+        if (io) {
+          io.emit('tournamentRegenerated', {
+            scrimId: id,
+            tournamentCode: tournamentData.tournamentCode,
+            riotTournament: updatedScrim.riotTournament
+          });
+        }
+        
+        console.log(`New tournament setup created for scrim ${id}: ${tournamentData.tournamentCode}`);
+        
+        return res.status(200).json({
+          message: 'New tournament code generated successfully',
+          riotTournament: updatedScrim.riotTournament,
+          scrim: updatedScrim
+        });
+        
+      } catch (setupError) {
+        console.error('Failed to create new tournament setup:', setupError);
+        throw setupError;
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error regenerating tournament code:', error);
+    return res.status(500).json({ 
+      error: 'Failed to regenerate tournament code',
+      details: error.message 
+    });
+  }
+};
+
 module.exports = {
   getAllScrims,
   getTodaysScrims,
@@ -1748,4 +1897,5 @@ module.exports = {
   cancelScrim,
   adminAssignPlayer,
   adminFillRandomPositions,
+  regenerateTournamentCode,
 };

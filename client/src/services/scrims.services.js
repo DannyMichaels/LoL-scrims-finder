@@ -394,6 +394,15 @@ export const deleteScrim = async (id) => {
   }
 };
 
+export const regenerateTournamentCode = async (id) => {
+  try {
+    const response = await api.post(`/scrims/${id}/regenerate-tournament-code`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // the who won buttons (only admins or lobby captains/hosts can see)
 export const setScrimWinner = async (id, winnerTeamName, setAlert) => {
   try {

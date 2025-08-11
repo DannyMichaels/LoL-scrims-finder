@@ -28,7 +28,11 @@ import TimePicker from '../../components/shared/TimePicker';
 
 // utils
 import devLog from '../../utils/devLog';
-import { getScrimById, deleteScrim } from '../../services/scrims.services';
+import {
+  getScrimById,
+  deleteScrim,
+  regenerateTournamentCode,
+} from '../../services/scrims.services';
 import { sample } from '../../utils/sample';
 import withAdminRoute from './../../utils/withAdminRoute';
 
@@ -147,11 +151,12 @@ function ScrimEdit() {
     if (newTimeValue && moment.isMoment(newTimeValue)) {
       setScrimData((prevState) => {
         // Keep the current date but update the time
-        const currentDate = moment.isMoment(prevState.gameStartTime) 
-          ? prevState.gameStartTime 
+        const currentDate = moment.isMoment(prevState.gameStartTime)
+          ? prevState.gameStartTime
           : moment();
-        
-        const updatedDateTime = currentDate.clone()
+
+        const updatedDateTime = currentDate
+          .clone()
           .hour(newTimeValue.hour())
           .minute(newTimeValue.minute())
           .second(0)
@@ -263,7 +268,11 @@ function ScrimEdit() {
           : 0,
       };
 
-      const updatedScrim = await updateScrimFromAPI(id, dataSending, setCurrentAlert);
+      const updatedScrim = await updateScrimFromAPI(
+        id,
+        dataSending,
+        setCurrentAlert
+      );
 
       if (updatedScrim) {
         setCurrentAlert({
@@ -275,7 +284,10 @@ function ScrimEdit() {
         return;
       } else {
         // This shouldn't happen if API returned 200, but let's log it
-        console.error('updateScrim returned falsy value despite success:', updatedScrim);
+        console.error(
+          'updateScrim returned falsy value despite success:',
+          updatedScrim
+        );
         setCurrentAlert({
           type: 'Error',
           message: 'Error updating Scrim - No data returned',
@@ -285,7 +297,10 @@ function ScrimEdit() {
       }
     } catch (error) {
       console.error('Error updating scrim:', error);
-      const errorMsg = error?.response?.data?.error || error?.message || 'Error updating Scrim';
+      const errorMsg =
+        error?.response?.data?.error ||
+        error?.message ||
+        'Error updating Scrim';
       setCurrentAlert({
         type: 'Error',
         message: errorMsg,
@@ -298,7 +313,9 @@ function ScrimEdit() {
 
   const handleDeleteScrim = async () => {
     try {
-      const confirmDelete = window.confirm('Are you sure you want to delete this scrim? This action cannot be undone.');
+      const confirmDelete = window.confirm(
+        'Are you sure you want to delete this scrim? This action cannot be undone.'
+      );
       if (!confirmDelete) return;
 
       await deleteScrim(id);
@@ -306,7 +323,7 @@ function ScrimEdit() {
         type: 'Success',
         message: 'Scrim deleted successfully!',
       });
-      
+
       // Redirect to scrims page after successful deletion
       history.push('/');
     } catch (error) {
@@ -314,6 +331,42 @@ function ScrimEdit() {
       setCurrentAlert({
         type: 'Error',
         message: 'Error deleting scrim',
+      });
+    }
+  };
+
+  const handleRegenerateTournamentCode = async () => {
+    try {
+      const confirmRegenerate = window.confirm(
+        'Are you sure you want to regenerate the tournament code? The old code will no longer work.'
+      );
+      if (!confirmRegenerate) return;
+
+      const response = await regenerateTournamentCode(id);
+
+      if (response?.riotTournament?.tournamentCode) {
+        setScrimData((prev) => ({
+          ...prev,
+          riotTournament: response.riotTournament,
+          lobbyName: response.riotTournament.tournamentCode,
+        }));
+
+        setCurrentAlert({
+          type: 'Success',
+          message: `New tournament code generated: ${response.riotTournament.tournamentCode}`,
+        });
+      } else {
+        setCurrentAlert({
+          type: 'Error',
+          message: 'Failed to generate new tournament code',
+        });
+      }
+    } catch (error) {
+      console.error('Error regenerating tournament code:', error);
+      setCurrentAlert({
+        type: 'Error',
+        message:
+          error?.response?.data?.error || 'Error regenerating tournament code',
       });
     }
   };
@@ -423,47 +476,70 @@ function ScrimEdit() {
 
                 <Grid item>
                   <FormHelperText className="text-white">
-                    {scrimData.riotTournament?.tournamentCode ? 'Tournament Code' : 'Lobby Name'}
+                    {scrimData.riotTournament?.tournamentCode
+                      ? 'Tournament Code'
+                      : 'Lobby Name'}
                   </FormHelperText>
                   <Grid container alignItems="flex-end" spacing={1}>
-                    <Grid item xs>
+                    <Grid item>
                       <TextField
                         fullWidth
                         variant="standard"
                         name="lobbyName"
                         value={scrimData.lobbyName || ''}
                         onChange={handleChange}
-                        placeholder={scrimData.riotTournament?.tournamentCode ? "Tournament code" : "Enter custom lobby name"}
+                        placeholder={
+                          scrimData.riotTournament?.tournamentCode
+                            ? 'Tournament code'
+                            : 'Enter custom lobby name'
+                        }
                         required
                         disabled={!!scrimData.riotTournament?.tournamentCode}
                         InputProps={{
-                          style: scrimData.riotTournament?.tournamentCode ? { color: '#2196F3' } : {}
+                          style: scrimData.riotTournament?.tournamentCode
+                            ? { color: '#2196F3' }
+                            : {},
                         }}
                       />
                     </Grid>
                     {scrimData.riotTournament?.tournamentCode && (
-                      <Grid item>
-                        <Tooltip title="Clear tournament code to use custom lobby name">
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="secondary"
-                            onClick={() => {
-                              setScrimData(prev => ({
-                                ...prev,
-                                lobbyName: '',
-                                riotTournament: null
-                              }));
-                            }}>
-                            Clear Code
-                          </Button>
-                        </Tooltip>
-                      </Grid>
+                      <>
+                        <Grid item>
+                          <Tooltip title="Generate a new tournament code">
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              color="primary"
+                              onClick={handleRegenerateTournamentCode}>
+                              Regenerate
+                            </Button>
+                          </Tooltip>
+                        </Grid>
+                        <Grid item>
+                          <Tooltip title="Clear tournament code to use custom lobby name">
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              color="secondary"
+                              onClick={() => {
+                                setScrimData((prev) => ({
+                                  ...prev,
+                                  lobbyName: '',
+                                  riotTournament: null,
+                                }));
+                              }}>
+                              Clear
+                            </Button>
+                          </Tooltip>
+                        </Grid>
+                      </>
                     )}
                   </Grid>
                   {scrimData.riotTournament?.tournamentCode && (
-                    <FormHelperText style={{ color: '#2196F3', fontSize: '0.7rem' }}>
-                      Using Riot Tournament Code - Clear to use custom lobby name
+                    <FormHelperText
+                      style={{ color: '#2196F3', fontSize: '0.7rem' }}>
+                      Using Riot Tournament Code - Clear to use custom lobby
+                      name
                     </FormHelperText>
                   )}
                 </Grid>
@@ -663,8 +739,8 @@ function ScrimEdit() {
                       </Button>
                     </Grid>
                     <Grid item>
-                      <Button 
-                        variant="contained" 
+                      <Button
+                        variant="contained"
                         sx={{
                           backgroundColor: 'error.main',
                           '&:hover': {
