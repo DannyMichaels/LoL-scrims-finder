@@ -20,14 +20,14 @@ export default function NavbarCheckboxes() {
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
   const matchesXs = useMediaQuery(theme.breakpoints.down('xs'));
 
-  const { 
-    showPreviousScrims, 
-    showCurrentScrims, 
+  const {
+    showPreviousScrims,
+    showCurrentScrims,
     showUpcomingScrims,
     setShowPreviousScrims,
     setShowCurrentScrims,
     setShowUpcomingScrims,
-    scrimsDate
+    scrimsDate,
   } = useScrimStore();
 
   // Check if the selected date is in the past
@@ -37,12 +37,18 @@ export default function NavbarCheckboxes() {
     return selectedDate.isBefore(today);
   }, [scrimsDate]);
 
-  // Auto-toggle off upcoming scrims for past dates
+  // Auto-toggle upcoming scrims based on date
   useEffect(() => {
     if (isPastDate && showUpcomingScrims) {
+      // Turn off upcoming scrims for past dates
       setShowUpcomingScrims(false);
+    } else if (!isPastDate && !showUpcomingScrims) {
+      // Turn on upcoming scrims when returning to current/future dates
+      setShowUpcomingScrims(true);
     }
-  }, [isPastDate, showUpcomingScrims, setShowUpcomingScrims]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPastDate, scrimsDate]); // Removed showUpcomingScrims from deps to prevent infinite loop
 
   const toggleShowScrims = (e) => {
     const { name, checked } = e.target;
@@ -94,9 +100,11 @@ export default function NavbarCheckboxes() {
 
         <Tooltip
           title={
-            isPastDate 
-              ? 'No upcoming scrims for past dates' 
-              : (showUpcomingScrims ? 'Hide upcoming scrims' : 'Show upcoming scrims')
+            isPastDate
+              ? 'No upcoming scrims for past dates'
+              : showUpcomingScrims
+              ? 'Hide upcoming scrims'
+              : 'Show upcoming scrims'
           }>
           <FormControlLabel
             control={
