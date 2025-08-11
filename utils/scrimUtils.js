@@ -75,12 +75,12 @@ const populateTeam = (teamName) => {
     populate: {
       path: '_user',
       model: 'User',
-      select: 'name discord rank region', // exclude adminKey,uid and email from showing
+      select: 'name discord rank region summonerTagline', // exclude adminKey,uid and email from showing
     },
   };
 };
 
-const populateUser = ['name', 'discord', 'region'];
+const populateUser = ['name', 'discord', 'region', 'summonerTagline'];
 
 // mongoose populate stuff
 const populateOneScrim = async (scrimId) => {

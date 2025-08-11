@@ -100,7 +100,7 @@ export default function UserProfile() {
         }
 
         const userScrimsResponse = await getUserParticipatedScrims(userId);
-        
+
         // Check if response has the new structure with stats
         if (userScrimsResponse.scrims && userScrimsResponse.stats) {
           setUserParticipatedScrims(userScrimsResponse.scrims);
@@ -115,11 +115,7 @@ export default function UserProfile() {
       } catch (error) {
         setCurrentAlert({
           type: 'Error',
-          message: (
-            <>
-              User {name} was not found {region ? `in ${region}` : ''}
-            </>
-          ),
+          message: `User ${name} was not found${region ? ` in ${region}` : ''}`,
         });
         history.push('/');
       }
@@ -198,23 +194,31 @@ export default function UserProfile() {
               <Tooltip title={`visit ${userData?.name}'s op.gg`}>
                 <a
                   className="link"
-                  href={userData?.summonerTagline 
-                    ? `https://www.op.gg/summoners/${userData?.region?.toLowerCase()}/${encodeURIComponent(userData?.name)}-${encodeURIComponent(userData?.summonerTagline)}`
-                    : `https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`}
+                  href={
+                    userData?.summonerTagline
+                      ? `https://www.op.gg/summoners/${userData?.region?.toLowerCase()}/${encodeURIComponent(
+                          userData?.name
+                        )}-${encodeURIComponent(userData?.summonerTagline)}`
+                      : `https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`
+                  }
                   target="_blank"
                   rel="noopener noreferrer">
                   {userData?.isDonator ? (
                     <Sparkles>
                       {userData?.name}
                       {userData?.summonerTagline && (
-                        <span style={{ color: '#999', fontWeight: 400 }}>#{userData.summonerTagline}</span>
+                        <span style={{ color: '#999', fontWeight: 400 }}>
+                          #{userData.summonerTagline}
+                        </span>
                       )}
                     </Sparkles>
                   ) : (
                     <>
                       {userData?.name}
                       {userData?.summonerTagline && (
-                        <span style={{ color: '#999', fontWeight: 400 }}>#{userData.summonerTagline}</span>
+                        <span style={{ color: '#999', fontWeight: 400 }}>
+                          #{userData.summonerTagline}
+                        </span>
                       )}
                     </>
                   )}
