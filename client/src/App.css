@@ -20,8 +20,11 @@ picture img {
   flex-direction: row;
   justify-content: center;
   padding: 10px;
-  padding-top: 20px;
   flex-grow: 1;
+}
+
+.footer-spacer {
+  padding-top: 20px;
 }
 
 .link {
