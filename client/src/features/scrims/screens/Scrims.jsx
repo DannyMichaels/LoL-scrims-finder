@@ -56,6 +56,7 @@ export default function Scrims() {
         scrimsDate={scrimsDate}
         showDropdowns
         showCheckboxes
+        showLess={false}
       />
 
       <PageContent>
@@ -217,7 +218,11 @@ export default function Scrims() {
               {currentScrims.length > 0 ? (
                 <ScrimsColumn
                   headerText="Current Scrims"
-                  headerIcon={<WhatshotIcon sx={{ color: getScrimIcon(SCRIM_TYPES.CURRENT).color }} />}
+                  headerIcon={
+                    <WhatshotIcon
+                      sx={{ color: getScrimIcon(SCRIM_TYPES.CURRENT).color }}
+                    />
+                  }
                   scrims={currentScrims}
                   show={showCurrentScrims}
                 />
@@ -228,7 +233,11 @@ export default function Scrims() {
               {/* UPCOMING SCRIMS */}
               <ScrimsColumn
                 headerText="Upcoming Scrims"
-                headerIcon={<ScheduleIcon sx={{ color: getScrimIcon(SCRIM_TYPES.UPCOMING).color }} />}
+                headerIcon={
+                  <ScheduleIcon
+                    sx={{ color: getScrimIcon(SCRIM_TYPES.UPCOMING).color }}
+                  />
+                }
                 altText="No upcoming scrims"
                 scrims={upcomingScrims}
                 show={showUpcomingScrims}
@@ -240,7 +249,11 @@ export default function Scrims() {
                 <ScrimsColumn
                   scrims={previousScrims}
                   headerText="Previous Scrims"
-                  headerIcon={<HistoryIcon sx={{ color: getScrimIcon(SCRIM_TYPES.PREVIOUS).color }} />}
+                  headerIcon={
+                    <HistoryIcon
+                      sx={{ color: getScrimIcon(SCRIM_TYPES.PREVIOUS).color }}
+                    />
+                  }
                   show={showPreviousScrims}
                 />
               ) : null}

@@ -543,7 +543,7 @@ export default function AdminDashboard() {
         <meta name="description" content="Admin Dashboard for Reluminate.gg" />
       </Helmet>
 
-      <Navbar />
+      <Navbar showLess />
       <InnerColumn>
         {/* Header */}
         <Grid

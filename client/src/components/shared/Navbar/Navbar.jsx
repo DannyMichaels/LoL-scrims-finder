@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Navbar({
   showDropdowns,
-  showLess,
+  showLess = true,
   showCheckboxes,
   noLogin = false,
   noSpacer = false,
