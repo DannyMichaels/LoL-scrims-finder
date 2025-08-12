@@ -306,6 +306,7 @@ export default function SignUp() {
                 </Grid>
               </Grid>
             </form>
+            <div style={{ minHeight: '64px' }} />
           </InnerColumn>
         </PageSection>
       </PageContent>

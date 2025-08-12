@@ -15,6 +15,7 @@ const friendRoutes = require('./routes/friends.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const adminRoutes = require('./routes/admin.routes');
 const riotRoutes = require('./routes/riot.routes');
+const riotAuthRoutes = require('./routes/riot.auth.routes');
 const helmet = require('helmet');
 
 function createServer() {
@@ -80,6 +81,7 @@ function createServer() {
   app.use('/api', notificationRoutes);
   app.use('/api', adminRoutes);
   app.use('/api', riotRoutes);
+  app.use('/api', riotAuthRoutes);
 
   // another way to require api key for a specific route only.
   // router.get('/scrims', apiKey, controllers.getAllScrims);

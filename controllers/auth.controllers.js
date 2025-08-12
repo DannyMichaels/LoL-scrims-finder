@@ -77,6 +77,17 @@ const loginUser = async (req, res) => {
       }
     }
 
+    // Check if user needs to migrate to Riot auth
+    if (foundUser.authProvider === 'google') {
+      // Google auth is no longer supported, must migrate to Riot
+      return res.status(403).json({
+        error: 'migration_required',
+        message: 'Google authentication is no longer supported. Please migrate to Riot Sign-On to continue.',
+        migrationUrl: '/migrate-account',
+        requiresRiotAuth: true
+      });
+    }
+
     const payload = {
       uid: foundUser.uid,
       email: foundUser.email,
@@ -91,7 +102,8 @@ const loginUser = async (req, res) => {
       notifications: foundUser.notifications,
       friendRequests: foundUser.friendRequests,
       friends: foundUser.friends,
-      canSendEmailsToUser: foundUser.canSendEmailsToUser ?? false, // didn't exist on db in older versions
+      authProvider: foundUser.authProvider || 'google', // Include auth provider
+      canSendEmailsToUser: foundUser.canSendEmailsToUser ?? false // didn't exist on db in older versions
     };
 
     // I don't even think we need to hash the uid...
@@ -127,6 +139,13 @@ const registerUser = async (req, res) => {
   let error;
 
   try {
+    // Google registration is no longer allowed - must use Riot SSO
+    return res.status(403).json({
+      error: 'New registrations must use Riot Sign-On',
+      useRiotAuth: true,
+      message: 'Please sign up using your Riot account to verify you are a League of Legends player.'
+    });
+
     const {
       uid,
       name,
@@ -150,6 +169,7 @@ const registerUser = async (req, res) => {
       adminKey,
       email,
       region,
+      authProvider: 'google', // Mark as Google auth user
       lastLoggedIn: Date.now(),
       canSendEmailsToUser,
     };
@@ -298,6 +318,17 @@ const verifyUser = async (req, res) => {
       });
     }
 
+    // Check if user needs to migrate to Riot auth
+    if (foundUser.authProvider === 'google') {
+      // Google auth is no longer supported, must migrate to Riot
+      return res.status(403).json({
+        error: 'migration_required',
+        message: 'Google authentication is no longer supported. Please migrate to Riot Sign-On to continue.',
+        migrationUrl: '/migrate-account',
+        requiresRiotAuth: true
+      });
+    }
+
     const payload = {
       uid: foundUser.uid,
       email: foundUser.email,
@@ -312,6 +343,7 @@ const verifyUser = async (req, res) => {
       notifications: foundUser.notifications,
       friendRequests: foundUser.friendRequests,
       friends: foundUser.friends,
+      authProvider: foundUser.authProvider || 'google', // Include auth provider
     };
 
     const accessToken = jwt.sign(payload, KEYS.SECRET_OR_KEY, {
