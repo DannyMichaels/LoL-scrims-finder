@@ -13,6 +13,8 @@ import Settings from '@/screens/Settings';
 import UserProfile from '@/features/users/screens/UserProfile';
 import ServerError from '@/screens/ServerError';
 import Guide from '@/screens/Guide';
+import PrivacyPolicy from '@/screens/PrivacyPolicy';
+import TermsOfService from '@/screens/TermsOfService';
 import BanHistory from '@/features/admin/screens/BanHistory';
 import AdminDashboard from '@/features/admin/screens/AdminDashboard';
 
@@ -29,6 +31,10 @@ const AppRouter = () => (
     <Route exact path="/server-error" component={ServerError} />
     <PrivateRoute exact path={['/', '/scrims']} component={Scrims} />
     <Route exact path="/guide" component={Guide} />
+    
+    {/* Legal Pages */}
+    <Route exact path="/privacy-policy" component={PrivacyPolicy} />
+    <Route exact path="/terms-of-service" component={TermsOfService} />
 
     <Route component={NotFound} />
   </Switch>

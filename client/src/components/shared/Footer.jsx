@@ -2,6 +2,7 @@
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { InnerColumn } from './PageComponents';
+import { Link } from 'react-router-dom';
 
 // utils
 import { styled } from '@mui/system';
@@ -34,8 +35,8 @@ const Footer = ({ location }) => (
     <div className="footer-spacer" />
     <StyledFooter className="page-section site-footer">
       <InnerColumn>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
+        <Grid container justifyContent="space-between" alignItems="center" spacing={2}>
+          <Grid item xs={12} sm={4}>
             <Typography
               variant="body2"
               sx={{
@@ -43,20 +44,37 @@ const Footer = ({ location }) => (
                 fontWeight: 500,
                 fontSize: '12px',
               }}>
-              &copy; {currentYear} Reluminate.gg - Lighting up the rift
+              &copy; {currentYear} LoL Scrims Finder
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid item xs={12} sm={4} sx={{ textAlign: 'center' }}>
+            <Link to="/privacy-policy" style={{ 
+              color: 'rgba(255, 255, 255, 0.7)', 
+              textDecoration: 'none',
+              fontSize: '12px',
+              marginRight: '16px',
+              '&:hover': { color: '#2196F3' }
+            }}>
+              Privacy Policy
+            </Link>
+            <Link to="/terms-of-service" style={{ 
+              color: 'rgba(255, 255, 255, 0.7)', 
+              textDecoration: 'none',
+              fontSize: '12px',
+              '&:hover': { color: '#2196F3' }
+            }}>
+              Terms of Service
+            </Link>
+          </Grid>
+          <Grid item xs={12} sm={4} sx={{ textAlign: 'right' }}>
             <Typography
               variant="body2"
               sx={{
-                background: 'linear-gradient(90deg, #64B5F6 0%, #2196F3 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontWeight: 600,
-                fontSize: '12px',
+                color: 'rgba(255, 255, 255, 0.5)',
+                fontSize: '11px',
+                fontStyle: 'italic',
               }}>
-              Connecting the League of Legends community, one soul at a time
+              Not affiliated with Riot Games
             </Typography>
           </Grid>
         </Grid>
