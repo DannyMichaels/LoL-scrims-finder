@@ -19,6 +19,7 @@ export default function ProfileAccountDetails({
   setUser,
   userParticipatedScrims,
   stats,
+  isOnline,
 }) {
   const history = useHistory();
   const userStats = useProfileAccountDetails(

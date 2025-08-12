@@ -25,6 +25,7 @@ picture img {
 
 .footer-spacer {
   padding-top: 20px;
+  min-height: 65px;
 }
 
 .link {

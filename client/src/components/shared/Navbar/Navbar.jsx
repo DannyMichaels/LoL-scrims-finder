@@ -261,7 +261,6 @@ export default function Navbar({
       />
 
       <div className={classes.offset} />
-      {!noSpacer && <div className={classes.toolbarDistance} />}
     </>
   );
 }

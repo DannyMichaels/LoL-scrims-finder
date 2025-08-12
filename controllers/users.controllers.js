@@ -122,6 +122,7 @@ const getOneUser = async (req, res) => {
       'friends',
       'isDonator',
       'currentBan',
+      'lastLoggedIn',
     ]);
 
     if (!user)

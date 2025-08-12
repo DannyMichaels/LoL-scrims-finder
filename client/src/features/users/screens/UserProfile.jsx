@@ -17,6 +17,7 @@ import Tooltip from '@/components/shared/Tooltip';
 import ScrollToTopOnMount from '@/components/shared/ScrollToTopOnMount';
 import Sparkles from '@/components/shared/effects/Sparkles';
 import { Helmet } from 'react-helmet';
+import Moment from 'react-moment';
 
 // sections
 import ChangeBackground from '@/features/users/components/ChangeBackground';
@@ -183,67 +184,81 @@ export default function UserProfile() {
               summonerTagline={userData?.summonerTagline}
               region={userData?.region}
             />
-            <Typography variant="h1" className="inline-flex">
-              <Tooltip
-                title={`${userData?.name} is ${
-                  isOnline ? 'online' : 'offline'
-                }`}>
-                <div className={classes.onlineCircle} />
-              </Tooltip>
-
-              <Tooltip title={`visit ${userData?.name}'s op.gg`}>
-                <a
-                  className="link"
-                  href={
-                    userData?.summonerTagline
-                      ? `https://www.op.gg/summoners/${userData?.region?.toLowerCase()}/${encodeURIComponent(
-                          userData?.name
-                        )}-${encodeURIComponent(userData?.summonerTagline)}`
-                      : `https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer">
-                  {userData?.isDonator ? (
-                    <Sparkles>
-                      {userData?.name}
-                      {userData?.summonerTagline && (
-                        <span style={{ color: '#999', fontWeight: 400 }}>
-                          #{userData.summonerTagline}
-                        </span>
-                      )}
-                    </Sparkles>
-                  ) : (
-                    <>
-                      {userData?.name}
-                      {userData?.summonerTagline && (
-                        <span style={{ color: '#999', fontWeight: 400 }}>
-                          #{userData.summonerTagline}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </a>
-              </Tooltip>
-              {userData?.isDonator && (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h1" className="inline-flex">
                 <Tooltip
-                  placement="top"
-                  title={`${userData?.name} helped keep this app alive!`}>
-                  <span style={{ cursor: 'help', marginLeft: '8px' }}>
-                    <HonorIcon />
-                  </span>
+                  title={`${userData?.name} is ${
+                    isOnline ? 'online' : 'offline'
+                  }`}>
+                  <div className={classes.onlineCircle} />
                 </Tooltip>
-              )}
 
-              {userData?.isAdmin && (
-                <Tooltip
-                  placement="top"
-                  title={`${userData?.name} is a verified admin`}>
-                  <span style={{ cursor: 'help', marginLeft: '8px' }}>
-                    <VerifiedAdminIcon />
-                  </span>
+                <Tooltip title={`visit ${userData?.name}'s op.gg`}>
+                  <a
+                    className="link"
+                    href={
+                      userData?.summonerTagline
+                        ? `https://www.op.gg/summoners/${userData?.region?.toLowerCase()}/${encodeURIComponent(
+                            userData?.name
+                          )}-${encodeURIComponent(userData?.summonerTagline)}`
+                        : `https://${userData?.region}.op.gg/summoner/userName=${userData?.name}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {userData?.isDonator ? (
+                      <Sparkles>
+                        {userData?.name}
+                        {userData?.summonerTagline && (
+                          <span style={{ color: '#999', fontWeight: 400 }}>
+                            #{userData.summonerTagline}
+                          </span>
+                        )}
+                      </Sparkles>
+                    ) : (
+                      <>
+                        {userData?.name}
+                        {userData?.summonerTagline && (
+                          <span style={{ color: '#999', fontWeight: 400 }}>
+                            #{userData.summonerTagline}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </a>
                 </Tooltip>
+                {userData?.isDonator && (
+                  <Tooltip
+                    placement="top"
+                    title={`${userData?.name} helped keep this app alive!`}>
+                    <span style={{ cursor: 'help', marginLeft: '8px' }}>
+                      <HonorIcon />
+                    </span>
+                  </Tooltip>
+                )}
+
+                {userData?.isAdmin && (
+                  <Tooltip
+                    placement="top"
+                    title={`${userData?.name} is a verified admin`}>
+                    <span style={{ cursor: 'help', marginLeft: '8px' }}>
+                      <VerifiedAdminIcon />
+                    </span>
+                  </Tooltip>
+                )}
+              </Typography>
+              {!isOnline && userData?.lastLoggedIn && (
+                <Typography 
+                  variant="body2" 
+                  style={{ 
+                    color: '#999', 
+                    fontSize: '0.9rem',
+                    marginTop: '-16px',
+                    marginLeft: '20px'
+                  }}>
+                  Last seen <Moment fromNow>{userData.lastLoggedIn}</Moment>
+                </Typography>
               )}
-            </Typography>
+            </div>
           </Grid>
 
           <Grid item>
@@ -269,6 +284,7 @@ export default function UserProfile() {
           setUser={setUserData}
           userParticipatedScrims={userParticipatedScrims}
           stats={userStats}
+          isOnline={isOnline}
         />
 
         {/* User Statistics Charts */}

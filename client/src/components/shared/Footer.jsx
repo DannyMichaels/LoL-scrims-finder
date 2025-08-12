@@ -14,7 +14,7 @@ const StyledFooter = styled('footer')({
   boxShadow: '0 -2px 20px rgba(0, 0, 0, 0.3)',
   scrollMarginTop: '2em',
   overflow: 'hidden',
-  padding: '10px 0',
+  padding: '0 0',
   backdropFilter: 'blur(12px)', // Glass effect
   WebkitBackdropFilter: 'blur(12px)', // Safari support
   // fixed footer.
@@ -35,7 +35,11 @@ const Footer = ({ location }) => (
     <div className="footer-spacer" />
     <StyledFooter className="page-section site-footer">
       <InnerColumn>
-        <Grid container justifyContent="space-between" alignItems="center" spacing={2}>
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          spacing={2}>
           <Grid item xs={12} sm={4}>
             <Typography
               variant="body2"
@@ -48,21 +52,25 @@ const Footer = ({ location }) => (
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4} sx={{ textAlign: 'center' }}>
-            <Link to="/privacy-policy" style={{ 
-              color: 'rgba(255, 255, 255, 0.7)', 
-              textDecoration: 'none',
-              fontSize: '12px',
-              marginRight: '16px',
-              '&:hover': { color: '#2196F3' }
-            }}>
+            <Link
+              to="/privacy-policy"
+              style={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                textDecoration: 'none',
+                fontSize: '12px',
+                marginRight: '16px',
+                '&:hover': { color: '#2196F3' },
+              }}>
               Privacy Policy
             </Link>
-            <Link to="/terms-of-service" style={{ 
-              color: 'rgba(255, 255, 255, 0.7)', 
-              textDecoration: 'none',
-              fontSize: '12px',
-              '&:hover': { color: '#2196F3' }
-            }}>
+            <Link
+              to="/terms-of-service"
+              style={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                textDecoration: 'none',
+                fontSize: '12px',
+                '&:hover': { color: '#2196F3' },
+              }}>
               Terms of Service
             </Link>
           </Grid>
