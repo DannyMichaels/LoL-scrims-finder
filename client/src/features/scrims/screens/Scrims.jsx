@@ -379,6 +379,8 @@ export default function Scrims() {
               </GlassPanel>
             </InnerColumn>
           )}
+
+          <br />
         </div>
       </PageContent>
     </>
