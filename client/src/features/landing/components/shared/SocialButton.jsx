@@ -15,7 +15,7 @@ const SocialButton = styled(Button)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: '12px',
-  backdropFilter: 'blur(10px)',
+  backdropFilter: 'blur(4px)',
   '&:hover': {
     background: 'rgba(33, 150, 243, 0.2)',
     border: '2px solid rgba(33, 150, 243, 0.5)',

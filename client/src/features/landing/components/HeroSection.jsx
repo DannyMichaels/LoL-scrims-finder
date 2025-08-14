@@ -142,6 +142,7 @@ export default function HeroSection() {
               padding: 4,
               maxWidth: '600px',
               margin: '0 auto',
+              backdropFilter: 'blur(4px)',
             }}>
             <Typography
               sx={{
