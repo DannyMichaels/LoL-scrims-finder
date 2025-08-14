@@ -48,7 +48,7 @@ const Footer = ({ location }) => (
                 fontWeight: 500,
                 fontSize: '12px',
               }}>
-              &copy; {currentYear} LoL Scrims Finder
+              &copy; {currentYear} Reluminate.gg
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4} sx={{ textAlign: 'center' }}>

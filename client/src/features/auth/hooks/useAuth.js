@@ -38,7 +38,7 @@ export function useAuthActions() {
     localStorage.removeItem('jwtToken'); // remove token from localStorage
     removeToken();
     dispatch({ type: 'auth/logout' });
-    history.push('/signup'); // push back to signup
+    history.push('/'); // push back to landing page
   };
 
   const handleLogin = async () => {
@@ -110,8 +110,8 @@ export function useAuthVerify() {
             // if time passed expiration
             // Logout user
             handleLogout();
-            // Redirect to login
-            history.push('/signup');
+            // Redirect to landing
+            history.push('/');
           }
         }
       }

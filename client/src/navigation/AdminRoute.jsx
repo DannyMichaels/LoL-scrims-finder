@@ -18,7 +18,7 @@ const AdminRoute = ({ component: Component, ...rest }) => {
           return (
             <Redirect
               to={{
-                pathname: '/signup',
+                pathname: '/',
                 state: {
                   from: props.location,
                   message: 'Please login to continue',
