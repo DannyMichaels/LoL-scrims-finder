@@ -1,0 +1,8 @@
+{
+  "development": ["*"],
+  "production": [
+    "https://lol-scrims-finder.netlify.app",
+    "https://reluminate.gg",
+    "https://www.reluminate.gg"
+  ]
+}

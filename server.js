@@ -16,15 +16,13 @@ const notificationRoutes = require('./routes/notification.routes');
 const adminRoutes = require('./routes/admin.routes');
 const riotRoutes = require('./routes/riot.routes');
 const helmet = require('helmet');
+const allowedOrigins = require('./config/allowed-origins.json');
 
 function createServer() {
   const app = express();
 
   const corsOptions = {
-    origin:
-      process.env.NODE_ENV === 'production'
-        ? 'https://lol-scrims-finder.netlify.app'
-        : '*',
+    origin: allowedOrigins[process.env.NODE_ENV] || allowedOrigins.development,
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   };
 

@@ -5,14 +5,12 @@ const { sendConversation } = require('./events/sendConversation');
 const { sendScrimMessage } = require('./events/sendScrimMessage');
 
 require('dotenv').config();
+const allowedOrigins = require('../config/allowed-origins.json');
 
 const createSocket = (server) => {
   const io = require('socket.io')(server, {
     cors: {
-      origin:
-        process.env.NODE_ENV === 'production'
-          ? 'https://lol-scrims-finder.netlify.app'
-          : '*',
+      origin: allowedOrigins[process.env.NODE_ENV] || allowedOrigins.development,
       credentials: true,
     },
     path: '/socket.io', // specify the namespace path here
