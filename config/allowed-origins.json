@@ -1,5 +1,10 @@
 {
-  "development": ["*"],
+  "development": [
+    "*",
+    "http://localhost:3002",
+    "http://localhost:3001",
+    "http://localhost:3000"
+  ],
   "production": [
     "https://lol-scrims-finder.netlify.app",
     "https://reluminate.gg",

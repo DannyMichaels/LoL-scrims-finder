@@ -16,13 +16,16 @@ const notificationRoutes = require('./routes/notification.routes');
 const adminRoutes = require('./routes/admin.routes');
 const riotRoutes = require('./routes/riot.routes');
 const helmet = require('helmet');
+require('dotenv').config();
 const allowedOrigins = require('./config/allowed-origins.json');
+
+const envName = process.env.NODE_ENV || 'development';
 
 function createServer() {
   const app = express();
 
   const corsOptions = {
-    origin: allowedOrigins[process.env.NODE_ENV] || allowedOrigins.development,
+    origin: allowedOrigins[envName],
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   };
 

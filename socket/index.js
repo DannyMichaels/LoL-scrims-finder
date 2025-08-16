@@ -10,7 +10,7 @@ const allowedOrigins = require('../config/allowed-origins.json');
 const createSocket = (server) => {
   const io = require('socket.io')(server, {
     cors: {
-      origin: allowedOrigins[process.env.NODE_ENV] || allowedOrigins.development,
+      origin: allowedOrigins[process.env.NODE_ENV || 'development'],
       credentials: true,
     },
     path: '/socket.io', // specify the namespace path here
@@ -91,7 +91,7 @@ const createSocket = (server) => {
       return;
     });
   });
-  
+
   return io;
 };
 
