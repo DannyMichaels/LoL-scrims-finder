@@ -43,16 +43,7 @@ export default function SendFriendRequest({ user, setUser }) {
         currentUser._id
       ); // current user sending to that user in the profile page.
 
-      //  add a new notification to the user
-      const socketNotification = {
-        ...newNotification,
-        createdDate: Date.now(),
-        createdAt: Date.now(),
-        receiverId: user?._id,
-      };
-
-      // send notification to user who received the frind request
-      socket?.emit('sendNotification', socketNotification);
+      // Socket notification is now handled automatically by the backend API
 
       devLog('sent friend request', newFriendRequest);
 

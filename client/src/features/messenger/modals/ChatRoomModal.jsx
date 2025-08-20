@@ -177,17 +177,7 @@ export default function ChatRoomModal() {
           receiverId: receiver._id,
         });
 
-        // send event to server after creating on client and posting to api
-        devLog('EMIT'); // emits only once
-
-        socket?.emit('sendMessage', {
-          senderId: currentUser?._id,
-          text: msgText,
-          receiverId: receiver?._id,
-          messageId: newlyCreatedMessage._id,
-          createdAt: newlyCreatedMessage.createdAt,
-          _conversation: conversation._id,
-        });
+        // Socket event is now handled automatically by the backend API
 
         setMessages((prevState) => [...prevState, newlyCreatedMessage]);
 

@@ -138,6 +138,7 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 
 - user can now unsend friend request
 - fixed an exploit where sender user could accept receiver users' friend request when using a proxy.
+- socket message emissions are now being sent from the backend instead of front-end
 
 ---
 

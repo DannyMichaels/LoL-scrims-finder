@@ -139,16 +139,7 @@ export default function ScrimChatRoomModal() {
           text: msgText,
         });
 
-        // send event to server after creating on client and posting to api
-        devLog('EMIT'); // emits only once
-
-        socket?.emit('sendScrimMessage', {
-          senderId: currentUser?._id,
-          text: msgText,
-          messageId: newlyCreatedMessage._id,
-          createdAt: newlyCreatedMessage.createdAt,
-          _conversation: conversation._id,
-        });
+        // Socket event is now handled automatically by the backend API
 
         setMessages((prevState) => [...prevState, newlyCreatedMessage]);
 

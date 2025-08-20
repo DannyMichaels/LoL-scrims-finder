@@ -1,5 +1,6 @@
 const Conversation = require('../models/conversation.model');
 const User = require('../models/user.model');
+const { sendConversation } = require('../socket/events/sendConversation');
 
 // @route   POST /api/conversations
 // @desc    create one conversation between a sender and a receiver (For user messenger)
@@ -24,6 +25,16 @@ const postConversation = async (req, res) => {
 
     savedConversation = await Conversation.findById(savedConversation._id)
       .populate('members', ['name', 'discord', 'rank', 'region']);
+
+    // Emit socket event for real-time conversation notification
+    const io = req.app.get('io');
+    if (io) {
+      sendConversation(io, {
+        senderId: senderId,
+        receiverId: receiverId,
+        conversationId: savedConversation._id,
+      });
+    }
 
     return res.status(200).json(savedConversation);
   } catch (error) {

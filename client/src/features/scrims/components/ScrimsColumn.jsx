@@ -8,7 +8,13 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 
 // used in Scrims.jsx
-export default function ScrimsColumn({ show, scrims, headerText, altText, headerIcon }) {
+export default function ScrimsColumn({
+  show,
+  scrims,
+  headerText,
+  altText,
+  headerIcon,
+}) {
   return (
     show && (
       <>
@@ -58,19 +64,20 @@ export default function ScrimsColumn({ show, scrims, headerText, altText, header
                         letterSpacing: '0.5px',
                       }}>
                       {scrims.length > 0 ? headerText : altText}
-                      {scrims.length > 0 && (
-                        <Box
-                          component="span"
-                          sx={{
-                            ml: 2,
-                            fontSize: '0.8em',
-                            opacity: 0.8,
-                            fontWeight: 600,
-                          }}>
-                          ({scrims.length})
-                        </Box>
-                      )}
                     </Typography>
+                    {scrims.length > 0 && (
+                      <Typography
+                        component="span"
+                        sx={{
+                          ml: 2,
+                          fontSize: { xs: '1.2rem', md: '1.6rem' },
+                          fontWeight: 600,
+                          color: '#fff',
+                          textShadow: '0 2px 10px rgba(255, 255, 255, 0.3)',
+                        }}>
+                        ({scrims.length})
+                      </Typography>
+                    )}
                   </Box>
                 </GlassPanel>
               </Divider>

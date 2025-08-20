@@ -69,36 +69,13 @@ export default function FriendRequestsModal() {
           requestId
         );
 
-        const receiverNotification = {
-          message: `You and ${currentUser?.name} are now friends!`,
-          _relatedUser: currentUser._id,
-          createdDate: Date.now(),
-          receiverId: requestUser._id,
-        };
-
-        // send event to friend user.
-        socket?.emit('sendNotification', receiverNotification);
-
-        // send notification to new friend
-        await pushUserNotification(requestUser._id, {
-          message: `You and ${currentUser?.name} are now friends!`,
-          _relatedUser: currentUser,
-          createdDate: Date.now(),
-        });
-
-        // send notification to currentUser
-        const { notifications } = await pushUserNotification(currentUser._id, {
-          message: `You and ${requestUser?.name} are now friends!`,
-          _relatedUser: requestUser,
-          createdDate: Date.now(),
-        });
+        // Socket notifications and database notifications are now handled automatically by the backend API
 
         dispatch({
           type: 'auth/updateCurrentUser',
           payload: {
             friends: updatedUserFriends,
             friendRequests,
-            notifications,
           },
         });
 

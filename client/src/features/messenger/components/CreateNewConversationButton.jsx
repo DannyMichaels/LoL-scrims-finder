@@ -57,24 +57,7 @@ export default function CreateNewConversationButton({
 
       devLog('new message added to the conversation!', newlyCreatedMessage);
 
-      socket?.emit('sendConversation', {
-        senderId: currentUser?._id,
-        receiverId: receiverUser._id,
-        conversationId: newConversation._id,
-      });
-
-      // send event to server after creating on client and posting to api
-      devLog('EMIT'); // emits only once
-
-      // send to receiver user that he got new message
-      socket?.emit('sendMessage', {
-        senderId: currentUser?._id,
-        text: newlyCreatedMessage.text,
-        receiverId: newlyCreatedMessage._receiver,
-        messageId: newlyCreatedMessage._id,
-        createdAt: newlyCreatedMessage.createdAt,
-        _conversation: newlyCreatedMessage._conversation,
-      });
+      // Socket conversation event is now handled automatically by the backend API
 
       dispatch({
         type: 'messenger/addNewConversation',

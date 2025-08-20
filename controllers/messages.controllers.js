@@ -1,6 +1,8 @@
 const Message = require('../models/message.model');
 const Conversation = require('../models/conversation.model');
 const User = require('../models/user.model');
+const { sendMessage } = require('../socket/events/sendMessage');
+const { sendScrimMessage } = require('../socket/events/sendScrimMessage');
 
 const mongoose = require('mongoose');
 
@@ -51,6 +53,31 @@ const postMessage = async (req, res) => {
     // make sure we get _sender.name, region, rank etc after creating with populate, or else it will only return id to the client
     savedMessage = await Message.findById(savedMessage._id)
       .populate('_sender', ['name', 'discord', 'rank', 'region']);
+
+    // Emit socket event for real-time messaging
+    const io = req.app.get('io');
+    if (io) {
+      if (receiverId) {
+        // Regular message with receiver (private chat)
+        sendMessage(io, {
+          senderId: savedMessage._sender._id,
+          receiverId: receiverId,
+          text: savedMessage.text,
+          messageId: savedMessage._id,
+          createdAt: savedMessage.createdAt,
+          _conversation: savedMessage._conversation,
+        });
+      } else {
+        // Scrim message (no receiver, broadcast to conversation)
+        sendScrimMessage(io, {
+          senderId: savedMessage._sender._id,
+          text: savedMessage.text,
+          messageId: savedMessage._id,
+          createdAt: savedMessage.createdAt,
+          _conversation: savedMessage._conversation,
+        });
+      }
+    }
 
     return res.status(200).json(savedMessage);
   } catch (error) {

@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-const escape = require('escape-html');
+const { sendNotification } = require('../socket/events/sendNotification');
 
 const nestedPopulate = (path, modelPath) => {
   // nested populate
@@ -72,9 +72,10 @@ const checkFriendRequestSent = async (req, res) => {
       return res.status(404).json({ error: 'Receiver not found' });
     }
 
-    const isFriendRequestSentBySender = receiverUser.friendRequests?.some(
-      (request) => String(request?._user) === String(senderId)
-    ) || false;
+    const isFriendRequestSentBySender =
+      receiverUser.friendRequests?.some(
+        (request) => String(request?._user) === String(senderId)
+      ) || false;
 
     return res.status(200).json(isFriendRequestSentBySender);
   } catch (error) {
@@ -137,21 +138,33 @@ const sendFriendRequest = async (req, res) => {
     };
 
     const reqBody = {
-      friendRequests: [...(userReceiving.friendRequests || []), newFriendRequest],
+      friendRequests: [
+        ...(userReceiving.friendRequests || []),
+        newFriendRequest,
+      ],
       notifications: [...(userReceiving.notifications || []), newNotification],
     };
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userReceivingId,
-      reqBody,
-      { new: true }
-    );
+    const updatedUser = await User.findByIdAndUpdate(userReceivingId, reqBody, {
+      new: true,
+    });
 
     if (!updatedUser) {
       return res.status(500).json({ error: 'Failed to update user' });
     }
 
     await updatedUser.save();
+
+    // Emit socket notification for real-time notification
+    const io = req.app.get('io');
+    if (io) {
+      sendNotification(io, {
+        ...newNotification,
+        createdDate: Date.now(),
+        createdAt: Date.now(),
+        receiverId: userReceivingId,
+      });
+    }
 
     return res.status(200).json({
       newFriendRequest: {
@@ -202,7 +215,7 @@ const rejectFriendRequest = async (req, res) => {
 const acceptFriendRequest = async (req, res) => {
   const { id } = req.params;
   const { newFriendUserId } = req.body;
-  
+
   // Get the authenticated user ID from the JWT token
   const authenticatedUserId = req.user._id;
 
@@ -233,7 +246,9 @@ const acceptFriendRequest = async (req, res) => {
   }
 
   if (!friendUser) {
-    return res.status(404).json({ error: `Friend user not found with id: ${newFriendUserId}` });
+    return res
+      .status(404)
+      .json({ error: `Friend user not found with id: ${newFriendUserId}` });
   }
 
   // Verify that the friend request actually exists
@@ -242,7 +257,7 @@ const acceptFriendRequest = async (req, res) => {
   );
 
   if (!friendRequestExists) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       error: 'No friend request found from this user',
     });
   }
@@ -276,6 +291,44 @@ const acceptFriendRequest = async (req, res) => {
 
   await friendUser.save();
 
+  // Add notifications to both users
+  const friendNotification = {
+    _relatedUser: user._id,
+    message: `You and ${user.name} are now friends!`,
+    createdDate: Date.now(),
+  };
+
+  const userNotification = {
+    _relatedUser: friendUser._id,
+    message: `You and ${friendUser.name} are now friends!`,
+    createdDate: Date.now(),
+  };
+
+  // Update both users with notifications
+  await User.findByIdAndUpdate(newFriendUserId, {
+    $push: { notifications: friendNotification }
+  });
+
+  await User.findByIdAndUpdate(user._id, {
+    $push: { notifications: userNotification }
+  });
+
+  // Emit socket notifications for real-time updates
+  const io = req.app.get('io');
+  if (io) {
+    // Notify the friend who sent the request
+    sendNotification(io, {
+      ...friendNotification,
+      receiverId: newFriendUserId,
+    });
+
+    // Notify the user who accepted the request
+    sendNotification(io, {
+      ...userNotification,
+      receiverId: user._id,
+    });
+  }
+
   return res.status(200).json({
     updatedUserFriends: user.friends,
     updatedFriendFriends: friendUser.friends,
@@ -296,11 +349,15 @@ const unfriendUser = async (req, res) => {
   let friendUser = await User.findById(friendUserId);
 
   if (!user) {
-    return res.status(404).json({ error: `User not found with id: ${currentUserId}` });
+    return res
+      .status(404)
+      .json({ error: `User not found with id: ${currentUserId}` });
   }
 
   if (!friendUser) {
-    return res.status(404).json({ error: `Friend user not found with id: ${friendUserId}` });
+    return res
+      .status(404)
+      .json({ error: `Friend user not found with id: ${friendUserId}` });
   }
 
   user.friends = (user.friends || []).filter(
@@ -350,8 +407,10 @@ const cancelFriendRequest = async (req, res) => {
     receiverUser.notifications = (receiverUser.notifications || []).filter(
       (notification) => {
         // Keep notifications that are not friend requests or not from this sender
-        return !(notification.isFriendRequest && 
-                String(notification._relatedUser) === String(senderId));
+        return !(
+          notification.isFriendRequest &&
+          String(notification._relatedUser) === String(senderId)
+        );
       }
     );
 
