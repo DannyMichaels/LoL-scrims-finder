@@ -43,9 +43,9 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     deleteScrim: deleteScrimAction,
   } = useScrimStore();
 
-  // Get or initialize scrim data - subscribe to store for reactivity
-  const scrimId = scrimData?._id;
-  const scrim = useScrimStore((state) => state.scrims[scrimId]) || scrimData;
+  // Use scrim data from props
+  const scrim = scrimData;
+  const scrimId = scrim?._id;
   const isScrimExpandedInStore = useScrimStore((state) =>
     state.expandedScrims.has(scrimId)
   );
@@ -269,7 +269,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
 
     await insertCasterInScrim({
       scrimId,
-      casterId: currentUser._id,
+      userId: currentUser._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
       setScrim: (scrim) => setScrim(scrimId, scrim),

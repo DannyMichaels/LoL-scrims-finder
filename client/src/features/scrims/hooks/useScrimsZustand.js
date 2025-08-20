@@ -10,7 +10,7 @@ import { getUserTimezone } from '@/utils/timezone';
  */
 export function useScrimsZustand() {
   const {
-    allScrimsArray,
+    scrims,
     scrimsLoaded,
     scrimsDate,
     scrimsRegion,
@@ -34,7 +34,7 @@ export function useScrimsZustand() {
   }, [scrimsRegion, scrimsDate]); // fetchAllScrims is stable from zustand
 
   return {
-    scrims: allScrimsArray,
+    scrims: scrims,
     scrimsLoaded,
     scrimsDate: moment.tz(scrimsDate, getUserTimezone()), // Convert back to moment in user's timezone
     scrimsRegion,
@@ -53,12 +53,12 @@ export function useScrimsZustand() {
  * Hook for getting filtered scrims (previous, current, upcoming)
  */
 export function useFilteredScrimsZustand() {
-  const { allScrimsArray } = useScrimStore();
+  const { scrims } = useScrimStore();
 
   const filteredScrims = useMemo(() => {
     // Backend already filters by date, so just return all scrims
-    return allScrimsArray;
-  }, [allScrimsArray]);
+    return scrims;
+  }, [scrims]);
 
   const currentScrims = useMemo(() => {
     return filteredScrims.filter((scrim) => {

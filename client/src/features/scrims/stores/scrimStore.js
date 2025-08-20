@@ -23,8 +23,7 @@ const useScrimStore = create(
   devtools(
     (set, get) => ({
       // State
-      scrims: {}, // Object with scrimId as key for O(1) lookups
-      allScrimsArray: [], // Array of all scrims for filtering
+      scrims: [], // Array of all scrims
       scrimsLoaded: false,
       expandedScrims: new Set(), // Track which scrims are expanded
       activeScrimRooms: new Set(), // Track which scrim rooms we've joined
@@ -44,14 +43,6 @@ const useScrimStore = create(
         set({ socketRef: socket });
 
         if (!socket) return;
-
-        // Set up socket event listeners
-        socket.on('scrim_updated', (data) => {
-          const scrim = data?.scrim || data;
-          if (scrim?._id) {
-            get().updateScrim(scrim._id, scrim);
-          }
-        });
 
         socket.on('getScrimTransaction', (data) => {
           const scrim = data?.scrim || data;
@@ -91,16 +82,17 @@ const useScrimStore = create(
         socket.on('getScrimMessage', (data) => {
           const conversationId = data._conversation; // scrim conversation ID
           const senderId = data.senderId;
-          
+
           if (conversationId && senderId) {
             // Only increment unread count if the scrim chat is NOT currently open
             const isChatOpen = get().openScrimChats.has(conversationId);
-            
+
             if (!isChatOpen) {
               set((state) => ({
                 unreadScrimMessages: {
                   ...state.unreadScrimMessages,
-                  [conversationId]: (state.unreadScrimMessages[conversationId] || 0) + 1,
+                  [conversationId]:
+                    (state.unreadScrimMessages[conversationId] || 0) + 1,
                 },
               }));
             }
@@ -110,59 +102,78 @@ const useScrimStore = create(
 
       // Set or update a scrim
       setScrim: (scrimId, scrimData) => {
-        set((state) => ({
-          scrims: {
-            ...state.scrims,
-            [scrimId]: scrimData,
-          },
-        }));
+        set((state) => {
+          const existingIndex = state.scrims.findIndex(s => s._id === scrimId);
+          if (existingIndex >= 0) {
+            // Check if the scrim data has actually changed
+            const currentScrim = state.scrims[existingIndex];
+            if (JSON.stringify(currentScrim) === JSON.stringify(scrimData)) {
+              return state; // No changes, don't update
+            }
+            
+            // Update existing scrim
+            const newScrims = [...state.scrims];
+            newScrims[existingIndex] = scrimData;
+            return { scrims: newScrims };
+          } else {
+            // Add new scrim
+            return { scrims: [...state.scrims, scrimData] };
+          }
+        });
       },
 
       // Update specific scrim fields
       updateScrim: (scrimId, updates) => {
         set((state) => {
-          const updatedScrim = {
-            ...state.scrims[scrimId],
-            ...updates,
-          };
-
-          return {
-            scrims: {
-              ...state.scrims,
-              [scrimId]: updatedScrim,
-            },
-            allScrimsArray: state.allScrimsArray.map((s) =>
-              s._id === scrimId ? updatedScrim : s
-            ),
-          };
+          const scrimIndex = state.scrims.findIndex(s => s._id === scrimId);
+          if (scrimIndex >= 0) {
+            const currentScrim = state.scrims[scrimIndex];
+            const updatedScrim = {
+              ...currentScrim,
+              ...updates,
+            };
+            
+            // Check if there are actual changes by comparing stringified versions
+            if (JSON.stringify(currentScrim) === JSON.stringify(updatedScrim)) {
+              return state; // No changes, don't update
+            }
+            
+            const newScrims = [...state.scrims];
+            newScrims[scrimIndex] = updatedScrim;
+            return { scrims: newScrims };
+          }
+          return state; // No changes if scrim not found
         });
       },
 
       // Update tournament data for a scrim
       updateScrimTournament: (scrimId, tournamentData) => {
         set((state) => {
-          const updatedScrim = {
-            ...state.scrims[scrimId],
-            riotTournament: tournamentData,
-            lobbyName:
-              tournamentData.tournamentCode || state.scrims[scrimId]?.lobbyName,
-          };
-
-          return {
-            scrims: {
-              ...state.scrims,
-              [scrimId]: updatedScrim,
-            },
-            allScrimsArray: state.allScrimsArray.map((s) =>
-              s._id === scrimId ? updatedScrim : s
-            ),
-          };
+          const scrimIndex = state.scrims.findIndex(s => s._id === scrimId);
+          if (scrimIndex >= 0) {
+            const currentScrim = state.scrims[scrimIndex];
+            const updatedScrim = {
+              ...currentScrim,
+              riotTournament: tournamentData,
+              lobbyName: tournamentData.tournamentCode || currentScrim?.lobbyName,
+            };
+            
+            // Check if there are actual changes
+            if (JSON.stringify(currentScrim) === JSON.stringify(updatedScrim)) {
+              return state; // No changes, don't update
+            }
+            
+            const newScrims = [...state.scrims];
+            newScrims[scrimIndex] = updatedScrim;
+            return { scrims: newScrims };
+          }
+          return state; // No changes if scrim not found
         });
       },
 
       // Get a specific scrim
       getScrim: (scrimId) => {
-        return get().scrims[scrimId];
+        return get().scrims.find(s => s._id === scrimId);
       },
 
       // Fetch scrim from API if needed
@@ -311,7 +322,7 @@ const useScrimStore = create(
         try {
           const updatedScrim = await insertCasterInScrim({
             scrimId,
-            casterId: userId,
+            userId: userId,
             setAlert,
             setButtonsDisabled,
             setScrim: (scrim) => get().setScrim(scrimId, scrim),
@@ -405,17 +416,13 @@ const useScrimStore = create(
           if (updatedScrim) {
             // Update in store
             set((state) => {
-              const newScrims = { ...state.scrims };
-              newScrims[scrimId] = updatedScrim;
-
-              const newScrimsArray = state.allScrimsArray.map((s) =>
-                s._id === scrimId ? updatedScrim : s
-              );
-
-              return {
-                scrims: newScrims,
-                allScrimsArray: newScrimsArray,
-              };
+              const scrimIndex = state.scrims.findIndex(s => s._id === scrimId);
+              if (scrimIndex >= 0) {
+                const newScrims = [...state.scrims];
+                newScrims[scrimIndex] = updatedScrim;
+                return { scrims: newScrims };
+              }
+              return state;
             });
 
             // Socket event is now handled automatically by the backend API
@@ -460,8 +467,7 @@ const useScrimStore = create(
           if (newScrim) {
             // Add to store
             set((state) => ({
-              scrims: { ...state.scrims, [newScrim._id]: newScrim },
-              allScrimsArray: [...state.allScrimsArray, newScrim],
+              scrims: [...state.scrims, newScrim],
             }));
 
             // Set the date filter to match the new scrim
@@ -496,17 +502,13 @@ const useScrimStore = create(
           if (updatedScrim) {
             // Update in store
             set((state) => {
-              const newScrims = { ...state.scrims };
-              newScrims[scrimId] = updatedScrim;
-
-              const newScrimsArray = state.allScrimsArray.map((s) =>
-                s._id === scrimId ? updatedScrim : s
-              );
-
-              return {
-                scrims: newScrims,
-                allScrimsArray: newScrimsArray,
-              };
+              const scrimIndex = state.scrims.findIndex(s => s._id === scrimId);
+              if (scrimIndex >= 0) {
+                const newScrims = [...state.scrims];
+                newScrims[scrimIndex] = updatedScrim;
+                return { scrims: newScrims };
+              }
+              return state;
             });
 
             return updatedScrim;
@@ -531,20 +533,13 @@ const useScrimStore = create(
 
           // Remove from store
           set((state) => {
-            const newScrims = { ...state.scrims };
-            delete newScrims[scrimId];
-
             const newExpanded = new Set(state.expandedScrims);
             newExpanded.delete(scrimId);
 
-            // Also remove from the array
-            const newScrimsArray = state.allScrimsArray.filter(
-              (s) => s._id !== scrimId
-            );
+            const newScrims = state.scrims.filter((s) => s._id !== scrimId);
 
             return {
               scrims: newScrims,
-              allScrimsArray: newScrimsArray,
               expandedScrims: newExpanded,
             };
           });
@@ -578,15 +573,8 @@ const useScrimStore = create(
 
           const scrims = await getAllScrims(params);
 
-          // Convert array to object for O(1) lookups
-          const scrimsObj = {};
-          scrims.forEach((scrim) => {
-            scrimsObj[scrim._id] = scrim;
-          });
-
           set({
-            scrims: scrimsObj,
-            allScrimsArray: scrims,
+            scrims: scrims,
             scrimsLoaded: true,
             scrimsRegion: region || get().scrimsRegion,
             scrimsDate: date || get().scrimsDate, // date is already a string
@@ -652,8 +640,7 @@ const useScrimStore = create(
       // Clear store
       clearStore: () => {
         set({
-          scrims: {},
-          allScrimsArray: [],
+          scrims: [],
           scrimsLoaded: false,
           expandedScrims: new Set(),
           activeScrimRooms: new Set(),

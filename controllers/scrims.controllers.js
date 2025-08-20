@@ -453,6 +453,9 @@ const updateScrim = async (req, res) => {
       scrimScheduler.rescheduleRiotTournament(scrim, io);
     }
 
+    // Emit socket event to notify clients of the scrim update
+    emitScrimTransaction(req, scrim);
+
     return res.status(200).json(scrim);
   } catch (error) {
     console.error('Error updating scrim:', error);
@@ -1601,6 +1604,9 @@ const adminAssignPlayer = async (req, res) => {
       return res.status(200).json(finalScrim);
     }
 
+    // Emit socket event to notify clients of the scrim update
+    emitScrimTransaction(req, updatedScrim);
+
     return res.status(200).json(updatedScrim);
   } catch (error) {
     console.error('Error in admin assign player:', error);
@@ -1757,6 +1763,9 @@ const adminFillRandomPositions = async (req, res) => {
           })),
       });
     }
+
+    // Emit socket event to notify clients of the scrim update
+    emitScrimTransaction(req, updatedScrim);
 
     return res.status(200).json({
       scrim: updatedScrim,
