@@ -2,7 +2,6 @@
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import useAlerts from '@/hooks/useAlerts';
-import useSocket from '@/hooks/useSocket';
 
 // components
 import IconButton from '@mui/material/IconButton';
@@ -27,8 +26,6 @@ export default function CreateNewConversationButton({
 }) {
   const dispatch = useDispatch();
   const { setCurrentAlert } = useAlerts();
-
-  const { socket } = useSocket();
 
   const handleCreateConversation = useCallback(async () => {
     try {
@@ -56,8 +53,6 @@ export default function CreateNewConversationButton({
       });
 
       devLog('new message added to the conversation!', newlyCreatedMessage);
-
-      // Socket conversation event is now handled automatically by the backend API
 
       dispatch({
         type: 'messenger/addNewConversation',
@@ -89,7 +84,6 @@ export default function CreateNewConversationButton({
     currentUser._id,
     receiverUser._id,
     receiverUser.name,
-    socket,
     dispatch,
     setCurrentAlert,
     newMessageText,

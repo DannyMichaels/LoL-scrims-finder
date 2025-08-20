@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import useScrimStore from '@/features/scrims/stores/scrimStore';
 import { useParams, useHistory } from 'react-router-dom';
 import ScrimSection from '@/features/scrims/components/ScrimSection';
@@ -6,7 +6,6 @@ import Navbar from '@/components/shared/Navbar/Navbar';
 import { Helmet } from 'react-helmet';
 import Loading from '@/components/shared/Loading';
 import { PageContent } from '@/components/shared/PageComponents';
-import { getScrimById } from '@/features/scrims/services/scrims.services';
 import useAlerts from '@/hooks/useAlerts';
 
 export default function ScrimDetail() {
@@ -16,14 +15,14 @@ export default function ScrimDetail() {
   const { setCurrentAlert } = useAlerts();
 
   // Get scrim from store (updated via sockets)
-  const scrim = scrims.find(s => s._id === id);
+  const scrim = scrims.find((s) => s._id === id);
 
   // Fetch scrim if not in store
   useEffect(() => {
     const loadScrim = async () => {
       if (!scrim) {
         try {
-          const fetchedScrim = await fetchScrim(id);
+          const fetchedScrim = await fetchScrim(id); // fetchScrim also adds it to the scrims array, which helps the .find() above find the scrim for us
           if (!fetchedScrim) {
             setCurrentAlert({
               type: 'Error',

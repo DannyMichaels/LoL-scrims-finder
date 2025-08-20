@@ -1,10 +1,10 @@
-import { useMemo, Fragment, memo, useState, useCallback, useEffect } from 'react';
+import { useMemo, Fragment, memo, useState, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import useAlerts from '@/hooks/useAlerts';
 import useTheme from '@mui/styles/useTheme';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useScrimSectionStyles } from '@/features/scrims/styles/ScrimSection.styles';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // components
 import Button from '@mui/material/Button';
@@ -114,7 +114,7 @@ export default function ScrimSectionHeader({
   const showPlayers = useMediaQuery('(min-width:1000px)');
 
   const [isHover, setIsHover] = useState(false);
-  
+
   // Chat open/close state is now handled globally in the scrim store
 
   const gameUrl = useMemo(

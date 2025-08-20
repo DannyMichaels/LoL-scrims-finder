@@ -1,6 +1,5 @@
 import { Fragment, memo, useCallback, useState, useEffect } from 'react';
 import useAlerts from '@/hooks/useAlerts';
-import useSocket from '@/hooks/useSocket';
 import { useSelector, useDispatch } from 'react-redux';
 
 // components
@@ -15,9 +14,6 @@ import { Link } from 'react-router-dom';
 
 // utils
 import { getRankImage } from '@/utils/getRankImage';
-
-// services
-import { pushUserNotification } from '@/services/notification.services';
 
 import {
   rejectFriendRequest,
@@ -37,8 +33,6 @@ export default function FriendRequestsModal() {
   const [friendRequests, setFriendRequests] = useState(() => {
     return currentUser?.friendRequests ?? [];
   });
-
-  const { socket } = useSocket();
 
   const dispatch = useDispatch();
   const { setCurrentAlert } = useAlerts();
@@ -68,8 +62,6 @@ export default function FriendRequestsModal() {
           currentUser?._id,
           requestId
         );
-
-        // Socket notifications and database notifications are now handled automatically by the backend API
 
         dispatch({
           type: 'auth/updateCurrentUser',
@@ -113,7 +105,7 @@ export default function FriendRequestsModal() {
       }
     },
 
-    [currentUser, dispatch, setCurrentAlert, socket]
+    [currentUser, dispatch, setCurrentAlert]
   );
 
   const onRejectClick = useCallback(
