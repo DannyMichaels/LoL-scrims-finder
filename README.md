@@ -134,6 +134,11 @@ If you have an admin key, you can host a scrim/lobby. Then players just have to 
 - updated the sidebar with collapsible sections and user image
 - refactored front-end code to use the features folder style and import aliases
 
+## 8/19/2025
+
+- user can now unsend friend request
+- fixed an exploit where sender user could accept receiver users' friend request when using a proxy.
+
 ---
 
 <br />
