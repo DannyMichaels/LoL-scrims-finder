@@ -14,6 +14,7 @@ import DeleteFriendButton from './DeleteFriendButton';
 import {
   sendFriendRequest,
   checkFriendRequestSent,
+  cancelFriendRequest,
 } from '@/features/users/services/friends.services';
 
 // utils
@@ -21,6 +22,7 @@ import devLog from '@/utils/devLog';
 
 // icons
 import AddFriendIcon from '@mui/icons-material/AddReaction';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 export default function SendFriendRequest({ user, setUser }) {
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
@@ -74,6 +76,32 @@ export default function SendFriendRequest({ user, setUser }) {
     }
   };
 
+  const onCancelFriendRequest = async () => {
+    setButtonsDisabled(true);
+
+    try {
+      await cancelFriendRequest(user._id);
+
+      setRequestSent(false);
+
+      setCurrentAlert({
+        type: 'Success',
+        message: `Friend request to ${user.name} cancelled!`,
+      });
+
+      setButtonsDisabled(false);
+    } catch (error) {
+      console.log({ error });
+      setCurrentAlert({
+        type: 'Error',
+        message: 'Error cancelling friend request',
+      });
+
+      setButtonsDisabled(false);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const checkIsRequestSent = async () => {
       if (!user?._id) return;
@@ -104,20 +132,38 @@ export default function SendFriendRequest({ user, setUser }) {
       }}>
       {/* if not friend, show send friend request button */}
       {!isFriend ? (
-        <Button
-          style={{
-            width: '100%',
-            height: '50px',
-            alignSelf: 'center',
-            marginLeft: !matchesSm ? '0' : '20px',
-            marginTop: '20px',
-          }}
-          startIcon={<AddFriendIcon />}
-          variant="contained"
-          disabled={buttonsDisabled || requestSent}
-          onClick={onSubmitFriendRequest}>
-          {requestSent ? 'Friend Request Sent' : 'Send Friend Request'}
-        </Button>
+        requestSent ? (
+          <Button
+            style={{
+              width: '100%',
+              height: '50px',
+              alignSelf: 'center',
+              marginLeft: !matchesSm ? '0' : '20px',
+              marginTop: '20px',
+            }}
+            startIcon={<CancelIcon />}
+            variant="contained"
+            color="error"
+            disabled={buttonsDisabled}
+            onClick={onCancelFriendRequest}>
+            Cancel Friend Request
+          </Button>
+        ) : (
+          <Button
+            style={{
+              width: '100%',
+              height: '50px',
+              alignSelf: 'center',
+              marginLeft: !matchesSm ? '0' : '20px',
+              marginTop: '20px',
+            }}
+            startIcon={<AddFriendIcon />}
+            variant="contained"
+            disabled={buttonsDisabled}
+            onClick={onSubmitFriendRequest}>
+            Send Friend Request
+          </Button>
+        )
       ) : (
         // else show delete button (unfriend)
         <DeleteFriendButton

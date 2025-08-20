@@ -198,11 +198,21 @@ const rejectFriendRequest = async (req, res) => {
 
 // @route   POST api/friend-requests/accept-request/:id
 // @desc    add a new friend to both parties (the friend requesting and accepting), this happens when a friend request is accepted
-// @access  Public
+// @access  Private
 const acceptFriendRequest = async (req, res) => {
   const { id } = req.params;
-
   const { newFriendUserId } = req.body;
+  
+  // Get the authenticated user ID from the JWT token
+  const authenticatedUserId = req.user._id;
+
+  // SECURITY CHECK: Verify that the authenticated user is the one accepting the request
+  // The authenticated user must be the recipient (id param) of the friend request
+  if (String(authenticatedUserId) !== String(id)) {
+    return res.status(403).json({
+      error: 'You can only accept friend requests sent to you',
+    });
+  }
 
   const sendingToSelf = String(newFriendUserId) === String(id);
 
@@ -212,10 +222,10 @@ const acceptFriendRequest = async (req, res) => {
     });
   }
 
-  // user receiving the  friend request
+  // user receiving the friend request (must be the authenticated user)
   let user = await User.findById(id);
 
-  // user sent the friendRequest
+  // user who sent the friendRequest
   let friendUser = await User.findById(newFriendUserId);
 
   if (!user) {
@@ -226,6 +236,17 @@ const acceptFriendRequest = async (req, res) => {
     return res.status(404).json({ error: `Friend user not found with id: ${newFriendUserId}` });
   }
 
+  // Verify that the friend request actually exists
+  const friendRequestExists = user.friendRequests?.some(
+    (request) => String(request._user) === String(newFriendUserId)
+  );
+
+  if (!friendRequestExists) {
+    return res.status(400).json({ 
+      error: 'No friend request found from this user',
+    });
+  }
+
   if (user.friends?.find(({ _id }) => String(_id) === String(friendUser._id))) {
     return res.status(400).json({ error: 'Friend already added!' });
   }
@@ -233,6 +254,11 @@ const acceptFriendRequest = async (req, res) => {
   if (friendUser.friends?.find(({ _id }) => String(_id) === String(user._id))) {
     return res.status(400).json({ error: 'Friend already added!' });
   }
+
+  // Remove the friend request from the user's friendRequests array
+  user.friendRequests = (user.friendRequests || []).filter(
+    (request) => String(request._user) !== String(newFriendUserId)
+  );
 
   if (user.friends) {
     user.friends.push(friendUser);
@@ -295,6 +321,51 @@ const unfriendUser = async (req, res) => {
   });
 };
 
+// @route   POST api/friend-requests/cancel-friend-request/:receiverId
+// @desc    cancel a sent friend request
+// @access  Private
+const cancelFriendRequest = async (req, res) => {
+  try {
+    const { receiverId } = req.params;
+    const senderId = req.user._id;
+
+    const receiverUser = await User.findById(receiverId);
+
+    if (!receiverUser) {
+      return res.status(404).json({ error: 'Receiver not found' });
+    }
+
+    // Remove the friend request from receiver's friendRequests array
+    const initialLength = receiverUser.friendRequests?.length || 0;
+    receiverUser.friendRequests = (receiverUser.friendRequests || []).filter(
+      (request) => String(request._user) !== String(senderId)
+    );
+
+    // Check if a friend request was actually removed
+    if (receiverUser.friendRequests.length === initialLength) {
+      return res.status(400).json({ error: 'Friend request not found' });
+    }
+
+    // Also remove the related notification if it exists
+    receiverUser.notifications = (receiverUser.notifications || []).filter(
+      (notification) => {
+        // Keep notifications that are not friend requests or not from this sender
+        return !(notification.isFriendRequest && 
+                String(notification._relatedUser) === String(senderId));
+      }
+    );
+
+    await receiverUser.save();
+
+    return res.status(200).json({
+      message: 'Friend request cancelled successfully',
+      receiverId: receiverId,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getUserFriends,
   sendFriendRequest,
@@ -303,4 +374,5 @@ module.exports = {
   unfriendUser,
   getUserFriendRequests,
   checkFriendRequestSent,
+  cancelFriendRequest,
 };

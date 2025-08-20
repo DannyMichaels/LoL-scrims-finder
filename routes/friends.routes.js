@@ -26,6 +26,7 @@ router.post(
 router.post(
   '/friend-requests/accept-request/:id',
   passport.authenticate('jwt', { session: false }),
+  auth,
   controllers.acceptFriendRequest
 ); // POST (accept friend request)
 
@@ -42,6 +43,13 @@ router.get(
   auth,
   controllers.checkFriendRequestSent
 ); // POST
+
+router.post(
+  '/friend-requests/cancel-friend-request/:receiverId',
+  passport.authenticate('jwt', { session: false }),
+  auth,
+  controllers.cancelFriendRequest
+); // POST (cancel friend request)
 
 router.get('/friends/user-friends/:id', controllers.getUserFriends); // GET
 

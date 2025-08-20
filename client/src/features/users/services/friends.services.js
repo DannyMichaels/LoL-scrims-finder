@@ -128,3 +128,21 @@ export const checkFriendRequestSent = async (receiverId) => {
     throw error;
   }
 };
+
+/**
+ * @method cancelFriendRequest
+ * @desc cancel a sent friend request
+ * @access private (takes user from jwt token)
+ * @param {String} receiverId (the user who was sent the friend request)
+ * @returns {Object} response with success message
+ */
+export const cancelFriendRequest = async (receiverId) => {
+  try {
+    const response = await api.post(
+      `/friend-requests/cancel-friend-request/${receiverId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
