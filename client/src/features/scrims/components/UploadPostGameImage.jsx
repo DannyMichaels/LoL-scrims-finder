@@ -50,7 +50,6 @@ export default function UploadPostGameImage({
         });
 
         setScrim(updatedScrim);
-        socket?.emit('sendScrimTransaction', updatedScrim);
       }
 
       setButtonDisabled(false);
@@ -122,8 +121,6 @@ export default function UploadPostGameImage({
         });
 
         setScrim(updatedScrim);
-
-        socket?.emit('sendScrimTransaction', updatedScrim);
       }
 
       setButtonDisabled(false);

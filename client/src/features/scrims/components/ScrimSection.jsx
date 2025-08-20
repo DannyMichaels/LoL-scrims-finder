@@ -134,7 +134,6 @@ export default function ScrimSection({ scrimData, isInDetail }) {
     setCasterEntered(casterInGame);
   }, [scrim, currentUser]);
 
-
   // Handle player swapping
   useEffect(() => {
     const performSwap = async () => {
@@ -268,17 +267,13 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       return;
     }
 
-    const updatedScrim = await insertCasterInScrim({
+    await insertCasterInScrim({
       scrimId,
       casterId: currentUser._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
       setScrim: (scrim) => setScrim(scrimId, scrim),
     });
-
-    if (updatedScrim?.createdBy) {
-      socket?.emit('sendScrimTransaction', updatedScrim);
-    }
 
     setButtonsDisabled(false);
   };
@@ -288,17 +283,13 @@ export default function ScrimSection({ scrimData, isInDetail }) {
 
     setButtonsDisabled(true);
 
-    const updatedScrim = await removeCasterFromScrim({
+    await removeCasterFromScrim({
       scrimId,
       casterId: casterEntered._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
       setScrim: (scrim) => setScrim(scrimId, scrim),
     });
-
-    if (updatedScrim?.createdBy) {
-      socket?.emit('sendScrimTransaction', updatedScrim);
-    }
 
     setButtonsDisabled(false);
   };

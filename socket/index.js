@@ -28,18 +28,7 @@ const createSocket = (server) => {
       io.emit('getUsers', global.socketUsers); // emit to client
     });
 
-    socket.on('sendMessage', (data) => {
-      sendMessage(io, data);
-    });
-
-    socket.on('sendConversation', (data) => {
-      sendConversation(io, data);
-    });
-
-    // for friend requests or conversation starts
-    socket.on('sendNotification', (data) => {
-      sendNotification(io, data);
-    });
+    // sendMessage, sendConversation, sendNotification are now handled directly by backend controllers
 
     // just checking that scrim chat has been opened or closed
     socket.on('scrimChatOpen', async ({ userId, scrimId }) => {
@@ -51,10 +40,7 @@ const createSocket = (server) => {
       console.log('scrimChatClose');
     });
 
-    // send scrim to scrim chat box
-    socket.on('sendScrimMessage', (data) => {
-      sendScrimMessage(io, data);
-    });
+    // sendScrimMessage is now handled directly by backend controllers
 
     // Join scrim room for real-time updates
     socket.on('join_scrim_room', ({ scrimId }) => {
@@ -74,12 +60,7 @@ const createSocket = (server) => {
       }
     });
 
-    // scrim team list socket here:
-    socket.on('sendScrimTransaction', async (updatedScrim) => {
-      console.log('sendScrimTransaction: ', updatedScrim);
-      // send the updated scrim
-      io.emit('getScrimTransaction', updatedScrim);
-    });
+    // sendScrimTransaction is now handled directly by backend controllers
 
     // when disconnect
     // add unsubscribe event listener

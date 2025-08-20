@@ -21,6 +21,7 @@ export default function MessengerButton({
   tooltipTitle = 'Messenger',
   tooltipType = 'primary',
   isScrim = true,
+  scrimUnreadCount = 0,
 }) {
   const anchorRef = useRef(null);
   const classes = useStyles();
@@ -42,9 +43,9 @@ export default function MessengerButton({
           }
           aria-haspopup={withDropdown && 'true'}>
           {/* red circle with unseen messages count */}
-          {!isScrim && unseenMessages.length > 0 ? (
+          {(!isScrim && unseenMessages.length > 0) || (isScrim && scrimUnreadCount > 0) ? (
             <div className={classes.unseenMessagesCount}>
-              {unseenMessages.length}
+              {isScrim ? scrimUnreadCount : unseenMessages.length}
             </div>
           ) : null}
           <MessengerIcon fontSize="large" />

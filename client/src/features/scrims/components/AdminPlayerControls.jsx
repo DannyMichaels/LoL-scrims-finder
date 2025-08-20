@@ -36,13 +36,7 @@ const TEAMS = [
   { value: 'teamTwo', label: 'Team Two (Red)' },
 ];
 
-export default function AdminPlayerControls({
-  scrim,
-  setScrim,
-  socket,
-  specificRole = null,
-  specificTeam = null,
-}) {
+export default function AdminPlayerControls({ scrim }) {
   const { isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
   const { allUsers } = useUsers();
@@ -51,8 +45,8 @@ export default function AdminPlayerControls({
   // State for manual assignment dialog
   const [assignDialogOpen, setAssignDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedTeam, setSelectedTeam] = useState(specificTeam || '');
-  const [selectedRole, setSelectedRole] = useState(specificRole || '');
+  const [selectedTeam, setSelectedTeam] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
   const [searchValue, setSearchValue] = useState('');
   const [assignLoading, setAssignLoading] = useState(false);
   const [fillLoading, setFillLoading] = useState(false);
@@ -65,20 +59,28 @@ export default function AdminPlayerControls({
       .filter((user) => {
         // Must be same region
         if (user.region !== scrim.region) return false;
-        
+
         // Check if input contains # for Riot ID search
         if (searchValue.includes('#')) {
           const [searchName, searchTagline] = searchValue.split('#');
-          const nameMatch = user.name.toLowerCase().includes(searchName.toLowerCase());
-          const taglineMatch = searchTagline 
-            ? user.summonerTagline?.toLowerCase().includes(searchTagline.toLowerCase())
+          const nameMatch = user.name
+            .toLowerCase()
+            .includes(searchName.toLowerCase());
+          const taglineMatch = searchTagline
+            ? user.summonerTagline
+                ?.toLowerCase()
+                .includes(searchTagline.toLowerCase())
             : true;
           return nameMatch && taglineMatch;
         }
-        
+
         // Otherwise search by name or tagline separately
-        const nameMatch = user.name.toLowerCase().includes(searchValue.toLowerCase());
-        const taglineMatch = user.summonerTagline?.toLowerCase().includes(searchValue.toLowerCase());
+        const nameMatch = user.name
+          .toLowerCase()
+          .includes(searchValue.toLowerCase());
+        const taglineMatch = user.summonerTagline
+          ?.toLowerCase()
+          .includes(searchValue.toLowerCase());
         return nameMatch || taglineMatch;
       })
       .slice(0, 10); // Limit results
@@ -134,13 +136,7 @@ export default function AdminPlayerControls({
     setFillLoading(true);
 
     try {
-      await adminFillRandom(
-        scrim._id,
-        scrim.region,
-        setCurrentAlert
-      );
-
-      // The store handles the socket emission and state update
+      await adminFillRandom(scrim._id, scrim.region, setCurrentAlert);
     } catch (error) {
       console.error('Error filling random positions:', error);
     } finally {
@@ -151,14 +147,14 @@ export default function AdminPlayerControls({
   const handleCloseAssignDialog = () => {
     setAssignDialogOpen(false);
     setSelectedUser(null);
-    setSelectedTeam(specificTeam || '');
-    setSelectedRole(specificRole || '');
+    setSelectedTeam('');
+    setSelectedRole('');
     setSearchValue('');
   };
 
   const handleOpenAssignDialog = () => {
-    setSelectedTeam(specificTeam || '');
-    setSelectedRole(specificRole || '');
+    setSelectedTeam('');
+    setSelectedRole('');
     setAssignDialogOpen(true);
   };
 
@@ -170,125 +166,6 @@ export default function AdminPlayerControls({
 
   const emptyPositionsCount = getEmptyPositionsCount();
 
-  // If this is for a specific position, show icon button like the door icons
-  if (specificRole && specificTeam) {
-    return (
-      <>
-        <Tooltip
-          title={`Assign player to ${
-            specificTeam === 'teamOne' ? 'Team One' : 'Team Two'
-          } - ${specificRole}`}>
-          <Box>
-            <IconButton onClick={handleOpenAssignDialog}>
-              <PersonAddIcon />
-            </IconButton>
-          </Box>
-        </Tooltip>
-
-        {/* Assignment Dialog */}
-        <Dialog
-          open={assignDialogOpen}
-          onClose={handleCloseAssignDialog}
-          maxWidth="sm"
-          fullWidth>
-          <DialogTitle>
-            Assign Player to{' '}
-            {selectedTeam === 'teamOne' ? 'Team One' : 'Team Two'} -{' '}
-            {selectedRole}
-          </DialogTitle>
-          <DialogContent>
-            <Box sx={{ pt: 1 }}>
-              {/* User Search */}
-              <Autocomplete
-                options={filteredUsers}
-                getOptionLabel={(option) =>
-                  `${option.name} (${option.region}) - ${
-                    option.rank || 'Unranked'
-                  }`
-                }
-                value={selectedUser}
-                onChange={(event, newValue) => setSelectedUser(newValue)}
-                inputValue={searchValue}
-                onInputChange={(event, newInputValue) =>
-                  setSearchValue(newInputValue)
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Search Users"
-                    placeholder="Type player name or GameName#Tagline..."
-                    fullWidth
-                    margin="normal"
-                  />
-                )}
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    key={option._id}
-                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <img
-                      src={getRankImage(option)}
-                      width="20px"
-                      alt={option.rank || 'Unranked'}
-                    />
-                    <Box>
-                      <Typography variant="body1">
-                        {option.name}
-                        {option.summonerTagline && (
-                          <span style={{ color: '#999', fontSize: '0.9em' }}>#{option.summonerTagline}</span>
-                        )}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {option.region} • {option.rank || 'Unranked'}
-                        {option.discord && ` • ${option.discord}`}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
-                noOptionsText={
-                  searchValue.length < 2
-                    ? 'Type at least 2 characters to search'
-                    : 'No users found'
-                }
-              />
-
-              {/* Selected User Preview */}
-              {selectedUser && (
-                <Alert severity="info" sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    Selected Player:
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>
-                      {selectedUser.name}
-                      {selectedUser.summonerTagline && (
-                        <span style={{ color: '#666', fontWeight: 'normal' }}>#{selectedUser.summonerTagline}</span>
-                      )}
-                    </strong> ({selectedUser.region})
-                    - {selectedUser.rank || 'Unranked'}
-                    {selectedUser.discord && ` • ${selectedUser.discord}`}
-                  </Typography>
-                </Alert>
-              )}
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseAssignDialog}>Cancel</Button>
-            <Button
-              onClick={handleAssignPlayer}
-              variant="contained"
-              disabled={!selectedUser || assignLoading}
-              startIcon={assignLoading ? <CircularProgress size={20} /> : null}>
-              {assignLoading ? 'Assigning...' : 'Assign Player'}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
-    );
-  }
-
-  // Main admin controls (shown in header)
   return (
     <>
       <Box sx={{ display: 'flex', gap: 1 }}>
@@ -327,8 +204,12 @@ export default function AdminPlayerControls({
             <Autocomplete
               options={filteredUsers}
               getOptionLabel={(option) => {
-                const tagline = option.summonerTagline ? `#${option.summonerTagline}` : '';
-                return `${option.name}${tagline} (${option.region}) - ${option.rank || 'Unranked'}`;
+                const tagline = option.summonerTagline
+                  ? `#${option.summonerTagline}`
+                  : '';
+                return `${option.name}${tagline} (${option.region}) - ${
+                  option.rank || 'Unranked'
+                }`;
               }}
               value={selectedUser}
               onChange={(event, newValue) => setSelectedUser(newValue)}
@@ -425,10 +306,12 @@ export default function AdminPlayerControls({
                   <strong>
                     {selectedUser.name}
                     {selectedUser.summonerTagline && (
-                      <span style={{ color: '#666', fontWeight: 'normal' }}>#{selectedUser.summonerTagline}</span>
+                      <span style={{ color: '#666', fontWeight: 'normal' }}>
+                        #{selectedUser.summonerTagline}
+                      </span>
                     )}
-                  </strong> ({selectedUser.region}) -{' '}
-                  {selectedUser.rank || 'Unranked'}
+                  </strong>{' '}
+                  ({selectedUser.region}) - {selectedUser.rank || 'Unranked'}
                   {selectedUser.discord && ` • ${selectedUser.discord}`}
                 </Typography>
               </Alert>

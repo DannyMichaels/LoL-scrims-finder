@@ -7,6 +7,7 @@ import useAuth from '@/features/auth/hooks/useAuth';
 import useSound from 'use-sound';
 import { useSelector, useDispatch } from 'react-redux';
 import { useScrimChat } from '@/features/messenger/hooks/useMessenger';
+import useScrimStore from '@/features/scrims/stores/scrimStore';
 
 // components
 import LinearProgress from '@mui/material/LinearProgress';
@@ -39,11 +40,15 @@ export default function ScrimChatRoomModal() {
   const { conversation, isOpen: open, scrimId, extraTitle } = scrimChatRoomOpen;
 
   const dispatch = useDispatch();
+  const closeAllScrimChats = useScrimStore((state) => state.closeAllScrimChats);
 
-  const onClose = () =>
+  const onClose = () => {
+    // Close in both Redux and scrim store
+    closeAllScrimChats();
     dispatch({
       type: 'general/closeScrimChatRoom',
     });
+  };
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [messages, setMessages] = useState([]);

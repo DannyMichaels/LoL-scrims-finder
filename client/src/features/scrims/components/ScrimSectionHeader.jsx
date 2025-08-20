@@ -1,10 +1,10 @@
-import { useMemo, Fragment, memo, useState, useCallback } from 'react';
+import { useMemo, Fragment, memo, useState, useCallback, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import useAlerts from '@/hooks/useAlerts';
 import useTheme from '@mui/styles/useTheme';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useScrimSectionStyles } from '@/features/scrims/styles/ScrimSection.styles';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 // components
 import Button from '@mui/material/Button';
@@ -36,6 +36,7 @@ import { GiEarthAsiaOceania } from 'react-icons/gi';
 
 // services
 import { findScrimConversation } from '@/features/messenger/services/conversations.services';
+import useScrimStore from '@/features/scrims/stores/scrimStore';
 
 // Helper function to get region icon and color
 const getRegionConfig = (region) => {
@@ -101,9 +102,20 @@ export default function ScrimSectionHeader({
   const regionConfig = getRegionConfig(scrim.region);
   const dispatch = useDispatch();
   const matchesMd = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Get unread scrim message count and helper functions
+  const unreadScrimMessageCount = useScrimStore(
+    (state) => state.unreadScrimMessages[scrim._conversation] || 0
+  );
+  const markScrimMessagesAsRead = useScrimStore(
+    (state) => state.markScrimMessagesAsRead
+  );
+  const setScrimChatOpen = useScrimStore((state) => state.setScrimChatOpen);
   const showPlayers = useMediaQuery('(min-width:1000px)');
 
   const [isHover, setIsHover] = useState(false);
+  
+  // Chat open/close state is now handled globally in the scrim store
 
   const gameUrl = useMemo(
     () => `${window.location.origin}/scrims/${scrim._id}`,
@@ -113,6 +125,10 @@ export default function ScrimSectionHeader({
   const handleOpenConversation = useCallback(async () => {
     try {
       const conversation = await findScrimConversation(scrim._id);
+
+      // Mark scrim messages as read and chat as open
+      markScrimMessagesAsRead(scrim._conversation);
+      setScrimChatOpen(scrim._conversation, true);
 
       dispatch({
         type: 'general/scrimChatRoomOpen',
@@ -133,7 +149,7 @@ export default function ScrimSectionHeader({
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrim._conversation]);
+  }, [scrim._conversation, markScrimMessagesAsRead]);
 
   return (
     <Grid
@@ -231,6 +247,8 @@ export default function ScrimSectionHeader({
                 onClick={handleOpenConversation}
                 tooltipTitle="Open scrim chat room"
                 tooltipType="secondary"
+                isScrim={true}
+                scrimUnreadCount={unreadScrimMessageCount}
               />
             </Grid>
           )}
@@ -271,11 +289,7 @@ export default function ScrimSectionHeader({
             </Grid>
 
             <Grid item>
-              <AdminPlayerControls
-                scrim={scrim}
-                setScrim={setScrim}
-                socket={socket}
-              />
+              <AdminPlayerControls scrim={scrim} />
             </Grid>
           </AdminArea>
         </Grid>
