@@ -13,7 +13,8 @@
       "Bash(mv:*)",
       "Bash(git checkout:*)",
       "Bash(git push:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(pnpm start:*)"
     ],
     "deny": []
   }

@@ -1212,6 +1212,12 @@ const removeCasterFromScrim = async (req, res) => {
         return res.status(401).send({ error: 'Unauthorized' });
       }
 
+      const scrim = await Scrim.findById(scrimId);
+
+      if (!scrim) {
+        return res.status(404).json({ error: 'Scrim not found' });
+      }
+
       const casterLeaving = await User.findOne({ _id: casterId });
 
       if (!casterLeaving) {
@@ -1227,7 +1233,7 @@ const removeCasterFromScrim = async (req, res) => {
         ),
       };
 
-      const scrim = await Scrim.findByIdAndUpdate(scrimId, bodyData, {
+      const updatedScrim = await Scrim.findByIdAndUpdate(scrimId, bodyData, {
         new: true,
       })
         .populate('createdBy', populateUser)
@@ -1237,12 +1243,12 @@ const removeCasterFromScrim = async (req, res) => {
         .populate(populateTeam('teamTwo'))
         .exec();
 
-      if (!scrim) {
+      if (!updatedScrim) {
         return res.status(404).json({ error: 'Scrim not found' });
       }
 
-      emitScrimTransaction(req, scrim);
-      return res.status(200).json(scrim);
+      emitScrimTransaction(req, updatedScrim);
+      return res.status(200).json(updatedScrim);
     });
     session.endSession();
   } catch (err) {
