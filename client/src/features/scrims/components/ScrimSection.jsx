@@ -285,7 +285,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
 
     await removeCasterFromScrim({
       scrimId,
-      casterId: casterEntered._id,
+      userId: casterEntered._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
       setScrim: (scrim) => setScrim(scrimId, scrim),
