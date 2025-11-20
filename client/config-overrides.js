@@ -1,6 +1,12 @@
 const path = require('path');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
 module.exports = function override(config, env) {
+  // Disable case-sensitive paths plugin to fix Windows path issues
+  config.plugins = config.plugins.filter(
+    plugin => !(plugin instanceof CaseSensitivePathsPlugin)
+  );
+
   // Find the oneOf array in the module rules
   const oneOfRule = config.module.rules.find((rule) => rule.oneOf);
 

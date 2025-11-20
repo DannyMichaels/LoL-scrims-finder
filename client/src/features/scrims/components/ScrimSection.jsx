@@ -272,7 +272,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       userId: currentUser._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
-      setScrim: (scrim) => setScrim(scrimId, scrim),
+      setScrim: (updatedScrim) => setScrim(scrimId, updatedScrim),
     });
 
     setButtonsDisabled(false);
@@ -288,7 +288,7 @@ export default function ScrimSection({ scrimData, isInDetail }) {
       userId: casterEntered._id,
       setAlert: setCurrentAlert,
       setButtonsDisabled,
-      setScrim: (scrim) => setScrim(scrimId, scrim),
+      setScrim: (updatedScrim) => setScrim(scrimId, updatedScrim),
     });
 
     setButtonsDisabled(false);
