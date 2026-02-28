@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 import useProfileAccountDetails from '@/features/users/hooks/useProfileAccountDetails';
 
 // components
@@ -22,6 +23,7 @@ export default function ProfileAccountDetails({
   isOnline,
 }) {
   const history = useHistory();
+  const theme = useTheme();
   const userStats = useProfileAccountDetails(
     userParticipatedScrims,
     user,
@@ -185,8 +187,8 @@ export default function ProfileAccountDetails({
                 <Tooltip title={`View ${user?.name}'s friends`}>
                   <span 
                     style={{ 
-                      cursor: 'pointer', 
-                      color: '#2196F3',
+                      cursor: 'pointer',
+                      color: theme.palette.primary.main,
                       marginLeft: '8px',
                       fontSize: '0.85em'
                     }} 

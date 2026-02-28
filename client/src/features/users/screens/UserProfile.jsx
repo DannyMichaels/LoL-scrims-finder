@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import useQuery from '@/hooks/useQuery';
 import useAlerts from '@/hooks/useAlerts';
 import useUsers from '@/features/users/hooks/useUsers';
+import useBranding from '@/hooks/useBranding';
 
 // components
 import Navbar from '@/components/shared/Navbar/Navbar';
@@ -47,6 +48,7 @@ export default function UserProfile() {
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
   const { onlineUsers } = useUsers();
+  const { brandName, tagline: brandTagline } = useBranding();
   const [userData, setUserData] = useState(null);
   const [userCreatedScrims, setUserCreatedScrims] = useState([]);
   const [userParticipatedScrims, setUserParticipatedScrims] = useState([]);
@@ -162,10 +164,10 @@ export default function UserProfile() {
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>{userData?.name} | Reluminate.gg</title>
+        <title>{userData?.name} | {brandName}</title>
         <meta
           name="description"
-          content={`Visit ${userData?.name}'s Profile at Reluminate.gg - Lighting up the rift!`}
+          content={`Visit ${userData?.name}'s Profile at ${brandName} - ${brandTagline}`}
         />
       </Helmet>
 

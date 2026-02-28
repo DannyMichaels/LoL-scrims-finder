@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { alpha } from '@mui/material/styles';
 import useScrimStore from '@/features/scrims/stores/scrimStore';
 import useAlerts from '@/hooks/useAlerts';
 import useAuth from '@/features/auth/hooks/useAuth';
@@ -282,7 +283,7 @@ function ScrimCreate() {
                           value={scrimData.gameStartTime}
                           onChange={handleChangeDate}
                           required
-                          sx={{
+                          sx={(theme) => ({
                             '& .MuiOutlinedInput-root': {
                               backgroundColor: 'rgba(255, 255, 255, 0.05)',
                               backdropFilter: 'blur(10px)',
@@ -291,7 +292,7 @@ function ScrimCreate() {
                                 borderColor: 'rgba(255, 255, 255, 0.2)',
                               },
                               '&:hover fieldset': {
-                                borderColor: 'rgba(33, 150, 243, 0.5)',
+                                borderColor: alpha(theme.palette.primary.main, 0.5),
                               },
                             },
                             '& .MuiInputBase-input': {
@@ -300,7 +301,7 @@ function ScrimCreate() {
                             '& .MuiInputLabel-root': {
                               color: 'rgba(255, 255, 255, 0.8)',
                             },
-                          }}
+                          })}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
@@ -316,7 +317,7 @@ function ScrimCreate() {
                           required
                           name="gameStartTime"
                           value={scrimData.gameStartTime}
-                          sx={{
+                          sx={(theme) => ({
                             '& .MuiOutlinedInput-root': {
                               backgroundColor: 'rgba(255, 255, 255, 0.05)',
                               backdropFilter: 'blur(10px)',
@@ -325,7 +326,7 @@ function ScrimCreate() {
                                 borderColor: 'rgba(255, 255, 255, 0.2)',
                               },
                               '&:hover fieldset': {
-                                borderColor: 'rgba(33, 150, 243, 0.5)',
+                                borderColor: alpha(theme.palette.primary.main, 0.5),
                               },
                             },
                             '& .MuiInputBase-input': {
@@ -334,7 +335,7 @@ function ScrimCreate() {
                             '& .MuiInputLabel-root': {
                               color: 'rgba(255, 255, 255, 0.8)',
                             },
-                          }}
+                          })}
                         />
                       </Grid>
                     </Grid>
@@ -484,22 +485,22 @@ function ScrimCreate() {
                       color="primary"
                       type="submit"
                       size="large"
-                      sx={{
+                      sx={(theme) => ({
                         py: 1.5,
                         px: 4,
                         fontSize: '1.1rem',
                         borderRadius: 2,
                         background:
-                          'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                        boxShadow: '0 3px 20px rgba(33, 150, 243, 0.4)',
+                          `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+                        boxShadow: `0 3px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
                         '&:hover': {
                           background:
-                            'linear-gradient(45deg, #1976D2 30%, #03A9F4 90%)',
-                          boxShadow: '0 5px 30px rgba(33, 150, 243, 0.6)',
+                            `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.light} 90%)`,
+                          boxShadow: `0 5px 30px ${alpha(theme.palette.primary.main, 0.6)}`,
                           transform: 'translateY(-2px)',
                         },
                         transition: 'all 0.3s ease',
-                      }}>
+                      })}>
                       🚀 Create Scrim
                     </Button>
                   </GlassPanel>

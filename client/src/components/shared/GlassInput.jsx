@@ -2,8 +2,9 @@ import React from 'react';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
 import FormHelperText from '@mui/material/FormHelperText';
+import { alpha } from '@mui/material/styles';
 
-const glassmorphicStyles = {
+const glassmorphicStyles = (theme) => ({
   '& .MuiOutlinedInput-root': {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     backdropFilter: 'blur(10px)',
@@ -13,17 +14,17 @@ const glassmorphicStyles = {
       borderWidth: '1px',
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(33, 150, 243, 0.5)',
+      borderColor: alpha(theme.palette.primary.main, 0.5),
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#2196F3',
+      borderColor: theme.palette.primary.main,
       borderWidth: '2px',
     },
   },
   '& .MuiInputLabel-root': {
     color: 'rgba(255, 255, 255, 0.8)',
     '&.Mui-focused': {
-      color: '#2196F3',
+      color: theme.palette.primary.main,
     },
   },
   '& .MuiInputBase-input': {
@@ -32,9 +33,9 @@ const glassmorphicStyles = {
   '& .MuiFormHelperText-root': {
     color: 'rgba(255, 255, 255, 0.6)',
   },
-};
+});
 
-const selectStyles = {
+const selectStyles = (theme) => ({
   '& .MuiOutlinedInput-root': {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     backdropFilter: 'blur(10px)',
@@ -44,10 +45,10 @@ const selectStyles = {
       borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(33, 150, 243, 0.5)',
+      borderColor: alpha(theme.palette.primary.main, 0.5),
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#2196F3',
+      borderColor: theme.palette.primary.main,
     },
   },
   '& .MuiSelect-icon': {
@@ -56,10 +57,10 @@ const selectStyles = {
   '& .MuiInputLabel-root': {
     color: 'rgba(255, 255, 255, 0.8)',
     '&.Mui-focused': {
-      color: '#2196F3',
+      color: theme.palette.primary.main,
     },
   },
-};
+});
 
 export function GlassTextField({ helperText, icon, ...props }) {
   return (
@@ -67,7 +68,7 @@ export function GlassTextField({ helperText, icon, ...props }) {
       <TextField
         variant="outlined"
         fullWidth
-        sx={glassmorphicStyles}
+        sx={(theme) => glassmorphicStyles(theme)}
         {...props}
       />
       {helperText && (
@@ -86,7 +87,7 @@ export function GlassSelect({ helperText, icon, children, ...props }) {
       <Select
         variant="outlined"
         fullWidth
-        sx={selectStyles}
+        sx={(theme) => selectStyles(theme)}
         {...props}
       >
         {children}

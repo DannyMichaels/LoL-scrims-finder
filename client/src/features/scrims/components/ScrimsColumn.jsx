@@ -1,4 +1,5 @@
 import { Fragment } from 'react';
+import { alpha } from '@mui/material/styles';
 import { InnerColumn } from '@/components/shared/PageComponents';
 import Typography from '@mui/material/Typography';
 import { Fade, Slide } from 'react-awesome-reveal';
@@ -26,25 +27,25 @@ export default function ScrimsColumn({
                 position: 'relative',
               }}>
               <Divider
-                sx={{
+                sx={(theme) => ({
                   mb: 3,
                   '&::before, &::after': {
-                    borderTop: '2px solid rgba(33, 150, 243, 0.3)',
+                    borderTop: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
                   },
-                }}>
+                })}>
                 <GlassPanel
                   variant="elevated"
-                  sx={{
+                  sx={(theme) => ({
                     px: 4,
                     py: 2,
                     display: 'inline-block',
                     borderRadius: '20px',
                     background:
-                      'linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(100, 181, 246, 0.1) 100%)',
+                      `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.light, 0.1)} 100%)`,
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(33, 150, 243, 0.3)',
-                    boxShadow: '0 8px 32px rgba(33, 150, 243, 0.2)',
-                  }}>
+                    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                    boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.2)}`,
+                  })}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     {headerIcon && (
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -53,16 +54,16 @@ export default function ScrimsColumn({
                     )}
                     <Typography
                       variant="h1"
-                      sx={{
+                      sx={(theme) => ({
                         fontWeight: 800,
                         fontSize: { xs: '1.5rem', md: '2rem' },
                         background:
-                          'linear-gradient(135deg, #fff 0%, #64B5F6 100%)',
+                          `linear-gradient(135deg, #fff 0%, ${theme.palette.primary.light} 100%)`,
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        textShadow: '0 2px 10px rgba(33, 150, 243, 0.3)',
+                        textShadow: `0 2px 10px ${alpha(theme.palette.primary.main, 0.3)}`,
                         letterSpacing: '0.5px',
-                      }}>
+                      })}>
                       {scrims.length > 0 ? headerText : altText}
                     </Typography>
                     {scrims.length > 0 && (

@@ -8,6 +8,7 @@ import Sparkles from '@/components/shared/effects/Sparkles';
 
 // utils
 import { makeStyles } from '@mui/styles';
+import { alpha } from '@mui/material/styles';
 import useCountdown from '@/hooks/useCountdown';
 import { twoDigitsFormat as formatNum } from '@/utils/twoDigitsFormat';
 
@@ -125,11 +126,11 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
   );
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   timer: {
-    background: 'rgba(33, 150, 243, 0.1)',
+    background: alpha(theme.palette.primary.main, 0.1),
     backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(33, 150, 243, 0.3)',
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
     color: '#fff',
     fontSize: '22px',
     display: 'flex',
@@ -152,11 +153,11 @@ const useStyles = makeStyles({
 
   timerText: {
     fontWeight: 600,
-    color: '#64B5F6',
+    color: theme.palette.primary.light,
     fontSize: '22px !important',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
   },
-});
+}));
 
 const TimerText = ({ children }) => {
   const classes = useStyles();

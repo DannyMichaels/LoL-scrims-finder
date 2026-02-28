@@ -7,12 +7,14 @@ import { Helmet } from 'react-helmet';
 import Loading from '@/components/shared/Loading';
 import { PageContent } from '@/components/shared/PageComponents';
 import useAlerts from '@/hooks/useAlerts';
+import useBranding from '@/hooks/useBranding';
 
 export default function ScrimDetail() {
   const { id } = useParams();
   const { scrims, fetchScrim } = useScrimStore();
   const history = useHistory();
   const { setCurrentAlert } = useAlerts();
+  const { brandName, tagline } = useBranding();
 
   // Get scrim from store (updated via sockets)
   const scrim = scrims.find((s) => s._id === id);
@@ -59,13 +61,13 @@ export default function ScrimDetail() {
       <Helmet>
         <meta charSet="utf-8" />
         <title>
-          {scrim?.title ?? `${scrim.createdBy.name}'s Scrim`} | Reluminate.gg
+          {scrim?.title ?? `${scrim.createdBy.name}'s Scrim`} | {brandName}
         </title>
         <meta
           name="description"
           content={`Visit ${
             scrim?.title ?? 'this scrim'
-          } at Reluminate.gg - Lighting up the rift!`}
+          } at ${brandName} - ${tagline}`}
         />
       </Helmet>
 

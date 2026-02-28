@@ -15,9 +15,11 @@ const friendRoutes = require('./routes/friends.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const adminRoutes = require('./routes/admin.routes');
 const riotRoutes = require('./routes/riot.routes');
+const brandingRoutes = require('./routes/branding.routes');
 const helmet = require('helmet');
 require('dotenv').config();
 const allowedOrigins = require('./config/allowed-origins.json');
+const { getAllDomains } = require('./controllers/branding.controllers');
 
 const envName = process.env.NODE_ENV || 'development';
 
@@ -25,8 +27,33 @@ function createServer() {
   const app = express();
 
   const corsOptions = {
-    origin: allowedOrigins[envName],
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    origin: async function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+
+      // In development, allow all
+      if (envName === 'development') return callback(null, true);
+
+      // Check static allowed origins first
+      const staticOrigins = allowedOrigins[envName] || [];
+      if (staticOrigins.includes(origin) || staticOrigins.includes('*')) {
+        return callback(null, true);
+      }
+
+      // Check dynamic domains from BrandConfig
+      try {
+        const domains = await getAllDomains();
+        const originHost = new URL(origin).hostname;
+        if (domains.includes(originHost)) {
+          return callback(null, true);
+        }
+      } catch (err) {
+        console.error('Dynamic CORS lookup error:', err);
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    },
+    optionsSuccessStatus: 200,
   };
 
   app.use(cors(corsOptions));
@@ -81,6 +108,7 @@ function createServer() {
   app.use('/api', notificationRoutes);
   app.use('/api', adminRoutes);
   app.use('/api', riotRoutes);
+  app.use('/api', brandingRoutes);
 
   // another way to require api key for a specific route only.
   // router.get('/scrims', apiKey, controllers.getAllScrims);

@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>White-Label Branding — Implementation Guide</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --surface: #121826;
+      --elevated: #1a2234;
+      --primary: #2196F3;
+      --primary-light: #64B5F6;
+      --primary-dark: #1976D2;
+      --text: #fff;
+      --text-secondary: rgba(255,255,255,0.7);
+      --border: rgba(33,150,243,0.2);
+      --green: #4CAF50;
+      --green-bg: rgba(76,175,80,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .subtitle { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 40px; }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-light);
+      margin: 48px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 24px 0 12px;
+    }
+    p, li { color: var(--text-secondary); margin-bottom: 10px; }
+    ul, ol { margin: 12px 0 16px 24px; }
+    strong { color: var(--text); }
+    code {
+      background: rgba(33,150,243,0.1);
+      border: 1px solid rgba(33,150,243,0.15);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88em;
+      color: var(--primary-light);
+    }
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 12px 0 20px;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    pre code { background: none; border: none; padding: 0; color: var(--text); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+    }
+    .tip {
+      background: var(--green-bg);
+      border: 1px solid rgba(76,175,80,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 16px 0;
+    }
+    .tip strong { color: var(--green); }
+    .warn {
+      background: rgba(255,152,0,0.1);
+      border: 1px solid rgba(255,152,0,0.3);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 16px 0;
+    }
+    .warn strong { color: #FFB74D; }
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 0 0 40px;
+    }
+    .toc h3 { margin-top: 0; color: var(--primary-light); }
+    .toc ol { columns: 2; column-gap: 32px; }
+    .toc a { color: var(--primary); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; }
+    th, td { text-align: left; padding: 8px 12px; border: 1px solid var(--border); }
+    th { background: rgba(33,150,243,0.1); color: var(--primary-light); font-weight: 600; font-size: 0.9rem; }
+    td { color: var(--text-secondary); font-size: 0.9rem; }
+    .flow {
+      background: var(--elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-family: monospace;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin: 16px 0;
+    }
+    .hl { color: var(--primary-light); font-weight: 600; }
+    .checklist { list-style: none; margin-left: 0; padding-left: 0; }
+    .checklist li { padding: 6px 0 6px 28px; position: relative; }
+    .checklist li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-radius: 3px;
+    }
+    a { color: var(--primary); }
+    @media (max-width: 600px) {
+      .toc ol { columns: 1; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>White-Label Multi-Tenant Branding</h1>
+  <p class="subtitle">Implementation guide for adding domain-based white-label branding to any web app. One codebase, one database, multiple branded experiences.</p>
+
+  <div class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#model">Data Model</a></li>
+      <li><a href="#api">API Endpoints</a></li>
+      <li><a href="#cache">Caching</a></li>
+      <li><a href="#cors">Dynamic CORS</a></li>
+      <li><a href="#theme">Theme Factory</a></li>
+      <li><a href="#provider">Branding Provider</a></li>
+      <li><a href="#consume">Consuming Branding</a></li>
+      <li><a href="#meta">Dynamic Meta Tags</a></li>
+      <li><a href="#admin">Admin UI</a></li>
+      <li><a href="#contrast">Auto Contrast</a></li>
+      <li><a href="#seed">Database Seeding</a></li>
+      <li><a href="#sql">SQL Alternative</a></li>
+      <li><a href="#checklist">Checklist</a></li>
+    </ol>
+  </div>
+
+  <!-- ========================================= -->
+  <h2 id="how">1. How It Works</h2>
+  <div class="flow">
+User visits <span class="hl">app.example.com</span>
+        |
+React app loads (shows dark loading screen)
+        |
+<span class="hl">GET /api/branding?hostname=app.example.com</span>
+        |
+Server matches hostname &rarr; returns brand config
+        |
+<span class="hl">createBrandTheme(config.colors)</span> builds UI theme
+        |
+Updates favicon, meta tags, manifest
+        |
+Renders with <span class="hl">&lt;ThemeProvider&gt;</span> + <span class="hl">&lt;BrandingContext&gt;</span></div>
+
+  <p><strong>Core idea:</strong> The database stores a branding config per tenant, each with a list of domains. The frontend sends <code>window.location.hostname</code> to the API, gets back the matching config, and uses it to build the theme and inject brand text/assets.</p>
+
+  <!-- ========================================= -->
+  <h2 id="model">2. Data Model</h2>
+  <h3>MongoDB (Mongoose)</h3>
+  <pre><code>const brandConfigSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  slug: { type: String, required: true, unique: true },
+  domains: [{ type: String }],
+  isDefault: { type: Boolean, default: false },
+  branding: {
+    brandName: { type: String, default: 'My App' },
+    tagline:   { type: String, default: '' },
+    logoUrl:   { type: String, default: '' },
+    faviconUrl:{ type: String, default: '' },
+  },
+  colors: {
+    primaryMain:       { type: String, default: '#2196F3' },
+    primaryLight:      { type: String },   // auto-derived if empty
+    primaryDark:       { type: String },
+    backgroundDefault: { type: String, default: '#0a0e1a' },
+    backgroundPaper:   { type: String, default: '#121826' },
+  },
+  socialLinks: {
+    discord: { type: String, default: '' },
+    twitter: { type: String, default: '' },
+  },
+}, { timestamps: true });
+
+brandConfigSchema.index({ domains: 1 });
+brandConfigSchema.index({ isDefault: 1 });</code></pre>
+
+  <p>For SQL, see <a href="#sql">Section 13</a>.</p>
+
+  <!-- ========================================= -->
+  <h2 id="api">3. API Endpoints</h2>
+
+  <table>
+    <thead><tr><th>Method</th><th>Route</th><th>Auth</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>GET</td><td><code>/api/branding?hostname=X</code></td><td>Public / API key</td><td>Fetch config by hostname</td></tr>
+      <tr><td>GET</td><td><code>/api/branding/manifest?hostname=X</code></td><td>Public</td><td>Dynamic PWA manifest</td></tr>
+      <tr><td>GET</td><td><code>/api/branding/all</code></td><td>Admin</td><td>List all configs</td></tr>
+      <tr><td>POST</td><td><code>/api/branding</code></td><td>Admin</td><td>Create config</td></tr>
+      <tr><td>PATCH</td><td><code>/api/branding/:id</code></td><td>Admin</td><td>Update config</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Hostname lookup logic</h3>
+  <pre><code>async function getBrandingByHostname(req, res) {
+  const { hostname } = req.query;
+
+  // 1. Check cache
+  const cached = cache.get(hostname);
+  if (cached) return res.json(cached);
+
+  // 2. Look up by domain
+  let config = await BrandConfig.findOne({ domains: hostname });
+
+  // 3. Fall back to default
+  if (!config) config = await BrandConfig.findOne({ isDefault: true });
+
+  if (!config) return res.status(404).json({ error: 'No config found' });
+
+  cache.set(hostname, config);
+  res.json(config);
+}</code></pre>
+
+  <div class="tip"><strong>Tip:</strong> Invalidate cache on every POST/PATCH to branding endpoints.</div>
+
+  <!-- ========================================= -->
+  <h2 id="cache">4. Caching</h2>
+  <pre><code>class SimpleCache {
+  constructor(ttlMs = 5 * 60 * 1000) {
+    this.cache = new Map();
+    this.ttl = ttlMs;
+  }
+  get(key) {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+    if (Date.now() - entry.ts > this.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+    return entry.value;
+  }
+  set(key, value) {
+    this.cache.set(key, { value, ts: Date.now() });
+  }
+  invalidate() {
+    this.cache.clear();
+  }
+}</code></pre>
+  <p>For multi-server deployments, use <strong>Redis</strong> instead of in-memory.</p>
+
+  <!-- ========================================= -->
+  <h2 id="cors">5. Dynamic CORS</h2>
+  <pre><code>const corsOptions = {
+  origin: async function (origin, callback) {
+    if (!origin) return callback(null, true);                    // server-to-server
+    if (process.env.NODE_ENV === 'development') return callback(null, true);
+
+    // Static allowlist
+    if (staticOrigins.includes(origin)) return callback(null, true);
+
+    // Dynamic: check tenant domains from DB (cached)
+    const domains = await getAllDomains();
+    const originHost = new URL(origin).hostname;
+    if (domains.includes(originHost)) return callback(null, true);
+
+    callback(new Error('Not allowed by CORS'));
+  }
+};</code></pre>
+
+  <!-- ========================================= -->
+  <h2 id="theme">6. Theme Factory</h2>
+  <h3>MUI Example</h3>
+  <pre><code>import { createTheme, alpha, lighten, darken } from '@mui/material/styles';
+
+function getContrastText(hex) {
+  const r = parseInt(hex.substring(1, 3), 16);
+  const g = parseInt(hex.substring(3, 5), 16);
+  const b = parseInt(hex.substring(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+}
+
+export function createBrandTheme(colors = {}) {
+  const primary = colors.primaryMain || '#2196F3';
+  const primaryLight = colors.primaryLight || lighten(primary, 0.2);
+  const primaryDark = colors.primaryDark || darken(primary, 0.2);
+
+  return createTheme({
+    palette: {
+      mode: 'dark',
+      primary: {
+        main: primary, light: primaryLight, dark: primaryDark,
+        contrastText: getContrastText(primary),
+      },
+      background: {
+        default: colors.backgroundDefault || '#0a0e1a',
+        paper: colors.backgroundPaper || '#121826',
+      },
+    },
+    components: {
+      // Replace ALL hardcoded colors with alpha(primary, ...) etc.
+    },
+  });
+}</code></pre>
+
+  <h3>CSS Variables Alternative (non-MUI)</h3>
+  <pre><code>function applyBrandTheme(colors) {
+  const root = document.documentElement;
+  root.style.setProperty('--color-primary', colors.primaryMain);
+  root.style.setProperty('--color-primary-light', colors.primaryLight);
+  root.style.setProperty('--color-bg', colors.backgroundDefault);
+}</code></pre>
+  <p>Then use <code>var(--color-primary)</code> everywhere in your CSS.</p>
+
+  <div class="warn"><strong>Key rule:</strong> Never hardcode color hex values in component files. Always reference the theme or CSS variables.</div>
+
+  <!-- ========================================= -->
+  <h2 id="provider">7. Branding Provider (Loading Gate)</h2>
+  <pre><code>export const BrandingContext = createContext(null);
+
+export default function BrandingProvider({ children }) {
+  const [config, setConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() =&gt; {
+    api.get(`/branding?hostname=${window.location.hostname}`)
+      .then(({ data }) =&gt; {
+        setConfig(data);
+        // Update favicon, apple-touch-icon, og:image, manifest link
+      })
+      .catch(console.error)
+      .finally(() =&gt; setLoading(false));
+  }, []);
+
+  const theme = useMemo(() =&gt; createBrandTheme(config?.colors || {}), [config]);
+  const branding = useMemo(() =&gt; ({
+    brandName: config?.branding?.brandName || 'My App',
+    logoUrl: config?.branding?.logoUrl || '/logo.png',
+    // ... other fields
+  }), [config]);
+
+  if (loading) return &lt;LoadingScreen /&gt;;
+
+  return (
+    &lt;BrandingContext.Provider value={branding}&gt;
+      &lt;ThemeProvider theme={theme}&gt;{children}&lt;/ThemeProvider&gt;
+    &lt;/BrandingContext.Provider&gt;
+  );
+}</code></pre>
+
+  <h3>Wire it up</h3>
+  <pre><code>// index.js — replace ThemeProvider with BrandingProvider
+&lt;BrandingProvider&gt;
+  &lt;App /&gt;
+&lt;/BrandingProvider&gt;</code></pre>
+
+  <!-- ========================================= -->
+  <h2 id="consume">8. Consuming Branding Data</h2>
+  <pre><code>// hooks/useBranding.js
+export default function useBranding() {
+  const ctx = useContext(BrandingContext);
+  if (!ctx) throw new Error('useBranding must be inside BrandingProvider');
+  return ctx;
+}
+
+// In any component:
+function Navbar() {
+  const { brandName, logoUrl } = useBranding();
+  return (
+    &lt;AppBar&gt;
+      &lt;img src={logoUrl} alt="logo" /&gt;
+      &lt;Typography&gt;{brandName}&lt;/Typography&gt;
+    &lt;/AppBar&gt;
+  );
+}</code></pre>
+
+  <div class="card">
+    <h3>What to find &amp; replace</h3>
+    <ul>
+      <li>Hardcoded brand names &rarr; <code>useBranding().brandName</code></li>
+      <li>Hardcoded logo paths &rarr; <code>useBranding().logoUrl</code></li>
+      <li>Hardcoded social links &rarr; <code>useBranding().socialLinks</code></li>
+      <li>Hardcoded hex colors &rarr; <code>theme.palette.primary.main</code> / <code>alpha(...)</code></li>
+    </ul>
+  </div>
+
+  <!-- ========================================= -->
+  <h2 id="meta">9. Dynamic Meta Tags</h2>
+
+  <h3>index.html — neutral defaults</h3>
+  <pre><code>&lt;title&gt;Loading...&lt;/title&gt;
+&lt;link rel="icon" href="%PUBLIC_URL%/default-favicon.png" /&gt;
+&lt;meta name="description" content="Loading..." /&gt;</code></pre>
+
+  <h3>React Helmet for dynamic title/description</h3>
+  <pre><code>const { brandName, tagline } = useBranding();
+&lt;Helmet&gt;
+  &lt;title&gt;{brandName}&lt;/title&gt;
+  &lt;meta name="description" content={`${brandName} - ${tagline}`} /&gt;
+&lt;/Helmet&gt;</code></pre>
+
+  <div class="warn">
+    <strong>Important — og:image and link previews:</strong>
+    Client-side JS updates to <code>&lt;meta property="og:image"&gt;</code> do <strong>NOT</strong> work for social media previews (Discord, Twitter, Slack). These crawlers read raw HTML, not JavaScript output.
+  </div>
+
+  <h3>Solutions for social previews</h3>
+  <ol>
+    <li><strong>SSR</strong> — Next.js / Remix render <code>&lt;head&gt;</code> tags server-side per hostname</li>
+    <li><strong>Edge middleware</strong> — Cloudflare Workers, Vercel Edge Functions, or Lambda@Edge intercept HTML and inject correct <code>&lt;meta&gt;</code> tags based on hostname</li>
+    <li><strong>Prerender service</strong> — prerender.io serves bot user agents pre-rendered HTML</li>
+    <li><strong>Reverse proxy</strong> — Nginx/Apache rewrites meta tags based on <code>Host</code> header</li>
+  </ol>
+
+  <h3>Edge function example</h3>
+  <pre><code>// Cloudflare Worker / Vercel Edge Middleware
+export default async function middleware(request) {
+  const response = await fetch(request);
+  const hostname = new URL(request.url).hostname;
+  const config = await fetch(`https://api.yourapp.com/branding?hostname=${hostname}`)
+    .then(r =&gt; r.json());
+
+  return new HTMLRewriter()
+    .on('meta[property="og:image"]', {
+      element(el) { el.setAttribute('content', config.branding.logoUrl); }
+    })
+    .on('title', {
+      element(el) { el.setInnerContent(config.branding.brandName); }
+    })
+    .transform(response);
+}</code></pre>
+
+  <!-- ========================================= -->
+  <h2 id="admin">10. Admin UI</h2>
+  <div class="card">
+    <h3>Recommended layout</h3>
+    <ul>
+      <li><strong>Tenant selector</strong> — dropdown of all configs + "Create New" option</li>
+      <li><strong>Left column:</strong> Form — domains, brand identity, assets, color picker, social links</li>
+      <li><strong>Right column:</strong> Live preview (scaled down, in its own <code>ThemeProvider</code>)</li>
+      <li><strong>Fullscreen button</strong> — opens a Dialog with 100% scale preview</li>
+    </ul>
+  </div>
+
+  <!-- ========================================= -->
+  <h2 id="contrast">11. Auto Contrast for Buttons</h2>
+  <p>When admin picks a light primary color (white, yellow), button text must switch to black automatically:</p>
+  <pre><code>function getContrastText(hex) {
+  const r = parseInt(hex.substring(1, 3), 16);
+  const g = parseInt(hex.substring(3, 5), 16);
+  const b = parseInt(hex.substring(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? '#000000' : '#FFFFFF';
+}
+
+// In theme:
+palette: {
+  primary: {
+    main: primary,
+    contrastText: getContrastText(primary),
+  }
+}</code></pre>
+
+  <!-- ========================================= -->
+  <h2 id="seed">12. Database Seeding</h2>
+  <pre><code>// seeds/seedBranding.js
+async function seed() {
+  await mongoose.connect(process.env.MONGO_URI);
+
+  const existing = await BrandConfig.findOne({ slug: 'my-app' });
+  if (existing) { console.log('Exists, skipping.'); return; }
+
+  await BrandConfig.create({
+    name: 'My App',
+    slug: 'my-app',
+    domains: ['myapp.com', 'www.myapp.com', 'localhost'],
+    isDefault: true,
+    branding: { brandName: 'MY APP', tagline: 'Your tagline' },
+    colors: { primaryMain: '#2196F3' },
+  });
+  console.log('Seeded.');
+}
+seed();</code></pre>
+
+  <!-- ========================================= -->
+  <h2 id="sql">13. SQL Alternative</h2>
+
+  <h3>PostgreSQL</h3>
+  <pre><code>CREATE TABLE brand_configs (
+  id              SERIAL PRIMARY KEY,
+  name            VARCHAR(255) NOT NULL,
+  slug            VARCHAR(255) NOT NULL UNIQUE,
+  is_default      BOOLEAN DEFAULT FALSE,
+  created_at      TIMESTAMP DEFAULT NOW(),
+  updated_at      TIMESTAMP DEFAULT NOW(),
+
+  -- Branding
+  brand_name      VARCHAR(255) DEFAULT 'My App',
+  tagline         VARCHAR(500) DEFAULT '',
+  logo_url        VARCHAR(1000) DEFAULT '',
+  favicon_url     VARCHAR(1000) DEFAULT '',
+
+  -- Colors
+  primary_main         VARCHAR(7) DEFAULT '#2196F3',
+  primary_light        VARCHAR(7),
+  primary_dark         VARCHAR(7),
+  background_default   VARCHAR(7) DEFAULT '#0a0e1a',
+  background_paper     VARCHAR(7) DEFAULT '#121826',
+
+  -- Social
+  social_discord  VARCHAR(500) DEFAULT '',
+  social_twitter  VARCHAR(500) DEFAULT '',
+  social_twitch   VARCHAR(500) DEFAULT ''
+);
+
+CREATE TABLE brand_config_domains (
+  id              SERIAL PRIMARY KEY,
+  brand_config_id INTEGER NOT NULL REFERENCES brand_configs(id) ON DELETE CASCADE,
+  domain          VARCHAR(255) NOT NULL
+);
+
+CREATE INDEX idx_domains_domain ON brand_config_domains(domain);
+CREATE INDEX idx_brand_configs_default ON brand_configs(is_default) WHERE is_default = TRUE;</code></pre>
+
+  <h3>MySQL</h3>
+  <pre><code>CREATE TABLE brand_configs (
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  name            VARCHAR(255) NOT NULL,
+  slug            VARCHAR(255) NOT NULL UNIQUE,
+  is_default      BOOLEAN DEFAULT FALSE,
+  created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  brand_name      VARCHAR(255) DEFAULT 'My App',
+  tagline         VARCHAR(500) DEFAULT '',
+  logo_url        VARCHAR(1000) DEFAULT '',
+  favicon_url     VARCHAR(1000) DEFAULT '',
+  primary_main         VARCHAR(7) DEFAULT '#2196F3',
+  primary_light        VARCHAR(7) NULL,
+  primary_dark         VARCHAR(7) NULL,
+  background_default   VARCHAR(7) DEFAULT '#0a0e1a',
+  background_paper     VARCHAR(7) DEFAULT '#121826',
+  social_discord  VARCHAR(500) DEFAULT '',
+  social_twitter  VARCHAR(500) DEFAULT '',
+  social_twitch   VARCHAR(500) DEFAULT ''
+);
+
+CREATE TABLE brand_config_domains (
+  id              INT AUTO_INCREMENT PRIMARY KEY,
+  brand_config_id INT NOT NULL,
+  domain          VARCHAR(255) NOT NULL,
+  FOREIGN KEY (brand_config_id) REFERENCES brand_configs(id) ON DELETE CASCADE,
+  INDEX idx_domain (domain)
+);</code></pre>
+
+  <h3>Lookup query</h3>
+  <pre><code>-- By hostname
+SELECT bc.* FROM brand_configs bc
+JOIN brand_config_domains bcd ON bc.id = bcd.brand_config_id
+WHERE bcd.domain = $1 LIMIT 1;
+
+-- Fallback
+SELECT * FROM brand_configs WHERE is_default = TRUE LIMIT 1;
+
+-- All domains (for CORS)
+SELECT DISTINCT domain FROM brand_config_domains;</code></pre>
+
+  <h3>Express controller with SQL</h3>
+  <pre><code>async function getBrandingByHostname(req, res) {
+  const { hostname } = req.query;
+  const cached = cache.get(hostname);
+  if (cached) return res.json(cached);
+
+  let result = await pool.query(`
+    SELECT bc.*, array_agg(bcd.domain) as domains
+    FROM brand_configs bc
+    JOIN brand_config_domains bcd ON bc.id = bcd.brand_config_id
+    WHERE bcd.domain = $1
+    GROUP BY bc.id LIMIT 1
+  `, [hostname]);
+
+  if (result.rows.length === 0) {
+    result = await pool.query(`
+      SELECT bc.*, array_agg(bcd.domain) as domains
+      FROM brand_configs bc
+      JOIN brand_config_domains bcd ON bc.id = bcd.brand_config_id
+      WHERE bc.is_default = TRUE
+      GROUP BY bc.id LIMIT 1
+    `);
+  }
+
+  // Reshape flat row into nested JSON for frontend compatibility
+  const row = result.rows[0];
+  const config = {
+    _id: row.id,
+    name: row.name,
+    slug: row.slug,
+    domains: row.domains,
+    branding: {
+      brandName: row.brand_name,
+      tagline: row.tagline,
+      logoUrl: row.logo_url,
+      faviconUrl: row.favicon_url,
+    },
+    colors: {
+      primaryMain: row.primary_main,
+      primaryLight: row.primary_light,
+      primaryDark: row.primary_dark,
+      backgroundDefault: row.background_default,
+      backgroundPaper: row.background_paper,
+    },
+    socialLinks: {
+      discord: row.social_discord,
+      twitter: row.social_twitter,
+    },
+  };
+
+  cache.set(hostname, config);
+  res.json(config);
+}</code></pre>
+
+  <h3>Prisma ORM</h3>
+  <pre><code>model BrandConfig {
+  id             Int       @id @default(autoincrement())
+  name           String
+  slug           String    @unique
+  isDefault      Boolean   @default(false)
+  domains        BrandConfigDomain[]
+
+  brandName      String    @default("My App")
+  tagline        String    @default("")
+  logoUrl        String    @default("")
+  faviconUrl     String    @default("")
+
+  primaryMain       String  @default("#2196F3")
+  primaryLight      String?
+  primaryDark       String?
+  backgroundDefault String  @default("#0a0e1a")
+  backgroundPaper   String  @default("#121826")
+
+  socialDiscord  String    @default("")
+  socialTwitter  String    @default("")
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model BrandConfigDomain {
+  id             Int          @id @default(autoincrement())
+  domain         String
+  brandConfig    BrandConfig  @relation(fields: [brandConfigId], references: [id], onDelete: Cascade)
+  brandConfigId  Int
+  @@index([domain])
+}</code></pre>
+
+  <!-- ========================================= -->
+  <h2 id="checklist">14. Checklist</h2>
+
+  <h3>Backend</h3>
+  <ul class="checklist">
+    <li>Create brand config model/table with domains, colors, branding fields</li>
+    <li>Create <code>GET /api/branding?hostname=</code> with domain lookup + default fallback</li>
+    <li>Create <code>GET /api/branding/manifest</code> for dynamic PWA manifest</li>
+    <li>Create admin CRUD endpoints (list all, create, update)</li>
+    <li>Add in-memory or Redis cache with TTL + invalidation on writes</li>
+    <li>Update CORS to dynamically allow tenant domains</li>
+    <li>Create seed script for default tenant</li>
+  </ul>
+
+  <h3>Frontend</h3>
+  <ul class="checklist">
+    <li>Convert static theme to factory function</li>
+    <li>Add <code>getContrastText()</code> for dynamic button text color</li>
+    <li>Replace ALL hardcoded color hex values with theme references</li>
+    <li>Create BrandingProvider with loading gate</li>
+    <li>Create <code>useBranding()</code> hook</li>
+    <li>Wrap app in BrandingProvider</li>
+    <li>Replace all hardcoded brand names/logos</li>
+    <li>Neutralize index.html defaults</li>
+    <li>Dynamic title/description via React Helmet</li>
+    <li>Update favicon/apple-touch-icon/og:image in provider</li>
+    <li>(Optional) Build admin UI with live preview</li>
+    <li>(Optional) SSR/edge function for og:image social previews</li>
+  </ul>
+
+  <div class="card" style="margin-top: 48px; text-align: center;">
+    <p style="color: var(--text); font-weight: 600; margin: 0;">White-Label Multi-Tenant Branding &mdash; Implementation Guide</p>
+    <p style="font-size: 0.85rem; margin: 4px 0 0;">February 2026</p>
+  </div>
+
+</div>
+</body>
+</html>

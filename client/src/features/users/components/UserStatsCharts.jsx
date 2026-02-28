@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTheme } from '@mui/material/styles';
 import {
   PieChart,
   Pie,
@@ -29,10 +30,9 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import moment from 'moment';
 import GlassPanel from '@/components/shared/GlassPanel';
 
-const COLORS = {
+const STATIC_COLORS = {
   win: '#4CAF50',
   loss: '#f44336',
-  primary: '#2196F3',
   secondary: '#FF9800',
   accent: '#9C27B0',
 };
@@ -42,6 +42,12 @@ export default function UserStatsCharts({
   userParticipatedScrims,
   user,
 }) {
+  const theme = useTheme();
+
+  const COLORS = {
+    primary: theme.palette.primary.main,
+    ...STATIC_COLORS,
+  };
   const [activityFilter, setActivityFilter] = useState('all');
   const [timeRange, setTimeRange] = useState(6); // months
   const [customDateRange, setCustomDateRange] = useState({

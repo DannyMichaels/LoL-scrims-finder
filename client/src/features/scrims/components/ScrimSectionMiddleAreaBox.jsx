@@ -20,27 +20,28 @@ import InfoIcon from '@mui/icons-material/Info';
 
 // utils
 import { makeStyles } from '@mui/styles';
+import { alpha } from '@mui/material/styles';
 import { copyTextToClipboard } from '@/utils/copyToClipboard';
 import pluralize from 'pluralize';
 
 // Removed direct service import - using store instead
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   infoBoxRoot: {
-    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
     padding: '16px',
     borderRadius: '8px',
     backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(33, 150, 243, 0.3)',
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
     transition: 'all 0.3s ease',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
     '&:hover': {
-      backgroundColor: 'rgba(33, 150, 243, 0.15)',
-      border: '1px solid rgba(33, 150, 243, 0.4)',
-      boxShadow: '0 4px 12px rgba(33, 150, 243, 0.2)',
+      backgroundColor: alpha(theme.palette.primary.main, 0.15),
+      border: `1px solid ${alpha(theme.palette.primary.main, 0.4)}`,
+      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
     },
   },
-});
+}));
 
 //  this is the area that contains the countdown timer for the scrim section and the other details.
 export default function ScrimSectionMiddleAreaBox({

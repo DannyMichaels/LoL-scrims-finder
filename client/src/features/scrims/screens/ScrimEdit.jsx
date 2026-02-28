@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Redirect, useParams, useHistory } from 'react-router-dom';
+import { alpha } from '@mui/material/styles';
 import useScrimStore from '@/features/scrims/stores/scrimStore';
 import useAlerts from '@/hooks/useAlerts';
 import useAuth from '@/features/auth/hooks/useAuth';
@@ -480,7 +481,7 @@ function ScrimEdit() {
                           required
                           name="gameStartDate"
                           value={scrimData.gameStartTime}
-                          sx={{
+                          sx={(theme) => ({
                             '& .MuiOutlinedInput-root': {
                               backgroundColor: 'rgba(255, 255, 255, 0.05)',
                               backdropFilter: 'blur(10px)',
@@ -489,7 +490,7 @@ function ScrimEdit() {
                                 borderColor: 'rgba(255, 255, 255, 0.2)',
                               },
                               '&:hover fieldset': {
-                                borderColor: 'rgba(33, 150, 243, 0.5)',
+                                borderColor: alpha(theme.palette.primary.main, 0.5),
                               },
                             },
                             '& .MuiInputBase-input': {
@@ -498,7 +499,7 @@ function ScrimEdit() {
                             '& .MuiInputLabel-root': {
                               color: 'rgba(255, 255, 255, 0.8)',
                             },
-                          }}
+                          })}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6}>
@@ -514,7 +515,7 @@ function ScrimEdit() {
                           required
                           name="gameStartTime"
                           value={scrimData?.gameStartTime}
-                          sx={{
+                          sx={(theme) => ({
                             '& .MuiOutlinedInput-root': {
                               backgroundColor: 'rgba(255, 255, 255, 0.05)',
                               backdropFilter: 'blur(10px)',
@@ -523,7 +524,7 @@ function ScrimEdit() {
                                 borderColor: 'rgba(255, 255, 255, 0.2)',
                               },
                               '&:hover fieldset': {
-                                borderColor: 'rgba(33, 150, 243, 0.5)',
+                                borderColor: alpha(theme.palette.primary.main, 0.5),
                               },
                             },
                             '& .MuiInputBase-input': {
@@ -532,7 +533,7 @@ function ScrimEdit() {
                             '& .MuiInputLabel-root': {
                               color: 'rgba(255, 255, 255, 0.8)',
                             },
-                          }}
+                          })}
                         />
                       </Grid>
                     </Grid>
@@ -702,10 +703,10 @@ function ScrimEdit() {
                                 disabled
                                 label="Active Tournament Code"
                                 InputProps={{
-                                  style: {
-                                    color: '#2196F3',
+                                  sx: (theme) => ({
+                                    color: theme.palette.primary.main,
                                     fontWeight: 'bold',
-                                  },
+                                  }),
                                 }}
                               />
                             </Grid>
@@ -716,26 +717,26 @@ function ScrimEdit() {
                                   size="small"
                                   color="primary"
                                   onClick={handleRegenerateTournamentCode}
-                                  sx={{
-                                    borderColor: 'rgba(33, 150, 243, 0.5)',
-                                    color: '#2196F3',
+                                  sx={(theme) => ({
+                                    borderColor: alpha(theme.palette.primary.main, 0.5),
+                                    color: theme.palette.primary.main,
                                     '&:hover': {
-                                      borderColor: '#2196F3',
+                                      borderColor: theme.palette.primary.main,
                                       backgroundColor:
-                                        'rgba(33, 150, 243, 0.1)',
+                                        alpha(theme.palette.primary.main, 0.1),
                                     },
-                                  }}>
+                                  })}>
                                   🔄 Regenerate
                                 </Button>
                               </Tooltip>
                             </Grid>
                           </Grid>
                           <FormHelperText
-                            sx={{
-                              color: '#2196F3',
+                            sx={(theme) => ({
+                              color: theme.palette.primary.main,
                               fontSize: '0.8rem',
                               mt: 1,
-                            }}>
+                            })}>
                             ✨ Tournament code auto-generated
                           </FormHelperText>
                         </Box>
@@ -926,21 +927,21 @@ function ScrimEdit() {
                           startIcon={<SaveIcon />}
                           fullWidth
                           size="large"
-                          sx={{
+                          sx={(theme) => ({
                             py: 1.5,
                             fontSize: '1.1rem',
                             borderRadius: 2,
                             background:
-                              'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                            boxShadow: '0 3px 20px rgba(33, 150, 243, 0.4)',
+                              `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+                            boxShadow: `0 3px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
                             '&:hover': {
                               background:
-                                'linear-gradient(45deg, #1976D2 30%, #03A9F4 90%)',
-                              boxShadow: '0 5px 30px rgba(33, 150, 243, 0.6)',
+                                `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.primary.light} 90%)`,
+                              boxShadow: `0 5px 30px ${alpha(theme.palette.primary.main, 0.6)}`,
                               transform: 'translateY(-2px)',
                             },
                             transition: 'all 0.3s ease',
-                          }}>
+                          })}>
                           💾 Save Changes
                         </Button>
                       </Grid>

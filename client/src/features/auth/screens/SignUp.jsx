@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
 import useAlerts from '@/hooks/useAlerts';
 import useAuth, { useAuthActions } from '@/features/auth/hooks/useAuth';
+import useBranding from '@/hooks/useBranding';
 
 // components
 import { Redirect } from 'react-router-dom';
@@ -38,6 +39,7 @@ function getSteps() {
 export default function SignUp() {
   const { currentUser } = useAuth();
   const { setCurrentUser } = useAuthActions();
+  const { brandName } = useBranding();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userData, setUserData] = useState({
@@ -240,7 +242,7 @@ export default function SignUp() {
         <PageSection>
           <InnerColumn>
             <Typography variant="h1">
-              Welcome to Reluminate.gg, please fill in your details
+              Welcome to {brandName}, please fill in your details
             </Typography>
 
             <Grid container item direction="column" md={12}>

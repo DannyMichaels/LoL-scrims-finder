@@ -2,8 +2,10 @@
 import { useState, useCallback } from 'react';
 import useAuth, { useAuthActions } from '@/features/auth/hooks/useAuth';
 import { makeStyles } from '@mui/styles';
+import { alpha } from '@mui/material/styles';
 import useUsers from '@/features/users/hooks/useUsers';
 import { useDispatch } from 'react-redux';
+import useBranding from '@/hooks/useBranding';
 
 // Mui components
 import Button from '@mui/material/Button';
@@ -66,6 +68,7 @@ export default function Navbar({
   const { currentUser } = useAuth();
   const { handleLogin } = useAuthActions();
   const dispatch = useDispatch();
+  const { brandName, logoUrl } = useBranding();
 
   const openMessengerDropdown = useCallback(() => {
     setIsMessengerDropdownOpen((prevState) => !prevState);
@@ -76,11 +79,11 @@ export default function Navbar({
       <HideOnScroll>
         <AppBar
           position="sticky"
-          sx={{
+          sx={(theme) => ({
             background: 'rgba(10, 14, 26, 0.85)',
             backdropFilter: 'blur(20px)',
-            borderBottom: '1px solid rgba(33, 150, 243, 0.1)',
-          }}>
+            borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          })}>
           <Toolbar
             className={classes.toolbar}
             sx={{ minHeight: '64px !important' }}>
@@ -117,12 +120,12 @@ export default function Navbar({
                       (e.currentTarget.style.transform = 'scale(1)')
                     }>
                     <img
-                      src="/reluminate-logo.png"
+                      src={logoUrl}
                       style={{
                         width: '36px',
                         height: 'auto',
                       }}
-                      alt="Reluminate.gg"
+                      alt={brandName}
                     />
                     <Hidden mdDown>
                       <Typography
@@ -130,14 +133,13 @@ export default function Navbar({
                         sx={{
                           fontSize: '1.3rem',
                           fontWeight: 700,
-                          color: '#2196F3',
                           whiteSpace: 'nowrap',
-                          background:
-                            'linear-gradient(135deg, #2196F3, #64B5F6)',
+                          background: (theme) =>
+                            `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
                           WebkitBackgroundClip: 'text',
                           WebkitTextFillColor: 'transparent',
                         }}>
-                        RELUMINATE.GG
+                        {brandName}
                       </Typography>
                     </Hidden>
                   </Link>
@@ -191,14 +193,14 @@ export default function Navbar({
                       variant="outlined"
                       size="small"
                       startIcon={<SchoolIcon />}
-                      sx={{
-                        borderColor: 'rgba(33, 150, 243, 0.3)',
-                        color: '#2196F3',
+                      sx={(theme) => ({
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
+                        color: theme.palette.primary.main,
                         '&:hover': {
-                          borderColor: '#2196F3',
-                          backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                          borderColor: theme.palette.primary.main,
+                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
                         },
-                      }}>
+                      })}>
                       <Hidden smDown>Guide</Hidden>
                     </Button>
                   )}
@@ -209,13 +211,12 @@ export default function Navbar({
                       variant="contained"
                       size="small"
                       startIcon={<KeyIcon />}
-                      sx={{
-                        background: 'linear-gradient(135deg, #2196F3, #1976D2)',
+                      sx={(theme) => ({
+                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                         '&:hover': {
-                          background:
-                            'linear-gradient(135deg, #64B5F6, #2196F3)',
+                          background: `linear-gradient(135deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                         },
-                      }}>
+                      })}>
                       Log In
                     </Button>
                   )}

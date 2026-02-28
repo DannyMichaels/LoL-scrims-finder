@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import Hidden from '@mui/material/Hidden';
+import { alpha } from '@mui/material/styles';
 
 // utils
 import DatePicker from './../DatePicker';
@@ -59,7 +60,7 @@ export default function NavbarDropdowns({ compact = false }) {
                 shrink: true,
                 style: { color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.75rem' },
               },
-              sx: {
+              sx: (theme) => ({
                 '& .MuiOutlinedInput-root': {
                   height: '36px',
                   fontSize: '0.8rem',
@@ -69,14 +70,14 @@ export default function NavbarDropdowns({ compact = false }) {
                     borderColor: 'rgba(255, 255, 255, 0.2)',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'rgba(33, 150, 243, 0.5)',
+                    borderColor: alpha(theme.palette.primary.main, 0.5),
                   },
                 },
                 '& .MuiInputBase-input': {
                   color: '#fff',
                   padding: '8px 12px',
                 },
-              },
+              }),
             },
           }}
         />
@@ -86,7 +87,7 @@ export default function NavbarDropdowns({ compact = false }) {
           value={scrimsRegion}
           size="small"
           onChange={onSelectRegion}
-          sx={{
+          sx={(theme) => ({
             minWidth: '70px',
             height: '36px',
             fontSize: '0.8rem',
@@ -96,7 +97,7 @@ export default function NavbarDropdowns({ compact = false }) {
               borderColor: 'rgba(255, 255, 255, 0.2)',
             },
             '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(33, 150, 243, 0.5)',
+              borderColor: alpha(theme.palette.primary.main, 0.5),
             },
             '& .MuiSelect-select': {
               color: '#fff',
@@ -105,7 +106,7 @@ export default function NavbarDropdowns({ compact = false }) {
             '& .MuiSelect-icon': {
               color: 'rgba(255, 255, 255, 0.7)',
             },
-          }}
+          })}
         >
           {selectRegions.map((region, key) => (
             <MenuItem value={region} key={key}>

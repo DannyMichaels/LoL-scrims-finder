@@ -11,8 +11,7 @@ import { creditsComment } from './creditsComment';
 //  store
 import { Provider } from 'react-redux';
 import configureStore from './store'; // index.js
-import { ThemeProvider } from '@mui/material/styles';
-import { appTheme } from './appTheme';
+import BrandingProvider from './providers/BrandingProvider';
 
 const store = configureStore();
 
@@ -22,9 +21,9 @@ ReactDOM.render(
       <Provider store={store}>
         {/* the only way I know to render a comment in react */}
         <ReactComment text={creditsComment} trim={false} />
-        <ThemeProvider theme={appTheme}>
+        <BrandingProvider>
           <App />
-        </ThemeProvider>
+        </BrandingProvider>
       </Provider>
     </Router>
   </>,

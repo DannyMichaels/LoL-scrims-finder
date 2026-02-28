@@ -3,14 +3,15 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { InnerColumn } from './PageComponents';
 import { Link } from 'react-router-dom';
+import useBranding from '@/hooks/useBranding';
 
 // utils
-import { styled } from '@mui/system';
+import { styled, alpha } from '@mui/system';
 import { withRouter } from 'react-router-dom';
 
-const StyledFooter = styled('footer')({
+const StyledFooter = styled('footer')(({ theme }) => ({
   backgroundColor: 'rgba(18, 24, 38, 0.5)', // Semi-transparent
-  borderTop: '1px solid rgba(33, 150, 243, 0.2)',
+  borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
   boxShadow: '0 -2px 20px rgba(0, 0, 0, 0.3)',
   scrollMarginTop: '2em',
   overflow: 'hidden',
@@ -22,13 +23,16 @@ const StyledFooter = styled('footer')({
   bottom: '0',
   width: '100%',
   zIndex: 100,
-});
+}));
 
 const currentYear = new Date().getFullYear();
 
 const blacklist = ['/scrims', '/'];
 
-const Footer = ({ location }) => (
+const Footer = ({ location }) => {
+  const { brandName } = useBranding();
+
+  return (
   <>
     {!blacklist.includes(location.pathname) && <div className="page-break" />}
 
@@ -48,7 +52,7 @@ const Footer = ({ location }) => (
                 fontWeight: 500,
                 fontSize: '12px',
               }}>
-              &copy; {currentYear} Reluminate.gg
+              &copy; {currentYear} {brandName}
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4} sx={{ textAlign: 'center' }}>
@@ -89,6 +93,7 @@ const Footer = ({ location }) => (
       </InnerColumn>
     </StyledFooter>
   </>
-);
+  );
+};
 
 export default withRouter(Footer);

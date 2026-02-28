@@ -1,19 +1,20 @@
 import { useHistory } from 'react-router-dom';
 import { useAuthActions } from '@/features/auth/hooks/useAuth';
+import useBranding from '@/hooks/useBranding';
+import { resolveHeroBackground } from '@/assets/heroBackgrounds';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { styled } from '@mui/material/styles';
-
-// Images
-import threshBg from '@/assets/images/backgrounds/reluminate_thresh.jpg';
+import { styled, alpha } from '@mui/material/styles';
 
 // Shared Components
 import CTAButtonShared from './shared/CTAButton';
 import SocialButton from './shared/SocialButton';
 import { DiscordIcon, TwitchIcon, TwitterIcon } from './shared/SocialIcons';
 
-const HeroSectionWrapper = styled(Box)(({ theme }) => ({
+const HeroSectionWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'bgImage',
+})(({ theme, bgImage }) => ({
   minHeight: '60vh',
   display: 'flex',
   alignItems: 'center',
@@ -21,7 +22,7 @@ const HeroSectionWrapper = styled(Box)(({ theme }) => ({
   position: 'relative',
   paddingTop: '150px',
   paddingBottom: '60px',
-  backgroundImage: `url(${threshBg})`,
+  backgroundImage: bgImage ? `url(${bgImage})` : 'none',
   backgroundPosition: '50% 30%',
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
@@ -44,6 +45,8 @@ const HeroSectionWrapper = styled(Box)(({ theme }) => ({
 export default function HeroSection() {
   const history = useHistory();
   const { handleLogin } = useAuthActions();
+  const { brandName, tagline, socialLinks, heroBackgroundUrl } = useBranding();
+  const heroBg = resolveHeroBackground(heroBackgroundUrl);
 
   const handleSignupClick = () => {
     history.push('/signup');
@@ -54,22 +57,22 @@ export default function HeroSection() {
   };
 
   return (
-    <HeroSectionWrapper>
+    <HeroSectionWrapper bgImage={heroBg}>
       <Container maxWidth="lg">
         <Box textAlign="center">
           <Typography
-            sx={{
+            sx={(theme) => ({
               fontSize: { xs: '3rem', md: '5rem' },
               fontWeight: 800,
-              background: 'linear-gradient(135deg, #2196F3 0%, #64B5F6 100%)',
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               mb: 3,
               letterSpacing: '2px',
               textTransform: 'uppercase',
-            }}>
-            RELUMINATE.GG
+            })}>
+            {brandName}
           </Typography>
 
           <Typography
@@ -93,7 +96,7 @@ export default function HeroSection() {
               letterSpacing: '0.5px',
               textTransform: 'uppercase',
             }}>
-            ONE SOUL AT A TIME
+            {tagline}
           </Typography>
 
           {/* Social Buttons */}
@@ -105,48 +108,54 @@ export default function HeroSection() {
               flexWrap: 'wrap',
               mb: 6,
             }}>
-            <SocialButton
-              component="a"
-              href="https://www.twitch.tv/reluminategg"
-              target="_blank"
-              rel="noreferrer">
-              FOLLOW OUR TWITCH
-              <TwitchIcon />
-            </SocialButton>
+            {socialLinks.twitch && (
+              <SocialButton
+                component="a"
+                href={socialLinks.twitch}
+                target="_blank"
+                rel="noreferrer">
+                FOLLOW OUR TWITCH
+                <TwitchIcon />
+              </SocialButton>
+            )}
 
-            <SocialButton
-              component="a"
-              href="https://discord.com/invite/Fn8d3UAD6y"
-              target="_blank"
-              rel="noreferrer">
-              JOIN US ON DISCORD
-              <DiscordIcon />
-            </SocialButton>
+            {socialLinks.discord && (
+              <SocialButton
+                component="a"
+                href={socialLinks.discord}
+                target="_blank"
+                rel="noreferrer">
+                JOIN US ON DISCORD
+                <DiscordIcon />
+              </SocialButton>
+            )}
 
-            <SocialButton
-              component="a"
-              href="https://twitter.com/Reluminategg"
-              target="_blank"
-              rel="noreferrer">
-              CHECK OUT OUR TWITTER
-              <TwitterIcon />
-            </SocialButton>
+            {socialLinks.twitter && (
+              <SocialButton
+                component="a"
+                href={socialLinks.twitter}
+                target="_blank"
+                rel="noreferrer">
+                CHECK OUT OUR TWITTER
+                <TwitterIcon />
+              </SocialButton>
+            )}
           </Box>
 
           {/* App CTA Section */}
           <Box
-            sx={{
-              background: 'rgba(33, 150, 243, 0.05)',
-              border: '1px solid rgba(33, 150, 243, 0.2)',
+            sx={(theme) => ({
+              background: alpha(theme.palette.primary.main, 0.05),
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
               borderRadius: '16px',
               padding: 4,
               maxWidth: '600px',
               margin: '0 auto',
               backdropFilter: 'blur(4px)',
-            }}>
+            })}>
             <Typography
               sx={{
-                color: '#2196F3',
+                color: (theme) => theme.palette.primary.main,
                 fontSize: '1.5rem',
                 fontWeight: 600,
                 mb: 2,

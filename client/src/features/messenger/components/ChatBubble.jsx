@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { useTheme, alpha } from '@mui/material/styles';
 import { getRankImage } from '@/utils/getRankImage';
 import Moment from 'react-moment';
 import 'moment-timezone';
@@ -10,10 +11,11 @@ export default function ChatBubble({
   userName,
   userRank,
 }) {
+  const theme = useTheme();
   const rankImage = getRankImage(userRank);
 
   return (
-    <StyledBubble isCurrentUser={isCurrentUser}>
+    <StyledBubble isCurrentUser={isCurrentUser} theme={theme}>
       <div className="bubble__username">
         <img src={rankImage} width="20px" alt={`${userName}'s rank`} />
         <span>{userName}</span>
@@ -73,9 +75,9 @@ const StyledBubble = styled.div`
 
   p.from-me {
     /* align-self: flex-end; */
-    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    background: linear-gradient(135deg, ${({ theme }) => theme.palette.primary.main} 0%, ${({ theme }) => theme.palette.primary.dark} 100%);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 2px 8px ${({ theme }) => alpha(theme.palette.primary.main, 0.3)};
   }
 
   p.from-me::before {

@@ -19,6 +19,7 @@ import PrivacyPolicy from '@/screens/PrivacyPolicy';
 import TermsOfService from '@/screens/TermsOfService';
 import BanHistory from '@/features/admin/screens/BanHistory';
 import AdminDashboard from '@/features/admin/screens/AdminDashboard';
+import BrandingConfig from '@/features/admin/components/BrandingConfig';
 
 const AppRouter = () => {
   const { currentUser } = useSelector(({ auth }) => auth);
@@ -33,6 +34,7 @@ const AppRouter = () => {
       />
 
       <AdminRoute exact path="/admin/dashboard" component={AdminDashboard} />
+      <AdminRoute exact path="/admin/branding" component={BrandingConfig} />
       <AdminRoute exact path="/scrims/new" component={ScrimCreate} />
       <AdminRoute exact path="/scrims/:id/edit" component={ScrimEdit} />
       <AdminRoute

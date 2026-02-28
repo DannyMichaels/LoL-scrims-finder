@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import useAuth from '@/features/auth/hooks/useAuth';
 import useAlerts from '@/hooks/useAlerts';
+import useBranding from '@/hooks/useBranding';
+import { useTheme } from '@mui/material/styles';
 
 // Components
 import Navbar from '@/components/shared/Navbar/Navbar';
@@ -58,8 +60,7 @@ import {
   getServerStatus,
 } from '@/features/admin/services/admin.services';
 
-const COLORS = {
-  primary: '#2196F3',
+const STATIC_COLORS = {
   secondary: '#FF9800',
   success: '#4CAF50',
   error: '#f44336',
@@ -88,7 +89,7 @@ const StatCard = ({ title, value, icon, color, change, subtitle }) => (
           <Typography
             variant="body2"
             sx={{
-              color: change >= 0 ? COLORS.success : COLORS.error,
+              color: change >= 0 ? STATIC_COLORS.success : STATIC_COLORS.error,
               display: 'flex',
               alignItems: 'center',
               mt: 0.5,
@@ -105,6 +106,7 @@ const StatCard = ({ title, value, icon, color, change, subtitle }) => (
 
 // Recent Activity Table Component
 const RecentActivityTable = ({ activities, history }) => {
+  const theme = useTheme();
   const hasActivities = activities && activities.length > 0;
 
   return (
@@ -220,12 +222,12 @@ const RecentActivityTable = ({ activities, history }) => {
                             height: 32,
                             bgcolor:
                               activity.type === 'scrim'
-                                ? COLORS.primary
+                                ? theme.palette.primary.main
                                 : activity.type === 'user'
-                                ? COLORS.success
+                                ? STATIC_COLORS.success
                                 : activity.type === 'ban'
-                                ? COLORS.error
-                                : COLORS.info,
+                                ? STATIC_COLORS.error
+                                : STATIC_COLORS.info,
                           }}>
                           {activity.type === 'scrim' && <GamesIcon />}
                           {activity.type === 'user' && <PersonIcon />}
@@ -268,7 +270,14 @@ const RecentActivityTable = ({ activities, history }) => {
 export default function AdminDashboard() {
   const { currentUser, isCurrentUserAdmin } = useAuth();
   const { setCurrentAlert } = useAlerts();
+  const { brandName } = useBranding();
+  const theme = useTheme();
   const history = useHistory();
+
+  const COLORS = {
+    primary: theme.palette.primary.main,
+    ...STATIC_COLORS,
+  };
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
@@ -539,8 +548,8 @@ export default function AdminDashboard() {
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>Admin Dashboard | Reluminate.gg</title>
-        <meta name="description" content="Admin Dashboard for Reluminate.gg" />
+        <title>Admin Dashboard | {brandName}</title>
+        <meta name="description" content={`Admin Dashboard for ${brandName}`} />
       </Helmet>
 
       <Navbar showLess />
@@ -1254,6 +1263,14 @@ export default function AdminDashboard() {
                     size="small"
                     onClick={() => window.location.reload()}>
                     Clear Cache
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => history.push('/admin/branding')}>
+                    Branding Config
                   </Button>
                 </Grid>
               </Grid>

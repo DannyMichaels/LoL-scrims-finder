@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import useSocket from './useSocket';
 import useAuth from '@/features/auth/hooks/useAuth';
 import { useDispatch, useSelector } from 'react-redux';
+import useBranding from '@/hooks/useBranding';
 
 // utils
 import devLog from '@/utils/devLog';
@@ -15,6 +16,7 @@ export default function useNotifications() {
   const { socket } = useSocket();
   const { currentUser } = useAuth();
   const dispatch = useDispatch();
+  const { logoUrl } = useBranding();
 
   const { notificationsOpen } = useSelector(({ general }) => general);
 
@@ -67,7 +69,7 @@ export default function useNotifications() {
 
           const notification = new Notification(notificationTitle, {
             body: notificationBody,
-            icon: '/reluminate-logo.png',
+            icon: logoUrl,
             tag: `notification-${Date.now()}`,
             requireInteraction: false,
           });
@@ -121,7 +123,7 @@ export default function useNotifications() {
       if ('Notification' in window && Notification.permission === 'granted') {
         const notification = new Notification('Scrim Starting!', {
           body: data.message,
-          icon: '/reluminate-logo.png',
+          icon: logoUrl,
           tag: `scrim-${data.scrimId}`,
           requireInteraction: false,
         });
@@ -144,7 +146,7 @@ export default function useNotifications() {
     };
 
     //  eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket, currentUser?._id, dispatch]);
+  }, [socket, currentUser?._id, dispatch, logoUrl]);
 
   useEffect(() => {
     const fetchNotifications = async () => {

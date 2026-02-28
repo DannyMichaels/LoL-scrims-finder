@@ -18,6 +18,7 @@ import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import Skeleton from '@mui/material/Skeleton';
+import { alpha } from '@mui/material/styles';
 
 // icons
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -84,12 +85,11 @@ export default function NavbarDrawerItems({ showCheckboxes, setIsDrawerOpen }) {
       {/* User Profile Header */}
       {currentUser?._id && (
         <Box
-          sx={{
+          sx={(theme) => ({
             p: 2,
-            background:
-              'linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.05) 100%)',
+            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          }}>
+          })}>
           <ListItem
             button
             onClick={() =>
@@ -167,7 +167,7 @@ export default function NavbarDrawerItems({ showCheckboxes, setIsDrawerOpen }) {
         {/* Quick Actions */}
         <ListItem button onClick={() => drawerNavPush('/')}>
           <ListItemIcon>
-            <HomeIcon sx={{ color: '#2196F3' }} />
+            <HomeIcon sx={{ color: (theme) => theme.palette.primary.main }} />
           </ListItemIcon>
           <ListItemText
             primary="Home"

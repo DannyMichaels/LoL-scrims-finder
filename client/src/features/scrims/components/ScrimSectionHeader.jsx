@@ -1,5 +1,6 @@
 import { useMemo, Fragment, memo, useState, useCallback } from 'react';
 import { Link, useHistory } from 'react-router-dom';
+import { alpha } from '@mui/material/styles';
 import useAlerts from '@/hooks/useAlerts';
 import useTheme from '@mui/styles/useTheme';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -298,21 +299,20 @@ export default function ScrimSectionHeader({
       <Grid container direction="row" justifyContent="space-between">
         <Grid item xs={6}>
           <Box
-            sx={{
+            sx={(theme) => ({
               position: 'relative',
-              background:
-                'linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(100, 181, 246, 0.08) 100%)',
+              background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.light, 0.08)} 100%)`,
               backdropFilter: 'blur(10px)',
               borderRadius: '12px',
-              border: '1px solid rgba(33, 150, 243, 0.2)',
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
               p: 2,
               mb: 1,
               overflow: 'hidden',
               transition: 'all 0.3s ease',
               '&:hover': {
                 transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(33, 150, 243, 0.2)',
-                border: '1px solid rgba(33, 150, 243, 0.4)',
+                boxShadow: `0 8px 25px ${alpha(theme.palette.primary.main, 0.2)}`,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.4)}`,
               },
               '&::before': {
                 content: '""',
@@ -329,7 +329,7 @@ export default function ScrimSectionHeader({
                 '0%': { transform: 'translateX(-100%)' },
                 '100%': { transform: 'translateX(100%)' },
               },
-            }}>
+            })}>
             <Box
               sx={{
                 display: 'flex',
@@ -339,17 +339,16 @@ export default function ScrimSectionHeader({
                 zIndex: 1,
               }}>
               <Box
-                sx={{
+                sx={(theme) => ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   width: '48px',
                   height: '48px',
                   borderRadius: '12px',
-                  background:
-                    'linear-gradient(135deg, #2196F3 0%, #64B5F6 100%)',
-                  boxShadow: '0 4px 15px rgba(33, 150, 243, 0.4)',
-                }}>
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+                  boxShadow: `0 4px 15px ${alpha(theme.palette.primary.main, 0.4)}`,
+                })}>
                 <ScheduleIcon sx={{ color: '#fff', fontSize: '1.5rem' }} />
               </Box>
               <Box sx={{ flex: 1 }}>
@@ -376,7 +375,10 @@ export default function ScrimSectionHeader({
                     gap: 1,
                   }}>
                   <CalendarTodayIcon
-                    sx={{ fontSize: '1rem', color: '#64B5F6' }}
+                    sx={(theme) => ({
+                      fontSize: '1rem',
+                      color: theme.palette.primary.light,
+                    })}
                   />
                   {dateFromUTC(scrim.gameStartTime).format('MMM DD, YYYY')}
                   <Box
@@ -387,7 +389,12 @@ export default function ScrimSectionHeader({
                       backgroundColor: 'rgba(255, 255, 255, 0.5)',
                     }}
                   />
-                  <AccessTimeIcon sx={{ fontSize: '1rem', color: '#64B5F6' }} />
+                  <AccessTimeIcon
+                    sx={(theme) => ({
+                      fontSize: '1rem',
+                      color: theme.palette.primary.light,
+                    })}
+                  />
                   {dateFromUTC(scrim.gameStartTime).format('h:mm A')}
                 </Typography>
                 <Typography

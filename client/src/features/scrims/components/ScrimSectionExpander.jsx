@@ -5,7 +5,7 @@ import { useState, useCallback } from 'react';
 import Tooltip from '@/components/shared/Tooltip';
 
 // utils
-import styled from '@emotion/styled'; // decided to use styled components because this is too much css
+import { styled, alpha } from '@mui/material/styles';
 
 // icons
 import ShowLessIcon from '@mui/icons-material/ExpandLess';
@@ -88,71 +88,60 @@ export default function ScrimSectionExpander({
   );
 }
 
-const StyledDivider = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 1100px;
-  display: flex;
-  justify-content: center;
-  box-shadow: none;
-  margin: auto;
-  box-sizing: inherit;
-  z-index: 10;
-  &.collapsed {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-    height: 6em;
-    margin-top: -6em;
-    background-image: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.8),
-      rgba(0, 0, 0, 0.6) 20%,
-      rgba(0, 0, 0, 0.3) 40%,
-      transparent 70%
-    );
-    border-radius: 0 0 8px 8px;
-  }
-
-  .scrim__expand--expandButton {
-    position: absolute;
-    bottom: 0;
-    min-width: 36px;
-    min-height: 36px;
-    max-width: 46px;
-    max-height: 46px;
-    background: #2196f3;
-    backdrop-filter: blur(10px);
-    padding-left: 0.8rem;
-    padding-right: 0.8rem;
-    border: 1px solid #1976d2;
-    transform: translateY(50%);
-    align-items: center;
-    appearance: none;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    opacity: 1;
-    padding: 0.8rem;
-    user-select: none;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    z-index: 11;
-    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
-
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
-    }
-
-    &:hover {
-      background: #1976d2;
-      border: 1px solid #1565c0;
-      transform: translateY(50%) scale(1.1);
-      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-    }
-
-    .modal__expandIcon {
-      color: #ffffff;
-    }
-  }
-`;
+const StyledDivider = styled('div')(({ theme }) => ({
+  position: 'relative',
+  width: '100%',
+  maxWidth: '1100px',
+  display: 'flex',
+  justifyContent: 'center',
+  boxShadow: 'none',
+  margin: 'auto',
+  boxSizing: 'inherit',
+  zIndex: 10,
+  '&.collapsed': {
+    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+    height: '6em',
+    marginTop: '-6em',
+    backgroundImage: 'linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6) 20%, rgba(0, 0, 0, 0.3) 40%, transparent 70%)',
+    borderRadius: '0 0 8px 8px',
+  },
+  '& .scrim__expand--expandButton': {
+    position: 'absolute',
+    bottom: 0,
+    minWidth: '36px',
+    minHeight: '36px',
+    maxWidth: '46px',
+    maxHeight: '46px',
+    background: theme.palette.primary.main,
+    backdropFilter: 'blur(10px)',
+    paddingLeft: '0.8rem',
+    paddingRight: '0.8rem',
+    border: `1px solid ${theme.palette.primary.dark}`,
+    transform: 'translateY(50%)',
+    alignItems: 'center',
+    appearance: 'none',
+    cursor: 'pointer',
+    display: 'flex',
+    justifyContent: 'center',
+    opacity: 1,
+    padding: '0.8rem',
+    userSelect: 'none',
+    borderRadius: '50%',
+    transition: 'all 0.3s ease',
+    zIndex: 11,
+    boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}`,
+    '&:focus': {
+      outline: 'none',
+      boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.3)}`,
+    },
+    '&:hover': {
+      background: theme.palette.primary.dark,
+      border: `1px solid ${theme.palette.primary.dark}`,
+      transform: 'translateY(50%) scale(1.1)',
+      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+    },
+    '& .modal__expandIcon': {
+      color: '#ffffff',
+    },
+  },
+}));

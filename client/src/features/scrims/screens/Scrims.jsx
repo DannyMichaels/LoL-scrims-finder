@@ -1,5 +1,6 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/styles/useTheme';
+import { alpha } from '@mui/material/styles';
 import useScrims, {
   useFilteredScrimsZustand,
 } from '@/features/scrims/hooks/useScrimsZustand';
@@ -71,44 +72,44 @@ export default function Scrims() {
               overflow: 'hidden',
             }}>
             <Box
-              sx={{
+              sx={(theme) => ({
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 right: 0,
                 bottom: 0,
                 background:
-                  'radial-gradient(circle at 20% 50%, rgba(33, 150, 243, 0.2) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(100, 181, 246, 0.15) 0%, transparent 50%)',
+                  `radial-gradient(circle at 20% 50%, ${alpha(theme.palette.primary.main, 0.2)} 0%, transparent 50%), radial-gradient(circle at 80% 80%, ${alpha(theme.palette.primary.light, 0.15)} 0%, transparent 50%)`,
                 animation: 'pulse 4s ease-in-out infinite',
                 '@keyframes pulse': {
                   '0%, 100%': { opacity: 0.5 },
                   '50%': { opacity: 1 },
                 },
-              }}
+              })}
             />
             <Typography
               variant="h2"
-              sx={{
+              sx={(theme) => ({
                 fontWeight: 700,
                 fontSize: { xs: '1.2rem', md: '1.5rem' },
                 background:
-                  'linear-gradient(135deg, #fff 0%, #64B5F6 50%, #2196F3 100%)',
+                  `linear-gradient(135deg, #fff 0%, ${theme.palette.primary.light} 50%, ${theme.palette.primary.main} 100%)`,
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                textShadow: '0 0 30px rgba(33, 150, 243, 0.3)',
+                textShadow: `0 0 30px ${alpha(theme.palette.primary.main, 0.3)}`,
                 mb: 0.25,
                 position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 1,
-              }}>
+              })}>
               <SportsEsportsIcon
-                sx={{
+                sx={(theme) => ({
                   fontSize: { xs: '1.5rem', md: '2rem' },
-                  color: '#2196F3',
-                  filter: 'drop-shadow(0 0 10px rgba(33, 150, 243, 0.5))',
-                }}
+                  color: theme.palette.primary.main,
+                  filter: `drop-shadow(0 0 10px ${alpha(theme.palette.primary.main, 0.5)})`,
+                })}
               />
               Scrims Hub
               <EmojiEventsIcon
@@ -274,7 +275,7 @@ export default function Scrims() {
                   overflow: 'hidden',
                 }}>
                 <Box
-                  sx={{
+                  sx={(theme) => ({
                     position: 'absolute',
                     top: '50%',
                     left: '50%',
@@ -282,7 +283,7 @@ export default function Scrims() {
                     width: '150%',
                     height: '150%',
                     background:
-                      'radial-gradient(circle, rgba(33, 150, 243, 0.1) 0%, transparent 70%)',
+                      `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.1)} 0%, transparent 70%)`,
                     animation: 'rotate 20s linear infinite',
                     '@keyframes rotate': {
                       '0%': { transform: 'translate(-50%, -50%) rotate(0deg)' },
@@ -290,7 +291,7 @@ export default function Scrims() {
                         transform: 'translate(-50%, -50%) rotate(360deg)',
                       },
                     },
-                  }}
+                  })}
                 />
                 <Grid
                   container
@@ -301,12 +302,12 @@ export default function Scrims() {
                   sx={{ position: 'relative' }}>
                   <Grid item>
                     <SportsEsportsIcon
-                      sx={{
+                      sx={(theme) => ({
                         fontSize: '4rem',
-                        color: '#64B5F6',
+                        color: theme.palette.primary.light,
                         opacity: 0.5,
                         mb: 2,
-                      }}
+                      })}
                     />
                   </Grid>
                   <Grid item>
@@ -314,15 +315,15 @@ export default function Scrims() {
                       align="center"
                       variant="h1"
                       component="h1"
-                      sx={{
+                      sx={(theme) => ({
                         fontWeight: 700,
                         fontSize: { xs: '1.5rem', md: '2.5rem' },
                         background:
-                          'linear-gradient(135deg, #64B5F6 0%, #2196F3 100%)',
+                          `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`,
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         mb: 2,
-                      }}>
+                      })}>
                       No scrims found in {scrimsRegion}
                     </Typography>
                     <Typography
@@ -336,16 +337,16 @@ export default function Scrims() {
                   </Grid>
                   <Grid item>
                     <Box
-                      sx={{
+                      sx={(theme) => ({
                         display: 'flex',
                         alignItems: 'center',
                         gap: 1,
                         p: 2,
                         borderRadius: 2,
-                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
-                        border: '1px solid rgba(33, 150, 243, 0.3)',
-                      }}>
-                      <HelpIcon sx={{ color: '#64B5F6' }} />
+                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                        border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                      })}>
+                      <HelpIcon sx={(theme) => ({ color: theme.palette.primary.light })} />
                       <Tooltip
                         title={
                           <>

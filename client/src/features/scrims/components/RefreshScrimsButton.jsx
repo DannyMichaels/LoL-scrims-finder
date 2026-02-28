@@ -40,17 +40,17 @@ export default function RefreshScrimsButton({ compact = false }) {
   if (compact) {
     return (
       <Tooltip title="Refresh scrims">
-        <IconButton 
-          disabled={disabled} 
+        <IconButton
+          disabled={disabled}
           onClick={handleRefresh}
           size="small"
-          sx={{
+          sx={(theme) => ({
             p: 0.5,
             color: disabled ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.7)',
             '&:hover': {
-              color: disabled ? 'rgba(255, 255, 255, 0.3)' : '#2196F3',
+              color: disabled ? 'rgba(255, 255, 255, 0.3)' : theme.palette.primary.main,
             },
-          }}
+          })}
         >
           <RefreshIcon fontSize="small" />
         </IconButton>

@@ -25,6 +25,7 @@ import Footer from '@/components/shared/Footer';
 import AppModals from '@/components/modals/AppModals';
 import CurrentAlertSnackbar from '@/components/shared/CurrentAlertSnackbar';
 import { Helmet } from 'react-helmet';
+import useBranding from '@/hooks/useBranding';
 
 function App() {
   const classes = useAppStyles();
@@ -43,6 +44,8 @@ function App() {
   useMessenger(); // listen for messenger socket events
   useNotifications(); // reload user notifications on socket events
 
+  const { brandName, tagline } = useBranding();
+
   if (isVerifyingUser) {
     return (
       <div ref={appWrapperRef} className={classes.root}>
@@ -55,8 +58,8 @@ function App() {
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>Reluminate.gg</title>
-        <meta name="description" content="Find LoL Custom Lobbies!" />
+        <title>{brandName}</title>
+        <meta name="description" content={`${brandName} - ${tagline}`} />
       </Helmet>
 
       <div className={classes.root} ref={appWrapperRef}>

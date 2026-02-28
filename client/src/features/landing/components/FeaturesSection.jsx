@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
-import { styled } from '@mui/material/styles';
+import { styled, alpha } from '@mui/material/styles';
 
 // Images
 import amongusImg from '@/assets/images/landing/amongus.png';
@@ -16,7 +16,7 @@ const HomepageCard = styled(Paper)(({ theme }) => ({
   background: 'rgba(18, 24, 38, 0.6)',
   backdropFilter: 'blur(10px)',
   borderRadius: '20px',
-  border: '1px solid rgba(33, 150, 243, 0.15)',
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
   padding: '40px 30px',
   textAlign: 'center',
   height: '100%',
@@ -24,8 +24,8 @@ const HomepageCard = styled(Paper)(({ theme }) => ({
   position: 'relative',
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: '0 20px 40px rgba(33, 150, 243, 0.2)',
-    border: '1px solid rgba(33, 150, 243, 0.3)',
+    boxShadow: `0 20px 40px ${alpha(theme.palette.primary.main, 0.2)}`,
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
   },
 }));
 
@@ -33,9 +33,8 @@ const CircleDiv = styled(Box)(({ theme }) => ({
   width: 90,
   height: 90,
   borderRadius: '50%',
-  background:
-    'linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0.2) 100%)',
-  border: '2px solid rgba(33, 150, 243, 0.3)',
+  background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.2)} 100%)`,
+  border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -47,7 +46,7 @@ const CircleDiv = styled(Box)(({ theme }) => ({
     width: '100%',
     height: '100%',
     borderRadius: '50%',
-    border: '1px solid rgba(33, 150, 243, 0.5)',
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
     animation: 'pulse 2s infinite',
   },
   '@keyframes pulse': {
@@ -85,7 +84,7 @@ export default function FeaturesSection() {
                 sx={{
                   fontSize: '1.25rem',
                   fontWeight: 700,
-                  color: '#2196F3',
+                  color: (theme) => theme.palette.primary.main,
                   mb: 2,
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
@@ -126,7 +125,7 @@ export default function FeaturesSection() {
                 sx={{
                   fontSize: '1.25rem',
                   fontWeight: 700,
-                  color: '#2196F3',
+                  color: (theme) => theme.palette.primary.main,
                   mb: 2,
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
@@ -161,7 +160,7 @@ export default function FeaturesSection() {
                 sx={{
                   fontSize: '1.25rem',
                   fontWeight: 700,
-                  color: '#2196F3',
+                  color: (theme) => theme.palette.primary.main,
                   mb: 2,
                   textTransform: 'uppercase',
                   letterSpacing: '1px',

@@ -1,4 +1,5 @@
 import { makeStyles } from '@mui/styles';
+import { alpha } from '@mui/material/styles';
 import BgGIF from '@/assets/images/backgrounds/vi_background.gif';
 import HappyTeam from '@/assets/images/backgrounds/happy_team.jpg';
 
@@ -22,7 +23,7 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',
-    border: '1px solid rgba(33, 150, 243, 0.3)',
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
     borderRadius: theme.spacing(1),
     overflow: 'visible', // Allow button to show outside
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
@@ -40,7 +41,7 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
     padding: '16px',
 
     backdropFilter: 'blur(10px)',
-    borderBottom: '1px solid rgba(33, 150, 243, 0.3)',
+    borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
 
     minHeight: '250px',
   },
@@ -75,10 +76,10 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
 
   teamListHeader: {
     color: '#fff !important',
-    background: 'rgba(33, 150, 243, 0.15)',
-    backgroundColor: 'rgba(33, 150, 243, 0.15) !important',
+    background: alpha(theme.palette.primary.main, 0.15),
+    backgroundColor: `${alpha(theme.palette.primary.main, 0.15)} !important`,
     backdropFilter: 'blur(10px)',
-    borderBottom: '1px solid rgba(33, 150, 243, 0.3)',
+    borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
   },
 
   teamList: {
@@ -87,7 +88,7 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
     background: 'rgba(18, 24, 38, 0.85)',
     backgroundColor: 'rgba(18, 24, 38, 0.85) !important',
     backdropFilter: 'blur(15px)',
-    border: '1px solid rgba(33, 150, 243, 0.2)',
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
     borderRadius: theme.spacing(1),
 
     transition: 'all 0.3s ease',
@@ -95,8 +96,8 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
 
     '&:hover': {
       backgroundColor: 'rgba(18, 24, 38, 0.95) !important',
-      border: '1px solid rgba(33, 150, 243, 0.4)',
-      boxShadow: '0 4px 12px rgba(33, 150, 243, 0.2)',
+      border: `1px solid ${alpha(theme.palette.primary.main, 0.4)}`,
+      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
     },
     '@media screen and (max-width: 630px)': {
       maxWidth: '100%',
