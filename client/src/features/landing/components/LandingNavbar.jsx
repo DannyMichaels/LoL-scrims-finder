@@ -72,7 +72,7 @@ export default function LandingNavbar() {
               onClick={handleSignupClick}
               sx={(theme) => ({
                 background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                color: '#fff',
+                color: theme.palette.primary.contrastText,
                 padding: '6px 16px',
                 height: '36px',
                 '&:hover': {

@@ -11,6 +11,7 @@ const CTAButton = styled(Button)(({ theme }) => ({
   backdropFilter: 'blur(10px)',
   '&.MuiButton-contained': {
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+    color: theme.palette.primary.contrastText,
     '&:hover': {
       background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${darken(theme.palette.primary.dark, 0.1)} 100%)`,
       transform: 'translateY(-2px)',

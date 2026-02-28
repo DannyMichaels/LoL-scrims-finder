@@ -463,7 +463,7 @@ export default function AdminDashboard() {
         0
       );
       const colorMap = {
-        NA: COLORS.primary,
+        NA: '#42A5F5',
         EUW: COLORS.secondary,
         EUNE: COLORS.success,
         LAN: COLORS.warning,
@@ -475,7 +475,7 @@ export default function AdminDashboard() {
         value:
           totalUsers > 0 ? Math.round((region.count / totalUsers) * 100) : 0,
         count: region.count,
-        color: colorMap[region.region] || COLORS.primary,
+        color: colorMap[region.region] || '#42A5F5',
       }));
     }
 

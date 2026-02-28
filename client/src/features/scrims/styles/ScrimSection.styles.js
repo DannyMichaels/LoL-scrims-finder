@@ -76,10 +76,21 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
 
   teamListHeader: {
     color: '#fff !important',
-    background: alpha(theme.palette.primary.main, 0.15),
-    backgroundColor: `${alpha(theme.palette.primary.main, 0.15)} !important`,
     backdropFilter: 'blur(10px)',
-    borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+    // Default fallback (overridden by team-specific selectors below)
+    background: 'rgba(33, 150, 243, 0.15)',
+    backgroundColor: 'rgba(33, 150, 243, 0.15) !important',
+    borderBottom: '1px solid rgba(33, 150, 243, 0.3)',
+    '.team-container--teamOne &': {
+      background: 'rgba(33, 150, 243, 0.15)',
+      backgroundColor: 'rgba(33, 150, 243, 0.15) !important',
+      borderBottom: '1px solid rgba(33, 150, 243, 0.3)',
+    },
+    '.team-container--teamTwo &': {
+      background: 'rgba(244, 67, 54, 0.15)',
+      backgroundColor: 'rgba(244, 67, 54, 0.15) !important',
+      borderBottom: '1px solid rgba(244, 67, 54, 0.3)',
+    },
   },
 
   teamList: {
@@ -88,16 +99,29 @@ export const useScrimSectionStyles = makeStyles((theme) => ({
     background: 'rgba(18, 24, 38, 0.85)',
     backgroundColor: 'rgba(18, 24, 38, 0.85) !important',
     backdropFilter: 'blur(15px)',
-    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
     borderRadius: theme.spacing(1),
-
     transition: 'all 0.3s ease',
     paddingBottom: '0 !important', // defaults to 8px
-
+    // Default fallback
+    border: '1px solid rgba(33, 150, 243, 0.2)',
     '&:hover': {
       backgroundColor: 'rgba(18, 24, 38, 0.95) !important',
-      border: `1px solid ${alpha(theme.palette.primary.main, 0.4)}`,
-      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+      border: '1px solid rgba(33, 150, 243, 0.4)',
+      boxShadow: '0 4px 12px rgba(33, 150, 243, 0.2)',
+    },
+    '.team-container--teamOne &': {
+      border: '1px solid rgba(33, 150, 243, 0.2)',
+      '&:hover': {
+        border: '1px solid rgba(33, 150, 243, 0.4)',
+        boxShadow: '0 4px 12px rgba(33, 150, 243, 0.2)',
+      },
+    },
+    '.team-container--teamTwo &': {
+      border: '1px solid rgba(244, 67, 54, 0.2)',
+      '&:hover': {
+        border: '1px solid rgba(244, 67, 54, 0.4)',
+        boxShadow: '0 4px 12px rgba(244, 67, 54, 0.2)',
+      },
     },
     '@media screen and (max-width: 630px)': {
       maxWidth: '100%',

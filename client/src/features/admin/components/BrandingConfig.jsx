@@ -43,6 +43,7 @@ const EMPTY_CONFIG = {
     twitch: '',
     twitter: '',
   },
+  featureCards: [],
 };
 
 export default function BrandingConfig() {
@@ -55,6 +56,16 @@ export default function BrandingConfig() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [s3Assets, setS3Assets] = useState([]);
+
+  const fetchS3Assets = useCallback(async () => {
+    try {
+      const { data } = await api.get('/branding/assets');
+      setS3Assets(data);
+    } catch (err) {
+      console.error('Failed to fetch S3 assets:', err);
+    }
+  }, []);
 
   const fetchConfigs = useCallback(async () => {
     try {
@@ -78,6 +89,7 @@ export default function BrandingConfig() {
 
   useEffect(() => {
     fetchConfigs();
+    fetchS3Assets();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -155,6 +167,8 @@ export default function BrandingConfig() {
           fileName,
           slug,
         });
+        // Refresh S3 assets list so newly uploaded file appears in browser
+        fetchS3Assets();
         return data.url;
       } catch (err) {
         console.error('Upload error:', err);
@@ -162,7 +176,7 @@ export default function BrandingConfig() {
         return null;
       }
     },
-    [formValues.slug, setCurrentAlert]
+    [formValues.slug, setCurrentAlert, fetchS3Assets]
   );
 
   if (loading) return <Loading text="Loading branding configs" />;
@@ -249,6 +263,7 @@ export default function BrandingConfig() {
               onReset={handleReset}
               saving={saving}
               onUploadAsset={handleUploadAsset}
+              s3Assets={s3Assets}
             />
           </Grid>
           <Grid item xs={12} md={6}>

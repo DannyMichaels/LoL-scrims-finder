@@ -76,7 +76,7 @@ const StyledBubble = styled.div`
   p.from-me {
     /* align-self: flex-end; */
     background: linear-gradient(135deg, ${({ theme }) => theme.palette.primary.main} 0%, ${({ theme }) => theme.palette.primary.dark} 100%);
-    color: #fff;
+    color: ${({ theme }) => theme.palette.primary.contrastText};
     box-shadow: 0 2px 8px ${({ theme }) => alpha(theme.palette.primary.main, 0.3)};
   }
 

@@ -128,9 +128,9 @@ export default function CountdownTimer({ scrim, setGameStarted, gameStarted }) {
 
 const useStyles = makeStyles((theme) => ({
   timer: {
-    background: alpha(theme.palette.primary.main, 0.1),
+    background: 'rgba(33, 150, 243, 0.1)',
     backdropFilter: 'blur(10px)',
-    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+    border: '1px solid rgba(33, 150, 243, 0.3)',
     color: '#fff',
     fontSize: '22px',
     display: 'flex',
@@ -153,7 +153,7 @@ const useStyles = makeStyles((theme) => ({
 
   timerText: {
     fontWeight: 600,
-    color: theme.palette.primary.light,
+    color: theme.palette.getContrastText(theme.palette.background.default),
     fontSize: '22px !important',
     textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
   },

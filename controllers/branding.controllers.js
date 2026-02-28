@@ -1,6 +1,9 @@
+const { ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const BrandConfig = require('../models/brandConfig.model');
 const Cache = require('../utils/Cache');
 const uploadToBucket = require('../utils/uploadToBucket');
+const createS3 = require('../utils/createS3');
+const KEYS = require('../config/keys');
 
 const brandingCache = new Cache({
   timeToLive: 5 * 60 * 1000, // 5 minutes
@@ -160,6 +163,37 @@ async function uploadBrandAsset(req, res) {
   }
 }
 
+// GET /api/branding/assets?prefix=branding/ (super-admin)
+async function listBrandAssets(req, res) {
+  try {
+    const s3 = createS3();
+    const prefix = req.query.prefix || 'branding/';
+
+    const command = new ListObjectsV2Command({
+      Bucket: KEYS.S3_BUCKET_NAME,
+      Prefix: prefix,
+    });
+
+    const result = await s3.send(command);
+    const region = KEYS.AWS_REGION || 'us-east-1';
+    const bucket = KEYS.S3_BUCKET_NAME;
+
+    const assets = (result.Contents || [])
+      .filter((obj) => !obj.Key.endsWith('/'))
+      .map((obj) => ({
+        key: obj.Key,
+        url: `https://${bucket}.s3.${region}.amazonaws.com/${obj.Key}`,
+        size: obj.Size,
+        lastModified: obj.LastModified,
+      }));
+
+    return res.json(assets);
+  } catch (error) {
+    console.error('listBrandAssets error:', error);
+    return res.status(500).json({ error: 'Failed to list S3 assets' });
+  }
+}
+
 // Helper: get all domains from BrandConfig for CORS
 async function getAllDomains() {
   const cacheKey = '__all_domains__';
@@ -179,5 +213,6 @@ module.exports = {
   createBrandConfig,
   updateBrandConfig,
   uploadBrandAsset,
+  listBrandAssets,
   getAllDomains,
 };

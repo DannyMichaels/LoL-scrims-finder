@@ -1,16 +1,11 @@
+import useBranding from '@/hooks/useBranding';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import { styled, alpha } from '@mui/material/styles';
-
-// Images
-import amongusImg from '@/assets/images/landing/amongus.png';
-import animeImg from '@/assets/images/landing/anime.webp';
-
-// Shared Icons
-import { DiscordIcon } from './shared/SocialIcons';
+import StarIcon from '@mui/icons-material/Star';
 
 const HomepageCard = styled(Paper)(({ theme }) => ({
   background: 'rgba(18, 24, 38, 0.6)',
@@ -65,124 +60,62 @@ const CircleDiv = styled(Box)(({ theme }) => ({
   },
 }));
 
-
 export default function FeaturesSection() {
+  const { featureCards } = useBranding();
+
+  if (!featureCards || featureCards.length === 0) return null;
+
+  // Calculate grid columns: 1-2 cards = 6 cols each, 3+ = 4 cols each
+  const mdCols = featureCards.length <= 2 ? 6 : 4;
+
   return (
     <Box sx={{ backgroundColor: '#121826', py: 8 }}>
       <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
-            <HomepageCard elevation={0}>
-              <CircleDiv>
-                <img
-                  src={amongusImg}
-                  alt="events"
-                  style={{ width: 32, height: 32 }}
-                />
-              </CircleDiv>
-              <Typography
-                sx={{
-                  fontSize: '1.25rem',
-                  fontWeight: 700,
-                  color: (theme) => theme.palette.primary.main,
-                  mb: 2,
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                }}>
-                EVENTS & TOURNAMENTS
-              </Typography>
-              <Typography
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  marginTop: 0,
-                  fontSize: 14,
-                  lineHeight: '25px',
-                  fontWeight: 300,
-                }}>
-                5v5 casted customs every friday!
-                <br />
-                Prized events + giveaways
-                <br />
-                Random game modes
-                <br />
-                Guest speakers from your favorite
-                <br />
-                creators
-              </Typography>
-            </HomepageCard>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <HomepageCard elevation={0}>
-              <CircleDiv>
-                <img
-                  src={animeImg}
-                  alt="community"
-                  style={{ width: 32, height: 32 }}
-                />
-              </CircleDiv>
-              <Typography
-                sx={{
-                  fontSize: '1.25rem',
-                  fontWeight: 700,
-                  color: (theme) => theme.palette.primary.main,
-                  mb: 2,
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                }}>
-                COMMUNITY
-              </Typography>
-              <Typography
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  marginTop: 0,
-                  fontSize: 14,
-                  lineHeight: '25px',
-                  fontWeight: 300,
-                }}>
-                Everyone has a reason for playing league.
-                <br />
-                Whether you're trying to climb the ladder,
-                <br />
-                find a duo, or escape reality. We're
-                <br />
-                building a community for it all.
-              </Typography>
-            </HomepageCard>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <HomepageCard elevation={0}>
-              <CircleDiv>
-                <DiscordIcon />
-              </CircleDiv>
-              <Typography
-                sx={{
-                  fontSize: '1.25rem',
-                  fontWeight: 700,
-                  color: (theme) => theme.palette.primary.main,
-                  mb: 2,
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px',
-                }}>
-                FREE COACHING
-              </Typography>
-              <Typography
-                sx={{
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  marginTop: 0,
-                  fontSize: 14,
-                  lineHeight: '25px',
-                  fontWeight: 300,
-                }}>
-                Join the Discord for free coaching in
-                <br />
-                classroom settings from master-challenger
-                <br />
-                players. All roles, all lanes, all playstyles.
-              </Typography>
-            </HomepageCard>
-          </Grid>
+        <Grid container spacing={4} justifyContent="center">
+          {featureCards.map((card, idx) => (
+            <Grid item xs={12} md={mdCols} key={card._id || idx}>
+              <HomepageCard elevation={0}>
+                <CircleDiv>
+                  {card.icon ? (
+                    <img
+                      src={card.icon}
+                      alt=""
+                      style={{ width: 32, height: 32, objectFit: 'contain' }}
+                    />
+                  ) : (
+                    <StarIcon
+                      sx={(theme) => ({
+                        fontSize: 32,
+                        color: theme.palette.primary.main,
+                      })}
+                    />
+                  )}
+                </CircleDiv>
+                <Typography
+                  sx={{
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    color: (theme) => theme.palette.primary.main,
+                    mb: 2,
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                  }}>
+                  {card.title}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    marginTop: 0,
+                    fontSize: 14,
+                    lineHeight: '25px',
+                    fontWeight: 300,
+                    whiteSpace: 'pre-line',
+                  }}>
+                  {card.description}
+                </Typography>
+              </HomepageCard>
+            </Grid>
+          ))}
         </Grid>
       </Container>
     </Box>

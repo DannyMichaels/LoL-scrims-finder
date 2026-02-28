@@ -181,9 +181,18 @@ export function createBrandTheme(colors = {}) {
           },
           containedPrimary: {
             background: `linear-gradient(135deg, ${primary} 0%, ${primaryDark} 100%)`,
+            color: primaryContrastText,
             '&:hover': {
               background: `linear-gradient(135deg, ${primaryLight} 0%, ${primary} 100%)`,
             },
+            '&.Mui-disabled': {
+              background: 'rgba(255, 255, 255, 0.12)',
+              color: 'rgba(255, 255, 255, 0.3)',
+              boxShadow: 'none',
+            },
+          },
+          containedSecondary: {
+            color: getContrastText(primaryLight),
           },
         },
       },

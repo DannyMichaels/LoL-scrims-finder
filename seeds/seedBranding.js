@@ -10,7 +10,33 @@ async function seed() {
 
   const existing = await BrandConfig.findOne({ slug: 'reluminate' });
   if (existing) {
-    console.log('Reluminate brand config already exists, skipping seed.');
+    // Patch in featureCards if missing
+    if (!existing.featureCards || existing.featureCards.length === 0) {
+      existing.featureCards = [
+        {
+          title: 'EVENTS & TOURNAMENTS',
+          description:
+            '5v5 casted customs every friday!\nPrized events + giveaways\nRandom game modes\nGuest speakers from your favorite\ncreators',
+          icon: 'https://lol-scrims-finder.s3.us-east-1.amazonaws.com/branding/reluminate/amongus.png',
+        },
+        {
+          title: 'COMMUNITY',
+          description:
+            "Everyone has a reason for playing league.\nWhether you're trying to climb the ladder,\nfind a duo, or escape reality. We're\nbuilding a community for it all.",
+          icon: 'https://lol-scrims-finder.s3.us-east-1.amazonaws.com/branding/reluminate/anime.webp',
+        },
+        {
+          title: 'FREE COACHING',
+          description:
+            'Join the Discord for free coaching in\nclassroom settings from master-challenger\nplayers. All roles, all lanes, all playstyles.',
+          icon: 'https://lol-scrims-finder.s3.us-east-1.amazonaws.com/branding/reluminate/discord.svg',
+        },
+      ];
+      await existing.save();
+      console.log('Patched featureCards onto existing Reluminate config.');
+    } else {
+      console.log('Reluminate brand config already exists with featureCards, skipping.');
+    }
     await mongoose.disconnect();
     return;
   }
@@ -39,6 +65,26 @@ async function seed() {
       twitch: 'https://www.twitch.tv/reluminategg',
       twitter: 'https://twitter.com/Reluminategg',
     },
+    featureCards: [
+      {
+        title: 'EVENTS & TOURNAMENTS',
+        description:
+          '5v5 casted customs every friday!\nPrized events + giveaways\nRandom game modes\nGuest speakers from your favorite\ncreators',
+        icon: 'https://lol-scrims-finder.s3.us-east-1.amazonaws.com/branding/reluminate/amongus.png',
+      },
+      {
+        title: 'COMMUNITY',
+        description:
+          "Everyone has a reason for playing league.\nWhether you're trying to climb the ladder,\nfind a duo, or escape reality. We're\nbuilding a community for it all.",
+        icon: 'https://lol-scrims-finder.s3.us-east-1.amazonaws.com/branding/reluminate/anime.webp',
+      },
+      {
+        title: 'FREE COACHING',
+        description:
+          'Join the Discord for free coaching in\nclassroom settings from master-challenger\nplayers. All roles, all lanes, all playstyles.',
+        icon: 'https://lol-scrims-finder.s3.us-east-1.amazonaws.com/branding/reluminate/discord.svg',
+      },
+    ],
   });
 
   console.log('Reluminate brand config seeded successfully.');

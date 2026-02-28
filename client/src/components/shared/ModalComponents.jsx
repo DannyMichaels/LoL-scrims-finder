@@ -220,7 +220,7 @@ export const Modal = React.memo(
         <DialogActions>
           {actionButtonProps && (
             <Button
-              type="primary"
+              color="primary"
               style={actionButtonStyle ? actionButtonStyle : null}
               onClick={() => actionButtonProps.onClick()}
               variant="contained"
@@ -229,7 +229,7 @@ export const Modal = React.memo(
             </Button>
           )}
 
-          <Button color="secondary" onClick={onClose} variant="contained">
+          <Button onClick={onClose} variant="outlined">
             {closeBtnTitle}
           </Button>
         </DialogActions>

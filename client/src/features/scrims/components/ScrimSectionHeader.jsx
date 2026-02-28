@@ -349,7 +349,7 @@ export default function ScrimSectionHeader({
                   background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
                   boxShadow: `0 4px 15px ${alpha(theme.palette.primary.main, 0.4)}`,
                 })}>
-                <ScheduleIcon sx={{ color: '#fff', fontSize: '1.5rem' }} />
+                <ScheduleIcon sx={(theme) => ({ color: theme.palette.primary.contrastText, fontSize: '1.5rem' })} />
               </Box>
               <Box sx={{ flex: 1 }}>
                 <Typography

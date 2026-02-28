@@ -28,17 +28,17 @@ import pluralize from 'pluralize';
 
 const useStyles = makeStyles((theme) => ({
   infoBoxRoot: {
-    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+    backgroundColor: 'rgba(33, 150, 243, 0.1)',
     padding: '16px',
     borderRadius: '8px',
     backdropFilter: 'blur(10px)',
-    border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+    border: '1px solid rgba(33, 150, 243, 0.3)',
     transition: 'all 0.3s ease',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
     '&:hover': {
-      backgroundColor: alpha(theme.palette.primary.main, 0.15),
-      border: `1px solid ${alpha(theme.palette.primary.main, 0.4)}`,
-      boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
+      backgroundColor: 'rgba(33, 150, 243, 0.15)',
+      border: '1px solid rgba(33, 150, 243, 0.4)',
+      boxShadow: '0 4px 12px rgba(33, 150, 243, 0.2)',
     },
   },
 }));
@@ -165,12 +165,16 @@ export default function ScrimSectionMiddleAreaBox({
                                 <Tooltip title="Click to copy tournament code">
                                   <Button
                                     variant="contained"
-                                    style={{
-                                      backgroundColor: '#4CAF50',
-                                      color: 'white',
+                                    color="inherit"
+                                    sx={{
+                                      background: '#4CAF50',
+                                      color: '#fff',
                                       fontWeight: 'bold',
                                       fontSize: '1.1em',
                                       padding: '10px 20px',
+                                      '&:hover': {
+                                        background: '#43A047',
+                                      },
                                     }}
                                     onClick={() => {
                                       copyTextToClipboard(
@@ -341,11 +345,15 @@ export default function ScrimSectionMiddleAreaBox({
                             <Tooltip
                               title={`Select ${teamAliases[teamName]} as winner`}>
                               <Button
-                                style={{
-                                  backgroundColor: idx === 0 ? 'blue' : 'red',
-                                  color: '#fff',
-                                }}
                                 variant="contained"
+                                color="inherit"
+                                sx={{
+                                  background: idx === 0 ? '#1565C0' : '#C62828',
+                                  color: '#fff',
+                                  '&:hover': {
+                                    background: idx === 0 ? '#1976D2' : '#D32F2F',
+                                  },
+                                }}
                                 onClick={async () => {
                                   // set team won for scrim
                                   let yes =

@@ -25,6 +25,13 @@ const brandConfigSchema = new mongoose.Schema(
       twitch: { type: String, default: '' },
       twitter: { type: String, default: '' },
     },
+    featureCards: [
+      {
+        title: { type: String, required: true },
+        description: { type: String, required: true },
+        icon: { type: String, default: '' },
+      },
+    ],
   },
   { timestamps: true }
 );

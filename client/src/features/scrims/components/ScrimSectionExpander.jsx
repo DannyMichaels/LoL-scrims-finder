@@ -141,7 +141,7 @@ const StyledDivider = styled('div')(({ theme }) => ({
       boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
     },
     '& .modal__expandIcon': {
-      color: '#ffffff',
+      color: theme.palette.primary.contrastText,
     },
   },
 }));

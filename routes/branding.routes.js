@@ -13,5 +13,6 @@ router.get('/branding/all', admin, controllers.getAllBrandConfigs);
 router.post('/branding', admin, controllers.createBrandConfig);
 router.patch('/branding/:id', admin, controllers.updateBrandConfig);
 router.post('/branding/upload-asset', admin, controllers.uploadBrandAsset);
+router.get('/branding/assets', admin, controllers.listBrandAssets);
 
 module.exports = router;

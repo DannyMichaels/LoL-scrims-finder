@@ -83,6 +83,7 @@ export default function BrandingProvider({ children }) {
         config?.branding?.heroBackgroundUrl ||
         DEFAULT_BRANDING.heroBackgroundUrl,
       socialLinks: config?.socialLinks || DEFAULT_SOCIAL_LINKS,
+      featureCards: config?.featureCards || [],
       colors: config?.colors || {},
       _id: config?._id,
       slug: config?.slug,
