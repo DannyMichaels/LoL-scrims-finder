@@ -18,7 +18,7 @@ import { ThemeProvider, alpha, darken } from '@mui/material/styles';
 import { createBrandTheme } from '@/appTheme';
 import { resolveHeroBackground } from '@/assets/heroBackgrounds';
 
-function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards, navbarLogoSize, showNavbarTitle }) {
+function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards, navbarLogoSize, navbarPadding, showNavbarTitle }) {
   const pt = previewTheme.palette;
 
   return (
@@ -36,7 +36,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
           backdropFilter: 'blur(10px)',
           borderBottom: `1px solid ${alpha(pt.primary.main, 0.1)}`,
         }}>
-        <Toolbar sx={{ minHeight: '56px !important' }}>
+        <Toolbar sx={{ minHeight: '56px !important', py: `${(navbarPadding ?? 16) * 0.5}px` }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {logoUrl && (
               <img
@@ -68,7 +68,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
               size="small"
               sx={{
                 borderColor: alpha(pt.primary.main, 0.5),
-                color: '#fff',
+                color: pt.text.primary,
                 fontSize: '0.75rem',
                 '&:hover': {
                   borderColor: pt.primary.main,
@@ -134,7 +134,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
         </Typography>
         <Typography
           sx={{
-            color: 'rgba(255,255,255,0.8)',
+            color: pt.text.secondary,
             fontSize: '1rem',
             mb: 1,
           }}>
@@ -150,7 +150,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
               sx={{
                 background: alpha(pt.primary.main, 0.1),
                 border: `1px solid ${alpha(pt.primary.main, 0.3)}`,
-                color: '#fff',
+                color: pt.text.primary,
                 fontSize: '0.65rem',
                 fontWeight: 600,
                 textTransform: 'uppercase',
@@ -238,7 +238,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
                   sx={{
                     backgroundColor: 'rgba(76, 175, 80, 0.12)',
                     border: '1px solid rgba(76, 175, 80, 0.37)',
-                    color: '#fff',
+                    color: pt.text.primary,
                     fontWeight: 600,
                     fontSize: '0.75rem',
                     height: '24px',
@@ -283,10 +283,10 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
                 <ScheduleIcon sx={{ color: pt.primary.contrastText, fontSize: '1.2rem' }} />
               </Box>
               <Box>
-                <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.6rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <Typography sx={{ color: pt.text.secondary, fontSize: '0.6rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Game Start Time
                 </Typography>
-                <Typography sx={{ color: '#fff', fontWeight: 600, fontSize: '0.85rem' }}>
+                <Typography sx={{ color: pt.text.primary, fontWeight: 600, fontSize: '0.85rem' }}>
                   Mar 01, 2026 · 8:00 PM
                 </Typography>
               </Box>
@@ -300,7 +300,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
               display: 'flex',
               justifyContent: 'center',
               height: '2.5em',
-              borderTop: `1px solid rgba(255,255,255,0.1)`,
+              borderTop: `1px solid ${alpha(pt.primary.main, 0.1)}`,
             }}>
             <Box
               sx={{
@@ -333,7 +333,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
                 sx={{
                   flex: `1 1 ${featureCards.length <= 2 ? '200px' : '140px'}`,
                   maxWidth: '220px',
-                  background: 'rgba(18, 24, 38, 0.6)',
+                  background: alpha(pt.background.paper, 0.6),
                   borderRadius: '12px',
                   border: `1px solid ${alpha(pt.primary.main, 0.15)}`,
                   p: 1.5,
@@ -361,7 +361,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
                 <Typography sx={{ color: pt.primary.main, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', mb: 0.5 }}>
                   {card.title}
                 </Typography>
-                <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.5rem', lineHeight: 1.4, whiteSpace: 'pre-line' }}>
+                <Typography sx={{ color: pt.text.secondary, fontSize: '0.5rem', lineHeight: 1.4, whiteSpace: 'pre-line' }}>
                   {(card.description || '').split('\n').slice(0, 2).join('\n')}
                   {(card.description || '').split('\n').length > 2 ? '...' : ''}
                 </Typography>
@@ -376,9 +376,9 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
         sx={{
           py: 2,
           textAlign: 'center',
-          borderTop: `1px solid rgba(255,255,255,0.05)`,
+          borderTop: `1px solid ${alpha(pt.primary.main, 0.05)}`,
         }}>
-        <Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>
+        <Typography sx={{ color: pt.text.secondary, fontSize: '0.7rem' }}>
           &copy; 2026 {brandName}. All rights reserved.
         </Typography>
       </Box>
@@ -413,8 +413,9 @@ export default function BrandingPreview({ formValues }) {
 
   const featureCards = formValues.featureCards || [];
   const navbarLogoSize = formValues.branding?.navbarLogoSize || 36;
+  const navbarPadding = formValues.branding?.navbarPadding ?? 16;
   const showNavbarTitle = formValues.branding?.showNavbarTitle ?? true;
-  const contentProps = { previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards, navbarLogoSize, showNavbarTitle };
+  const contentProps = { previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards, navbarLogoSize, navbarPadding, showNavbarTitle };
 
   return (
     <ThemeProvider theme={previewTheme}>
@@ -429,7 +430,7 @@ export default function BrandingPreview({ formValues }) {
             right: 4,
             zIndex: 10,
             backgroundColor: 'rgba(0,0,0,0.5)',
-            color: '#fff',
+            color: previewTheme.palette.text.primary,
             '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' },
           }}>
           <OpenInFullIcon fontSize="small" />
@@ -439,7 +440,7 @@ export default function BrandingPreview({ formValues }) {
           sx={{
             overflow: 'hidden',
             borderRadius: 2,
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: `1px solid ${alpha(previewTheme.palette.primary.main, 0.15)}`,
             height: contentHeight ? contentHeight * SCALE : 'auto',
           }}>
           <Box
@@ -474,7 +475,7 @@ export default function BrandingPreview({ formValues }) {
             justifyContent: 'space-between',
             px: 2,
             py: 1,
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            borderBottom: `1px solid ${alpha(previewTheme.palette.primary.main, 0.1)}`,
           }}>
           <Typography variant="subtitle2" color="text.secondary">
             Full Preview

@@ -16,13 +16,12 @@ const NavbarBox = styled(Box)(({ theme }) => ({
   backdropFilter: 'blur(10px)',
   borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
   zIndex: 1000,
-  padding: '16px 0',
 }));
 
 export default function LandingNavbar() {
   const history = useHistory();
   const { handleLogin } = useAuthActions();
-  const { brandName, logoUrl } = useBranding();
+  const { brandName, logoUrl, navbarLogoSize, navbarPadding, showNavbarTitle } = useBranding();
 
   const handleSignupClick = () => {
     history.push('/signup');
@@ -34,7 +33,7 @@ export default function LandingNavbar() {
 
   return (
     <NavbarBox>
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ py: `${navbarPadding}px` }}>
         <Box
           sx={{
             display: 'flex',
@@ -45,18 +44,20 @@ export default function LandingNavbar() {
             <img
               src={logoUrl}
               alt={brandName}
-              style={{ width: 32, height: 32 }}
+              style={{ width: navbarLogoSize, height: navbarLogoSize, objectFit: 'contain' }}
             />
-            <Typography
-              sx={{ color: '#fff', fontWeight: 600, fontSize: '18px' }}>
-              {brandName}
-            </Typography>
+            {showNavbarTitle && (
+              <Typography
+                sx={{ color: 'text.primary', fontWeight: 600, fontSize: '18px' }}>
+                {brandName}
+              </Typography>
+            )}
           </Box>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             <Button
               onClick={handleLoginClick}
               sx={(theme) => ({
-                color: '#fff',
+                color: theme.palette.text.primary,
                 borderColor: alpha(theme.palette.primary.main, 0.5),
                 padding: '6px 16px',
                 height: '36px',

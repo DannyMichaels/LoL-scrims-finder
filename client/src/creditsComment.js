@@ -78,6 +78,6 @@ export const creditsComment = `
                             ... . .................
 
                         **   LoL Scrims Finder  **
-                      Developed by: Daniel Michael (AKA GitCat)
-                            Discord: GitCat#9811    
+                      Developed by: Daniel Michael
+                            Discord: @.GitCat 
 `;

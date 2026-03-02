@@ -338,6 +338,20 @@ export default function BrandingForm({
             sx={{ maxWidth: 300 }}
           />
         </Box>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+            Navbar Padding: {formValues.branding?.navbarPadding ?? 16}px
+          </Typography>
+          <Slider
+            value={formValues.branding?.navbarPadding ?? 16}
+            onChange={(_, val) => updateBranding('navbarPadding', val)}
+            min={0}
+            max={40}
+            step={2}
+            valueLabelDisplay="auto"
+            sx={{ maxWidth: 300 }}
+          />
+        </Box>
         <FormControlLabel
           control={
             <Switch

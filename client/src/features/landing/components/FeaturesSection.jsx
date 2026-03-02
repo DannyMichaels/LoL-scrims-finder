@@ -104,7 +104,7 @@ export default function FeaturesSection() {
                 </Typography>
                 <Typography
                   sx={{
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: 'text.secondary',
                     marginTop: 0,
                     fontSize: 14,
                     lineHeight: '25px',

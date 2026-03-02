@@ -77,7 +77,7 @@ export default function HeroSection() {
 
           <Typography
             sx={{
-              color: '#fff',
+              color: 'text.primary',
               mb: 1,
               fontSize: { xs: '1.25rem', md: '1.75rem' },
               fontWeight: 600,
@@ -89,7 +89,7 @@ export default function HeroSection() {
 
           <Typography
             sx={{
-              color: 'rgba(255, 255, 255, 0.8)',
+              color: 'text.secondary',
               mb: 6,
               fontSize: { xs: '1rem', md: '1.5rem' },
               fontWeight: 400,
@@ -164,7 +164,7 @@ export default function HeroSection() {
             </Typography>
             <Typography
               sx={{
-                color: 'rgba(255, 255, 255, 0.8)',
+                color: 'text.secondary',
                 mb: 3,
                 fontSize: '1rem',
               }}>

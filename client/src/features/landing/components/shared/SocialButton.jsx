@@ -8,7 +8,7 @@ const SocialButton = styled(Button)(({ theme }) => ({
   padding: '14px 28px',
   fontSize: '14px',
   fontWeight: 600,
-  color: '#fff',
+  color: theme.palette.text.primary,
   textTransform: 'uppercase',
   letterSpacing: '1px',
   transition: 'all 0.3s ease',

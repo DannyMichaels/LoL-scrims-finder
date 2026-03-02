@@ -44,8 +44,6 @@ const useStyles = makeStyles((theme) => ({
   },
 
   toolbar: {
-    paddingTop: '8px',
-    paddingBottom: '8px',
     minHeight: '48px !important',
   },
 }));
@@ -68,7 +66,7 @@ export default function Navbar({
   const { currentUser } = useAuth();
   const { handleLogin } = useAuthActions();
   const dispatch = useDispatch();
-  const { brandName, logoUrl, navbarLogoSize, showNavbarTitle } = useBranding();
+  const { brandName, logoUrl, navbarLogoSize, navbarPadding, showNavbarTitle } = useBranding();
 
   const openMessengerDropdown = useCallback(() => {
     setIsMessengerDropdownOpen((prevState) => !prevState);
@@ -85,7 +83,7 @@ export default function Navbar({
           })}>
           <Toolbar
             className={classes.toolbar}
-            sx={{ minHeight: '64px !important' }}>
+            sx={{ minHeight: '48px !important', py: `${navbarPadding}px` }}>
             <InnerColumn>
               <Box
                 sx={{

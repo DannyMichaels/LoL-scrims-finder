@@ -83,6 +83,7 @@ export default function BrandingProvider({ children }) {
         config?.branding?.heroBackgroundUrl ||
         DEFAULT_BRANDING.heroBackgroundUrl,
       navbarLogoSize: config?.branding?.navbarLogoSize || 36,
+      navbarPadding: config?.branding?.navbarPadding ?? 16,
       showNavbarTitle: config?.branding?.showNavbarTitle ?? true,
       socialLinks: config?.socialLinks || DEFAULT_SOCIAL_LINKS,
       featureCards: config?.featureCards || [],
