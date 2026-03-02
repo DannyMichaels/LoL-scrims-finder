@@ -12,6 +12,8 @@ const brandConfigSchema = new mongoose.Schema(
       logoUrl: { type: String, default: '/reluminate-logo.png' },
       faviconUrl: { type: String, default: '/reluminate-logo.png' },
       heroBackgroundUrl: { type: String, default: '' },
+      navbarLogoSize: { type: Number, default: 36 },
+      showNavbarTitle: { type: Boolean, default: true },
     },
     colors: {
       primaryMain: { type: String, default: '#2196F3' },

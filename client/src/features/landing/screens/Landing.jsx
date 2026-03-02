@@ -8,16 +8,16 @@ import FeaturesSection from '../components/FeaturesSection';
 export default function Landing() {
   return (
     <Box
-      sx={{
+      sx={(theme) => ({
         position: 'fixed',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
         overflow: 'auto',
-        backgroundColor: '#121826',
+        backgroundColor: theme.palette.background.paper,
         pb: 2,
-      }}>
+      })}>
       <LandingNavbar />
       <HeroSection />
       <FeaturesSection />

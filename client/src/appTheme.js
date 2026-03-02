@@ -32,6 +32,11 @@ export const COLORS = {
   GREY_PAPER: '#121826',
 };
 
+// Returns true if the value is a valid hex color (#nnn or #nnnnnn)
+function isValidHex(color) {
+  return /^#([0-9A-Fa-f]{3}){1,2}$/.test(color);
+}
+
 // Returns '#000000' or '#FFFFFF' based on the luminance of the given hex color
 function getContrastText(hex) {
   const h = hex.replace('#', '');
@@ -44,11 +49,11 @@ function getContrastText(hex) {
 }
 
 export function createBrandTheme(colors = {}) {
-  const primary = colors.primaryMain || COLORS.PRIMARY_BLUE;
-  const primaryLight = colors.primaryLight || lighten(primary, 0.2);
-  const primaryDark = colors.primaryDark || darken(primary, 0.2);
-  const bgDefault = colors.backgroundDefault || COLORS.DARK_BG;
-  const bgPaper = colors.backgroundPaper || COLORS.DARK_SURFACE;
+  const primary = isValidHex(colors.primaryMain) ? colors.primaryMain : COLORS.PRIMARY_BLUE;
+  const primaryLight = isValidHex(colors.primaryLight) ? colors.primaryLight : lighten(primary, 0.2);
+  const primaryDark = isValidHex(colors.primaryDark) ? colors.primaryDark : darken(primary, 0.2);
+  const bgDefault = isValidHex(colors.backgroundDefault) ? colors.backgroundDefault : COLORS.DARK_BG;
+  const bgPaper = isValidHex(colors.backgroundPaper) ? colors.backgroundPaper : COLORS.DARK_SURFACE;
   const primaryContrastText = getContrastText(primary);
 
   return createTheme({
@@ -252,6 +257,16 @@ export function createBrandTheme(colors = {}) {
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             boxShadow: '0 2px 20px rgba(0, 0, 0, 0.3)',
+          },
+        },
+      },
+
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: bgPaper,
+            backgroundImage: 'none',
+            borderLeft: `1px solid ${alpha(primary, 0.2)}`,
           },
         },
       },

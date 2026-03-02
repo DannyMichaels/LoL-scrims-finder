@@ -10,7 +10,7 @@ import { styled, alpha } from '@mui/system';
 import { withRouter } from 'react-router-dom';
 
 const StyledFooter = styled('footer')(({ theme }) => ({
-  backgroundColor: 'rgba(18, 24, 38, 0.5)', // Semi-transparent
+  backgroundColor: alpha(theme.palette.background.paper, 0.5), // Semi-transparent
   borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
   boxShadow: '0 -2px 20px rgba(0, 0, 0, 0.3)',
   scrollMarginTop: '2em',

@@ -32,7 +32,7 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
         position="static"
         elevation={0}
         sx={{
-          backgroundColor: 'rgba(10, 14, 26, 0.95)',
+          backgroundColor: alpha(pt.background.paper, 0.95),
           backdropFilter: 'blur(10px)',
           borderBottom: `1px solid ${alpha(pt.primary.main, 0.1)}`,
         }}>

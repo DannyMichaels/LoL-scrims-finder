@@ -35,6 +35,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import HomeIcon from '@mui/icons-material/Home';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import PaletteIcon from '@mui/icons-material/Palette';
 import PeopleIcon from '@mui/icons-material/People';
 import InfoIcon from '@mui/icons-material/Info';
 
@@ -347,6 +348,18 @@ export default function NavbarDrawerItems({ showCheckboxes, setIsDrawerOpen }) {
                   </ListItemIcon>
                   <ListItemText
                     primary="Ban Management"
+                    primaryTypographyProps={{ fontSize: '0.9rem' }}
+                  />
+                </ListItem>
+                <ListItem
+                  button
+                  sx={{ pl: 4 }}
+                  onClick={() => drawerNavPush('/admin/branding')}>
+                  <ListItemIcon>
+                    <PaletteIcon fontSize="small" sx={{ color: '#FF9800' }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Branding Config"
                     primaryTypographyProps={{ fontSize: '0.9rem' }}
                   />
                 </ListItem>

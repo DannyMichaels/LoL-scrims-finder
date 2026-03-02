@@ -33,7 +33,7 @@ const HeroSectionWrapper = styled(Box, {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(10, 14, 26, 0.85)',
+    backgroundColor: alpha(theme.palette.background.default, 0.85),
     zIndex: 1,
   },
   '& > *': {

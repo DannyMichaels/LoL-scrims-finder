@@ -8,7 +8,6 @@ import Sparkles from '@/components/shared/effects/Sparkles';
 
 // utils
 import { makeStyles } from '@mui/styles';
-import { alpha } from '@mui/material/styles';
 import useCountdown from '@/hooks/useCountdown';
 import { twoDigitsFormat as formatNum } from '@/utils/twoDigitsFormat';
 

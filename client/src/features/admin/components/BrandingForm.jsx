@@ -12,6 +12,7 @@ import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Popover from '@mui/material/Popover';
 import Tooltip from '@mui/material/Tooltip';
+import Slider from '@mui/material/Slider';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
@@ -58,7 +59,12 @@ function ImageUploadField({ label, value, onChange, onUpload, s3Assets = [] }) {
           startIcon={<CloudUploadIcon />}
           sx={{ whiteSpace: 'nowrap' }}>
           Upload
-          <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+          <input
+            type="file"
+            hidden
+            accept="image/*"
+            onChange={handleFileChange}
+          />
         </Button>
         {s3Assets.length > 0 && (
           <Tooltip title="Browse existing S3 assets" arrow>
@@ -146,7 +152,9 @@ function ImageUploadField({ label, value, onChange, onUpload, s3Assets = [] }) {
                         maxHeight: '80%',
                         objectFit: 'contain',
                       }}
-                      onError={(e) => { e.target.style.display = 'none'; }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
                     />
                   </Box>
                 </Tooltip>
@@ -179,6 +187,7 @@ export default function BrandingForm({
   // Sync domainsText when formValues changes externally (e.g. tenant switch)
   useEffect(() => {
     setDomainsText((formValues.domains || []).join(', '));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formValues._id]); // re-sync when a different tenant is selected
 
   const handleDomainsBlur = useCallback(() => {
@@ -256,7 +265,9 @@ export default function BrandingForm({
             fullWidth
             value={formValues.slug || ''}
             InputProps={{ readOnly: !!formValues._id }}
-            helperText={formValues._id ? 'Cannot change slug after creation' : ''}
+            helperText={
+              formValues._id ? 'Cannot change slug after creation' : ''
+            }
             onChange={(e) =>
               setFormValues((prev) => ({ ...prev, slug: e.target.value }))
             }
@@ -312,6 +323,30 @@ export default function BrandingForm({
             handleAssetUpload('logoUrl', base64, fileName)
           }
           s3Assets={s3Assets}
+        />
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
+            Navbar Logo Size: {formValues.branding?.navbarLogoSize || 36}px
+          </Typography>
+          <Slider
+            value={formValues.branding?.navbarLogoSize || 36}
+            onChange={(_, val) => updateBranding('navbarLogoSize', val)}
+            min={20}
+            max={64}
+            step={2}
+            valueLabelDisplay="auto"
+            sx={{ maxWidth: 300 }}
+          />
+        </Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={formValues.branding?.showNavbarTitle ?? true}
+              onChange={(e) => updateBranding('showNavbarTitle', e.target.checked)}
+            />
+          }
+          label="Show brand name in navbar"
+          sx={{ mb: 2, display: 'block' }}
         />
         <ImageUploadField
           label="Favicon"
@@ -455,8 +490,7 @@ export default function BrandingForm({
                 { field: 'backgroundPaper', label: 'Background Paper' },
               ].map(({ field, label }) => (
                 <Grid item xs={6} key={field}>
-                  <Box
-                    sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <input
                       type="color"
                       value={formValues.colors?.[field] || '#000000'}
@@ -517,10 +551,14 @@ export default function BrandingForm({
 
       {/* Feature Cards */}
       <GlassPanel sx={{ p: 2, mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h6">
-            Feature Cards
-          </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 2,
+          }}>
+          <Typography variant="h6">Feature Cards</Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
               {(formValues.featureCards || []).length}/5 cards
@@ -543,7 +581,8 @@ export default function BrandingForm({
           </Box>
         </Box>
         <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-          Cards displayed on the landing page. Use \n in the description for line breaks. Each brand can have 0-5 cards.
+          Cards displayed on the landing page. Use \n in the description for
+          line breaks. Each brand can have 0-5 cards.
         </Typography>
 
         {(formValues.featureCards || []).map((card, idx) => (
@@ -556,7 +595,13 @@ export default function BrandingForm({
               border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
               backgroundColor: alpha(theme.palette.primary.main, 0.03),
             })}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 1,
+              }}>
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
                 Card {idx + 1}
               </Typography>
@@ -605,10 +650,14 @@ export default function BrandingForm({
                         src={card.icon}
                         alt=""
                         style={{ width: 32, height: 32, objectFit: 'contain' }}
-                        onError={(e) => { e.target.style.display = 'none'; }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
                       />
                     ) : (
-                      <FolderOpenIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <FolderOpenIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     )}
                   </Box>
                 </Tooltip>
@@ -640,10 +689,14 @@ export default function BrandingForm({
                         src={card.icon}
                         alt=""
                         style={{ width: 32, height: 32, objectFit: 'contain' }}
-                        onError={(e) => { e.target.style.display = 'none'; }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
                       />
                     ) : (
-                      <CloudUploadIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <CloudUploadIcon
+                        sx={{ color: 'text.secondary', fontSize: 20 }}
+                      />
                     )}
                     <input
                       type="file"
@@ -654,11 +707,19 @@ export default function BrandingForm({
                         if (!file || !onUploadAsset) return;
                         const reader = new FileReader();
                         reader.onloadend = async () => {
-                          const url = await onUploadAsset(reader.result, file.name);
+                          const url = await onUploadAsset(
+                            reader.result,
+                            file.name
+                          );
                           if (url) {
-                            const updated = [...(formValues.featureCards || [])];
+                            const updated = [
+                              ...(formValues.featureCards || []),
+                            ];
                             updated[idx] = { ...updated[idx], icon: url };
-                            setFormValues((prev) => ({ ...prev, featureCards: updated }));
+                            setFormValues((prev) => ({
+                              ...prev,
+                              featureCards: updated,
+                            }));
                           }
                         };
                         reader.readAsDataURL(file);
@@ -676,7 +737,10 @@ export default function BrandingForm({
                   onChange={(e) => {
                     const updated = [...(formValues.featureCards || [])];
                     updated[idx] = { ...updated[idx], title: e.target.value };
-                    setFormValues((prev) => ({ ...prev, featureCards: updated }));
+                    setFormValues((prev) => ({
+                      ...prev,
+                      featureCards: updated,
+                    }));
                   }}
                   sx={{ mb: 1.5 }}
                 />
@@ -689,8 +753,14 @@ export default function BrandingForm({
                   value={card.description || ''}
                   onChange={(e) => {
                     const updated = [...(formValues.featureCards || [])];
-                    updated[idx] = { ...updated[idx], description: e.target.value };
-                    setFormValues((prev) => ({ ...prev, featureCards: updated }));
+                    updated[idx] = {
+                      ...updated[idx],
+                      description: e.target.value,
+                    };
+                    setFormValues((prev) => ({
+                      ...prev,
+                      featureCards: updated,
+                    }));
                   }}
                 />
               </Box>
@@ -749,7 +819,8 @@ export default function BrandingForm({
                   const fileName = asset.key.split('/').pop();
                   const isSelected =
                     activeCardIdx !== null &&
-                    formValues.featureCards?.[activeCardIdx]?.icon === asset.url;
+                    formValues.featureCards?.[activeCardIdx]?.icon ===
+                      asset.url;
                   return (
                     <Tooltip key={asset.key} title={fileName} arrow>
                       <Box

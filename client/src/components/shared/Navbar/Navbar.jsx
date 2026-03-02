@@ -68,7 +68,7 @@ export default function Navbar({
   const { currentUser } = useAuth();
   const { handleLogin } = useAuthActions();
   const dispatch = useDispatch();
-  const { brandName, logoUrl } = useBranding();
+  const { brandName, logoUrl, navbarLogoSize, showNavbarTitle } = useBranding();
 
   const openMessengerDropdown = useCallback(() => {
     setIsMessengerDropdownOpen((prevState) => !prevState);
@@ -80,7 +80,6 @@ export default function Navbar({
         <AppBar
           position="sticky"
           sx={(theme) => ({
-            background: 'rgba(10, 14, 26, 0.85)',
             backdropFilter: 'blur(20px)',
             borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           })}>
@@ -122,26 +121,28 @@ export default function Navbar({
                     <img
                       src={logoUrl}
                       style={{
-                        width: '36px',
+                        width: `${navbarLogoSize}px`,
                         height: 'auto',
                       }}
                       alt={brandName}
                     />
-                    <Hidden mdDown>
-                      <Typography
-                        component="h1"
-                        sx={{
-                          fontSize: '1.3rem',
-                          fontWeight: 700,
-                          whiteSpace: 'nowrap',
-                          background: (theme) =>
-                            `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                        }}>
-                        {brandName}
-                      </Typography>
-                    </Hidden>
+                    {showNavbarTitle && (
+                      <Hidden mdDown>
+                        <Typography
+                          component="h1"
+                          sx={{
+                            fontSize: '1.3rem',
+                            fontWeight: 700,
+                            whiteSpace: 'nowrap',
+                            background: (theme) =>
+                              `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }}>
+                          {brandName}
+                        </Typography>
+                      </Hidden>
+                    )}
                   </Link>
 
                   {/* Search Bar */}

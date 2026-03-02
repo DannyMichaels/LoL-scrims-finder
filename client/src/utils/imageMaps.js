@@ -52,7 +52,7 @@ export const BG_IMAGES = {
   'Summoners Rift': summonersRiftImg,
   Anniversary: anniversaryImg,
   'Teemo Sunset': teemoSunsetImg,
-  "Bootcamp Dragon": bootCampDragonImg,
+  'Bootcamp Dragon': bootCampDragonImg,
   GitCat: epicCatImg,
   'Reluminate Thresh': reluminateThreshImg,
 };

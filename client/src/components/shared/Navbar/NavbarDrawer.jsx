@@ -18,9 +18,9 @@ import clsx from 'clsx';
 import { KEYCODES } from '@/utils/keycodes';
 import { makeStyles } from '@mui/styles';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   drawerRoot: {
-    background: 'rgba(18,25,35) !important',
+    backgroundColor: `${theme.palette.background.paper} !important`,
   },
 
   drawerList: {
@@ -29,7 +29,7 @@ const useStyles = makeStyles({
   drawerFullList: {
     width: 'auto',
   },
-});
+}));
 
 export default function NavbarDrawer({
   isDrawerOpen,

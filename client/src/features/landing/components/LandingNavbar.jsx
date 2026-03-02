@@ -12,7 +12,7 @@ const NavbarBox = styled(Box)(({ theme }) => ({
   top: 0,
   left: 0,
   right: 0,
-  backgroundColor: 'rgba(10, 14, 26, 0.95)',
+  backgroundColor: alpha(theme.palette.background.paper, 0.95),
   backdropFilter: 'blur(10px)',
   borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
   zIndex: 1000,

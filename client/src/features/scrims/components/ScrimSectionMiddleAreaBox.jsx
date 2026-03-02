@@ -20,7 +20,6 @@ import InfoIcon from '@mui/icons-material/Info';
 
 // utils
 import { makeStyles } from '@mui/styles';
-import { alpha } from '@mui/material/styles';
 import { copyTextToClipboard } from '@/utils/copyToClipboard';
 import pluralize from 'pluralize';
 
@@ -351,7 +350,8 @@ export default function ScrimSectionMiddleAreaBox({
                                   background: idx === 0 ? '#1565C0' : '#C62828',
                                   color: '#fff',
                                   '&:hover': {
-                                    background: idx === 0 ? '#1976D2' : '#D32F2F',
+                                    background:
+                                      idx === 0 ? '#1976D2' : '#D32F2F',
                                   },
                                 }}
                                 onClick={async () => {

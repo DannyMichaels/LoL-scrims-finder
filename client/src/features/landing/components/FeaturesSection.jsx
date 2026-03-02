@@ -8,7 +8,7 @@ import { styled, alpha } from '@mui/material/styles';
 import StarIcon from '@mui/icons-material/Star';
 
 const HomepageCard = styled(Paper)(({ theme }) => ({
-  background: 'rgba(18, 24, 38, 0.6)',
+  background: alpha(theme.palette.background.paper, 0.6),
   backdropFilter: 'blur(10px)',
   borderRadius: '20px',
   border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
@@ -69,7 +69,7 @@ export default function FeaturesSection() {
   const mdCols = featureCards.length <= 2 ? 6 : 4;
 
   return (
-    <Box sx={{ backgroundColor: '#121826', py: 8 }}>
+    <Box sx={(theme) => ({ backgroundColor: theme.palette.background.paper, py: 8 })}>
       <Container maxWidth="lg">
         <Grid container spacing={4} justifyContent="center">
           {featureCards.map((card, idx) => (
