@@ -4,11 +4,20 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
-import FormHelperText from '@mui/material/FormHelperText';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+
+const FIELD_LABELS = {
+  name: 'Summoner Name',
+  summonerTagline: 'Tagline',
+  rank: 'Rank',
+  region: 'Region',
+  discord: 'Discord',
+};
 
 export default function SignUpForms({
   handleChange,
@@ -23,35 +32,32 @@ export default function SignUpForms({
   const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
 
   const nameDiscordAndRegionForm = (
-    <Grid
-      container
-      direction={matchesSm ? 'column' : 'row'}
-      alignItems="center">
-      <Grid item sm={3}>
+    <Grid container spacing={3}>
+      <Grid item xs={12} sm={6} md={3}>
         <TextField
-          variant="standard"
+          fullWidth
+          variant="outlined"
           type="text"
           name="name"
           value={userData.name}
           onChange={(e) => handleChange(e, setUserData)}
           onKeyPress={(e) => {
-            // if user enters special characters don't do anything, allow spaces
             if (!/^[0-9a-zA-Z \b]+$/.test(e.key)) e.preventDefault();
           }}
           label="Summoner Name"
-          helperText="required"
+          helperText="Required"
           required
         />
       </Grid>
 
-      <Grid item sm={2}>
+      <Grid item xs={12} sm={6} md={2}>
         <TextField
-          variant="standard"
+          fullWidth
+          variant="outlined"
           type="text"
           name="summonerTagline"
           value={userData.summonerTagline}
           onChange={(e) => {
-            // Remove # if user tries to paste it
             const value = e.target.value.replace('#', '');
             handleChange({
               ...e,
@@ -59,7 +65,6 @@ export default function SignUpForms({
             }, setUserData);
           }}
           onKeyPress={(e) => {
-            // only allow alphanumeric characters (no # symbol)
             if (!/^[0-9a-zA-Z\b]+$/.test(e.key)) e.preventDefault();
           }}
           label="Tagline"
@@ -69,31 +74,28 @@ export default function SignUpForms({
         />
       </Grid>
 
-      <Grid item sm={2} mb={'2%'}>
-        <FormHelperText>Region</FormHelperText>
-
-        <Select
-          variant="standard"
-          name="region"
-          value={userData.region}
-          label="region"
-          onChange={(e) => handleChange(e, setUserData)}
-          required>
-          <MenuItem selected disabled>
-            select region
-          </MenuItem>
-          {/* these regions should really just be in a constants file */}
-          {['NA', 'EUW', 'EUNE', 'LAN', 'OCE'].map((region, key) => (
-            <MenuItem value={region} key={key}>
-              {region}
-            </MenuItem>
-          ))}
-        </Select>
+      <Grid item xs={12} sm={6} md={3}>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel>Region</InputLabel>
+          <Select
+            name="region"
+            value={userData.region}
+            label="Region"
+            onChange={(e) => handleChange(e, setUserData)}
+            required>
+            {['NA', 'EUW', 'EUNE', 'LAN', 'OCE'].map((region) => (
+              <MenuItem value={region} key={region}>
+                {region}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
 
-      <Grid item sm={4}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
-          variant="standard"
+          fullWidth
+          variant="outlined"
           type="text"
           name="discord"
           value={userData.discord}
@@ -107,75 +109,80 @@ export default function SignUpForms({
   );
 
   const rankForm = (
-    <Grid item container alignItems="center" spacing={4}>
-      <Grid item>
-        <FormHelperText>Rank Division</FormHelperText>
-        <Select
-          variant="standard"
-          name="rankDivision"
-          required
-          value={rankData.rankDivision}
-          onChange={(e) => handleChange(e, setRankData)}>
-          {[
-            'Unranked',
-            'Iron',
-            'Bronze',
-            'Silver',
-            'Gold',
-            'Platinum',
-            'Emerald',
-            'Diamond',
-            'Master',
-            'Grandmaster',
-            'Challenger',
-          ].map((value, key) => (
-            <MenuItem value={value} key={key}>
-              {value}
-            </MenuItem>
-          ))}
-        </Select>
-      </Grid>
-      {/* exclude this number select from divisions without numbers */}
-      {divisionsWithNumbers.includes(rankData.rankDivision) && (
-        <Grid item>
-          <FormHelperText>Rank Number</FormHelperText>
+    <Grid container spacing={3}>
+      <Grid item xs={12} sm={6} md={4}>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel>Rank Division</InputLabel>
           <Select
-            variant="standard"
-            name="rankNumber"
-            required={divisionsWithNumbers.includes(rankData.rankDivision)}
-            value={rankData.rankNumber}
+            name="rankDivision"
+            required
+            value={rankData.rankDivision}
+            label="Rank Division"
             onChange={(e) => handleChange(e, setRankData)}>
-            <MenuItem selected disabled>
-              select rank number
-            </MenuItem>
-            <MenuItem value={4}>4</MenuItem>
-            <MenuItem value={3}>3</MenuItem>
-            <MenuItem value={2}>2</MenuItem>
-            <MenuItem value={1}>1</MenuItem>
+            {[
+              'Unranked',
+              'Iron',
+              'Bronze',
+              'Silver',
+              'Gold',
+              'Platinum',
+              'Emerald',
+              'Diamond',
+              'Master',
+              'Grandmaster',
+              'Challenger',
+            ].map((value) => (
+              <MenuItem value={value} key={value}>
+                {value}
+              </MenuItem>
+            ))}
           </Select>
+        </FormControl>
+      </Grid>
+      {divisionsWithNumbers.includes(rankData.rankDivision) && (
+        <Grid item xs={12} sm={6} md={3}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Rank Number</InputLabel>
+            <Select
+              name="rankNumber"
+              required
+              value={rankData.rankNumber}
+              label="Rank Number"
+              onChange={(e) => handleChange(e, setRankData)}>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={1}>1</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
       )}
     </Grid>
   );
 
   const verificationForm = (
-    <Grid item sm={12}>
-      <Box>
-        <Typography variant="h1">Account details:</Typography>
-      </Box>
+    <Box>
+      <Typography variant="h5" sx={{ mb: 2 }}>
+        Account Details
+      </Typography>
 
-      {Object.entries(userData).map(
-        ([k, v], idx) =>
-          k !== 'canSendEmailsToUser' && (
-            <Box key={idx}>
-              <Typography variant="h3">
-                {k.charAt(0).toUpperCase() + k.substring(1)}: {v}
-              </Typography>
-            </Box>
-          )
-      )}
+      <Grid container spacing={1.5}>
+        {Object.entries(userData).map(
+          ([k, v]) =>
+            k !== 'canSendEmailsToUser' && (
+              <Grid item xs={12} sm={6} key={k}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.8rem' }}>
+                  {FIELD_LABELS[k] || k}
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {v || '—'}
+                </Typography>
+              </Grid>
+            )
+        )}
+      </Grid>
 
-      <Box mt={-1} mb={1}>
+      <Box sx={{ mt: 2 }}>
         <FormControlLabel
           control={
             <Checkbox
@@ -192,27 +199,17 @@ export default function SignUpForms({
         />
       </Box>
 
-      <Box>
-        <Typography variant="body2">
-          If you're sure you want to sign up with these details, click create my
-          account with google.
-        </Typography>
-      </Box>
-    </Grid>
+      <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+        If everything looks correct, click "Create my account with Google" below.
+      </Typography>
+    </Box>
   );
 
   let forms = [nameDiscordAndRegionForm, rankForm, verificationForm];
 
   return (
-    <Grid
-      mt={4}
-      ml={2}
-      container
-      justifyContent="flex-start"
-      direction={matchesSm ? 'column' : 'row'}
-      alignItems="center"
-      style={{ padding: '20px 0' }}>
+    <Box sx={{ py: 3 }}>
       {forms[currentFormIndex]}
-    </Grid>
+    </Box>
   );
 }

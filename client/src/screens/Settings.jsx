@@ -5,13 +5,13 @@ import useUsers from '@/features/users/hooks/useUsers';
 
 // components
 import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
 import Typography from '@mui/material/Typography';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -28,7 +28,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 // services & utils
-import { makeStyles } from '@mui/styles';
 import { updateUser } from '@/features/auth/services/auth.services';
 import { setAuthToken } from '@/features/auth/services/auth.services';
 
@@ -43,13 +42,6 @@ const removeSpaces = (str) => {
       return el2 + '';
     });
 };
-
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 180,
-  },
-}));
 
 // userEdit
 export default function Settings() {
@@ -72,8 +64,8 @@ export default function Settings() {
   const { setCurrentAlert } = useAlerts();
 
   const [rankData, setRankData] = useState({
-    rankDivision: currentUser?.rank?.replace(/[0-9]/g, '').trim(), // match letters, trim spaces.
-    rankNumber: currentUser?.rank?.replace(/[a-z]/gi, '').trim(), // match numbers
+    rankDivision: currentUser?.rank?.replace(/[0-9]/g, '').trim(),
+    rankNumber: currentUser?.rank?.replace(/[a-z]/gi, '').trim(),
   });
 
   const divisionsWithNumbers = [
@@ -86,8 +78,6 @@ export default function Settings() {
     'Diamond',
   ];
 
-  const classes = useStyles();
-
   const usersInRegion = useMemo(
     () => allUsers.filter((user) => user?.region === userData?.region),
     [allUsers, userData?.region]
@@ -95,14 +85,9 @@ export default function Settings() {
 
   const foundUserSummonerName = useMemo(
     () =>
-      // check only for users in the region.
       usersInRegion.find(
-        // make sure it's not the same user with uid.
         ({ name, _id }) => {
-          if (_id === currentUser?._id) {
-            return false;
-          }
-
+          if (_id === currentUser?._id) return false;
           return name === userData.name;
         }
       ),
@@ -111,19 +96,13 @@ export default function Settings() {
 
   const foundUserDiscord = useMemo(
     () =>
-      // discord is unique across all regions, unlike summoner names.
       allUsers.find(({ discord, _id }) => {
-        // make sure it's not the same user with _id.
-        if (_id === currentUser?._id) {
-          return false;
-        }
-
+        if (_id === currentUser?._id) return false;
         return removeSpaces(discord) === removeSpaces(userData.discord);
       }),
     [userData.discord, allUsers, currentUser?._id]
   );
 
-  // chrone is throwing a violation error for this: [Violation] 'submit' handler took 701ms
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -151,8 +130,8 @@ export default function Settings() {
 
       if (data?.token) {
         const { token } = data;
-        localStorage.setItem('jwtToken', token); // add token to back-end
-        setAuthToken(token); // add authorization in the request to be bearer token.
+        localStorage.setItem('jwtToken', token);
+        setAuthToken(token);
         let updatedUser = data?.user;
         setCurrentUser(updatedUser);
         setUserData({ ...updatedUser });
@@ -185,12 +164,10 @@ export default function Settings() {
     let isDivisionWithNumber = divisionsWithNumbers.includes(rankDivision);
 
     let rankResult = isDivisionWithNumber
-      ? `${rankDivision} ${rankNumber === '' ? '4' : rankNumber}` // when user saved a rank without a number but then changes back to rank with number
+      ? `${rankDivision} ${rankNumber === '' ? '4' : rankNumber}`
       : rankDivision;
 
     setUserData((prevState) => ({
-      //  change rank everytime one of the values in rankData changes.
-      // doing this because number and division are separate selects, but back-end is accepting 1 string which is both.
       ...prevState,
       rank: rankResult,
     }));
@@ -209,229 +186,182 @@ export default function Settings() {
       <Navbar showLess />
       <PageContent>
         <InnerColumn>
-          <form onSubmit={handleSubmit}>
-            <Grid
-              container
-              direction="column"
-              alignItems="center"
-              justifyContent="center"
-              spacing={4}
-              style={{
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                width: 'auto',
-              }}>
-              <Grid item>
-                <Typography variant="h1">Settings</Typography>
-              </Grid>
+          <Box sx={{ maxWidth: 600, mx: 'auto', py: 4 }}>
+            <Typography variant="h2" sx={{ mb: 1 }}>
+              Settings
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4 }}>
+              Update your account details below.
+            </Typography>
 
-              <Grid
-                item
-                container
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                spacing={4}>
-                {/* SUMMONER NAME */}
-                <Grid item>
-                  <TextField
-                    type="text"
-                    name="name"
-                    style={{ width: 180 }}
-                    variant="filled"
-                    value={userData.name || ''}
-                    onKeyPress={(e) => {
-                      // if user enters special characters don't do anything, allow spaces
-                      if (!/^[0-9a-zA-Z \b]+$/.test(e.key)) e.preventDefault();
-                    }}
-                    onChange={handleChange}
-                    label="Summoner Name"
-                    required
-                  />
-                </Grid>
-
-                {/* TAGLINE */}
-                <Grid item>
-                  <TextField
-                    type="text"
-                    name="summonerTagline"
-                    style={{ width: 100 }}
-                    variant="filled"
-                    value={userData.summonerTagline || ''}
-                    onKeyPress={(e) => {
-                      // only allow alphanumeric characters (no # symbol)
-                      if (!/^[0-9a-zA-Z\b]+$/.test(e.key)) e.preventDefault();
-                    }}
-                    onChange={(e) => {
-                      // Remove # if user tries to paste it
-                      const value = e.target.value.replace('#', '');
-                      handleChange({
-                        ...e,
-                        target: { ...e.target, name: 'summonerTagline', value }
-                      });
-                    }}
-                    label="Tagline"
-                    helperText="Without #"
-                    inputProps={{ maxLength: 5 }}
-                    required
-                  />
-                </Grid>
-
-                {/* DISCORD */}
-                <Grid item>
-                  <TextField
-                    type="text"
-                    variant="filled"
-                    name="discord"
-                    style={{ width: 230 }}
-                    value={userData.discord || ''}
-                    onChange={handleChange}
-                    label="Discord Username"
-                    required
-                  />
-                </Grid>
-              </Grid>
-
-              {/* CONTAINER BOTH REGION & ADMIN KEY */}
-              <Grid
-                item
-                container
-                direction="row"
-                alignItems="center"
-                justifyContent="center"
-                spacing={4}>
-                <Grid item>
-                  {/* REGION */}
-                  <FormControl className={classes.formControl} variant="filled">
-                    <InputLabel>Region</InputLabel>
-                    <Select
+            <form onSubmit={handleSubmit}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {/* Row 1: Summoner Name + Tagline */}
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={7}>
+                    <TextField
                       fullWidth
-                      style={{ width: 230 }}
-                      name="region"
-                      value={userData.region}
+                      variant="outlined"
+                      type="text"
+                      name="name"
+                      value={userData.name || ''}
+                      onKeyPress={(e) => {
+                        if (!/^[0-9a-zA-Z \b]+$/.test(e.key)) e.preventDefault();
+                      }}
                       onChange={handleChange}
-                      required>
-                      <MenuItem selected disabled>
-                        select region
-                      </MenuItem>
-                      {/* these regions should really be in a constants file */}
-                      {['NA', 'EUW', 'EUNE', 'LAN', 'OCE'].map(
-                        (region, key) => (
-                          <MenuItem value={region} key={key}>
+                      label="Summoner Name"
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={5}>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      type="text"
+                      name="summonerTagline"
+                      value={userData.summonerTagline || ''}
+                      onKeyPress={(e) => {
+                        if (!/^[0-9a-zA-Z\b]+$/.test(e.key)) e.preventDefault();
+                      }}
+                      onChange={(e) => {
+                        const value = e.target.value.replace('#', '');
+                        handleChange({
+                          ...e,
+                          target: { ...e.target, name: 'summonerTagline', value }
+                        });
+                      }}
+                      label="Tagline"
+                      helperText="Without #"
+                      inputProps={{ maxLength: 5 }}
+                      required
+                    />
+                  </Grid>
+                </Grid>
+
+                {/* Row 2: Discord + Region */}
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={7}>
+                    <TextField
+                      fullWidth
+                      variant="outlined"
+                      type="text"
+                      name="discord"
+                      value={userData.discord || ''}
+                      onChange={handleChange}
+                      label="Discord Username"
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={5}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>Region</InputLabel>
+                      <Select
+                        name="region"
+                        value={userData.region}
+                        label="Region"
+                        onChange={handleChange}
+                        required>
+                        {['NA', 'EUW', 'EUNE', 'LAN', 'OCE'].map((region) => (
+                          <MenuItem value={region} key={region}>
                             {region}
                           </MenuItem>
-                        )
-                      )}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                {/* ADMIN KEY */}
-                <Grid item>
-                  <TextField
-                    variant="filled"
-                    type={isAdminKeyHidden ? 'password' : 'text'}
-                    name="adminKey"
-                    style={{ width: 230 }}
-                    value={userData.adminKey || ''}
-                    onChange={handleChange}
-                    label="Admin key"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle admin key visibility"
-                            onClick={() =>
-                              setIsAdminKeyHidden((prevState) => !prevState)
-                            }
-                            onMouseDown={(e) => e.preventDefault()}>
-                            {isAdminKeyHidden ? (
-                              <Visibility />
-                            ) : (
-                              <VisibilityOff />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-              </Grid>
-
-              {/* RANK DIVISION AND # */}
-              <Grid
-                item
-                container
-                alignItems="center"
-                spacing={4}
-                justifyContent="center">
-                <Grid item>
-                  <FormHelperText>Rank Division</FormHelperText>
-                  <Select
-                    variant="standard"
-                    name="rankDivision"
-                    required
-                    value={rankData.rankDivision}
-                    onChange={(e) =>
-                      setRankData((prevState) => ({
-                        ...prevState,
-                        [e.target.name]: e.target.value,
-                      }))
-                    }>
-                    {[
-                      'Unranked',
-                      'Iron',
-                      'Bronze',
-                      'Silver',
-                      'Gold',
-                      'Platinum',
-                      'Emerald',
-                      'Diamond',
-                      'Master',
-                      'Grandmaster',
-                      'Challenger',
-                    ].map((value, key) => (
-                      <MenuItem value={value} key={key}>
-                        {value}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </Grid>
-                {/* exclude this number select from divisions without numbers */}
-                {divisionsWithNumbers.includes(rankData.rankDivision) && (
-                  <Grid item>
-                    <FormHelperText>Rank Number</FormHelperText>
-                    <Select
-                      variant="standard"
-                      name="rankNumber"
-                      required={divisionsWithNumbers.includes(
-                        rankData.rankDivision
-                      )}
-                      value={rankData.rankNumber || '4'}
-                      onChange={(e) =>
-                        setRankData((prevState) => ({
-                          ...prevState,
-                          [e.target.name]: e.target.value,
-                        }))
-                      }>
-                      <MenuItem selected disabled>
-                        select rank number
-                      </MenuItem>
-                      <MenuItem value={4}>4</MenuItem>
-                      <MenuItem value={3}>3</MenuItem>
-                      <MenuItem value={2}>2</MenuItem>
-                      <MenuItem value={1}>1</MenuItem>
-                    </Select>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
-                )}
-              </Grid>
+                </Grid>
 
-              <Grid
-                item
-                container
-                xs={8}
-                alignItems="center"
-                justifyContent="center">
+                {/* Row 3: Rank Division + Number */}
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={divisionsWithNumbers.includes(rankData.rankDivision) ? 7 : 12}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>Rank Division</InputLabel>
+                      <Select
+                        name="rankDivision"
+                        required
+                        value={rankData.rankDivision}
+                        label="Rank Division"
+                        onChange={(e) =>
+                          setRankData((prevState) => ({
+                            ...prevState,
+                            [e.target.name]: e.target.value,
+                          }))
+                        }>
+                        {[
+                          'Unranked',
+                          'Iron',
+                          'Bronze',
+                          'Silver',
+                          'Gold',
+                          'Platinum',
+                          'Emerald',
+                          'Diamond',
+                          'Master',
+                          'Grandmaster',
+                          'Challenger',
+                        ].map((value) => (
+                          <MenuItem value={value} key={value}>
+                            {value}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  {divisionsWithNumbers.includes(rankData.rankDivision) && (
+                    <Grid item xs={12} sm={5}>
+                      <FormControl fullWidth variant="outlined">
+                        <InputLabel>Rank Number</InputLabel>
+                        <Select
+                          name="rankNumber"
+                          required
+                          value={rankData.rankNumber || '4'}
+                          label="Rank Number"
+                          onChange={(e) =>
+                            setRankData((prevState) => ({
+                              ...prevState,
+                              [e.target.name]: e.target.value,
+                            }))
+                          }>
+                          <MenuItem value={4}>4</MenuItem>
+                          <MenuItem value={3}>3</MenuItem>
+                          <MenuItem value={2}>2</MenuItem>
+                          <MenuItem value={1}>1</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  )}
+                </Grid>
+
+                {/* Row 4: Admin Key */}
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  type={isAdminKeyHidden ? 'password' : 'text'}
+                  name="adminKey"
+                  value={userData.adminKey || ''}
+                  onChange={handleChange}
+                  label="Admin Key"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle admin key visibility"
+                          onClick={() =>
+                            setIsAdminKeyHidden((prevState) => !prevState)
+                          }
+                          onMouseDown={(e) => e.preventDefault()}>
+                          {isAdminKeyHidden ? (
+                            <Visibility />
+                          ) : (
+                            <VisibilityOff />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+
+                {/* Email opt-in */}
                 <FormControlLabel
                   control={
                     <Checkbox
@@ -446,17 +376,14 @@ export default function Settings() {
                   }
                   label="Send me emails regarding app updates and/or notifications"
                 />
-              </Grid>
 
-              <Grid container item xs={12} className="page-break" />
-
-              <Grid item>
+                {/* Submit */}
                 <Button variant="contained" color="primary" type="submit">
-                  Submit
+                  Save Changes
                 </Button>
-              </Grid>
-            </Grid>
-          </form>
+              </Box>
+            </form>
+          </Box>
         </InnerColumn>
       </PageContent>
     </>

@@ -332,7 +332,7 @@ export default function BrandingForm({
             value={formValues.branding?.navbarLogoSize || 36}
             onChange={(_, val) => updateBranding('navbarLogoSize', val)}
             min={20}
-            max={64}
+            max={250}
             step={2}
             valueLabelDisplay="auto"
             sx={{ maxWidth: 300 }}

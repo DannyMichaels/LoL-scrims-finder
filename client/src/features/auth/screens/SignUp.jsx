@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import useAlerts from '@/hooks/useAlerts';
 import useAuth, { useAuthActions } from '@/features/auth/hooks/useAuth';
 import useBranding from '@/hooks/useBranding';
@@ -6,8 +6,8 @@ import useBranding from '@/hooks/useBranding';
 // components
 import { Redirect } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -241,33 +241,32 @@ export default function SignUp() {
       <PageContent>
         <PageSection>
           <InnerColumn>
-            <Typography variant="h1">
-              Welcome to {brandName}, please fill in your details
+            <Typography variant="h2" sx={{ mb: 1 }}>
+              Welcome to {brandName}
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
+              Please fill in your details to get started.
             </Typography>
 
-            <Grid container item direction="column" md={12}>
-              {[...errors.values()].map((error, key) => (
-                <Fragment key={key}>
-                  <Alert severity="error">
+            {[...errors.values()].length > 0 && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+                {[...errors.values()].map((error, key) => (
+                  <Alert severity="error" key={key}>
                     Please correct the following error —{' '}
                     <strong>{error}</strong>
                   </Alert>
-                  <br />
-                </Fragment>
-              ))}
-            </Grid>
-            <Stepper activeStep={currentFormIndex}>
-              {steps.map((label, index) => {
-                const stepProps = {};
-                const labelProps = {};
+                ))}
+              </Box>
+            )}
 
-                return (
-                  <Step key={index} {...stepProps}>
-                    <StepLabel {...labelProps}>{label}</StepLabel>
-                  </Step>
-                );
-              })}
+            <Stepper activeStep={currentFormIndex} sx={{ mb: 2 }}>
+              {steps.map((label, index) => (
+                <Step key={index}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
             </Stepper>
+
             <form onSubmit={handleSubmit} id="form">
               <SignUpForms
                 handleChange={handleChange}
@@ -278,35 +277,28 @@ export default function SignUp() {
                 setRankData={setRankData}
                 divisionsWithNumbers={divisionsWithNumbers}
               />
-              <div className="page-break" />
 
-              <Grid container item spacing={2} ml={0}>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    disabled={currentFormIndex === 0}
-                    onClick={goPreviousStep}>
-                    Previous
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button
-                    disabled={isSubmitting}
-                    onClick={(e) => {
-                      if (isLastStep) {
-                        return handleSubmit(e);
-                      }
-
-                      return goNextStep(e);
-                    }}
-                    variant="contained"
-                    color="primary"
-                    type="submit">
-                    {isLastStep ? 'Create my account with google' : 'Next'}
-                  </Button>
-                </Grid>
-              </Grid>
+              <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                <Button
+                  variant="outlined"
+                  disabled={currentFormIndex === 0}
+                  onClick={goPreviousStep}>
+                  Previous
+                </Button>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={(e) => {
+                    if (isLastStep) {
+                      return handleSubmit(e);
+                    }
+                    return goNextStep(e);
+                  }}
+                  variant="contained"
+                  color="primary"
+                  type="submit">
+                  {isLastStep ? 'Create my account with Google' : 'Next'}
+                </Button>
+              </Box>
             </form>
           </InnerColumn>
         </PageSection>

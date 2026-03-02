@@ -18,7 +18,7 @@ import { ThemeProvider, alpha, darken } from '@mui/material/styles';
 import { createBrandTheme } from '@/appTheme';
 import { resolveHeroBackground } from '@/assets/heroBackgrounds';
 
-function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards }) {
+function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards, navbarLogoSize, showNavbarTitle }) {
   const pt = previewTheme.palette;
 
   return (
@@ -42,22 +42,24 @@ function PreviewContent({ previewTheme, brandName, tagline, logoUrl, heroBackgro
               <img
                 src={logoUrl}
                 alt="logo"
-                style={{ width: 28, height: 28 }}
+                style={{ width: (navbarLogoSize || 36) * 0.8, height: 'auto' }}
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             )}
-            <Typography
-              sx={{
-                fontWeight: 700,
-                fontSize: '1rem',
-                background: `linear-gradient(135deg, ${pt.primary.main}, ${pt.primary.light})`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}>
-              {brandName}
-            </Typography>
+            {showNavbarTitle !== false && (
+              <Typography
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  background: `linear-gradient(135deg, ${pt.primary.main}, ${pt.primary.light})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}>
+                {brandName}
+              </Typography>
+            )}
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -410,7 +412,9 @@ export default function BrandingPreview({ formValues }) {
   }, []);
 
   const featureCards = formValues.featureCards || [];
-  const contentProps = { previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards };
+  const navbarLogoSize = formValues.branding?.navbarLogoSize || 36;
+  const showNavbarTitle = formValues.branding?.showNavbarTitle ?? true;
+  const contentProps = { previewTheme, brandName, tagline, logoUrl, heroBackgroundUrl, featureCards, navbarLogoSize, showNavbarTitle };
 
   return (
     <ThemeProvider theme={previewTheme}>
