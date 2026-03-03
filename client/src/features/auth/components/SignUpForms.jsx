@@ -1,5 +1,3 @@
-import useTheme from '@mui/material/styles/useTheme';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
@@ -28,9 +26,6 @@ export default function SignUpForms({
   setRankData,
   divisionsWithNumbers,
 }) {
-  const theme = useTheme();
-  const matchesSm = useMediaQuery(theme.breakpoints.down('sm'));
-
   const nameDiscordAndRegionForm = (
     <Grid container spacing={3}>
       <Grid item xs={12} sm={6} md={3}>
