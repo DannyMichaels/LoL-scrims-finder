@@ -16,6 +16,7 @@ const notificationRoutes = require('./routes/notification.routes');
 const adminRoutes = require('./routes/admin.routes');
 const riotRoutes = require('./routes/riot.routes');
 const brandingRoutes = require('./routes/branding.routes');
+const draftRoutes = require('./routes/draft.routes');
 const helmet = require('helmet');
 require('dotenv').config();
 const allowedOrigins = require('./config/allowed-origins.json');
@@ -109,6 +110,7 @@ function createServer() {
   app.use('/api', adminRoutes);
   app.use('/api', riotRoutes);
   app.use('/api', brandingRoutes);
+  app.use('/api', draftRoutes);
 
   // another way to require api key for a specific route only.
   // router.get('/scrims', apiKey, controllers.getAllScrims);

@@ -208,6 +208,18 @@ export default function NavbarDrawerItems({ showCheckboxes, setIsDrawerOpen }) {
                     primaryTypographyProps={{ fontSize: '0.9rem' }}
                   />
                 </ListItem>
+                <ListItem
+                  button
+                  sx={{ pl: 4 }}
+                  onClick={() => drawerNavPush('/draft/new')}>
+                  <ListItemIcon>
+                    <GavelIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Draft Tool"
+                    primaryTypographyProps={{ fontSize: '0.9rem' }}
+                  />
+                </ListItem>
               </List>
             </Collapse>
           </>

@@ -18,6 +18,7 @@ import useScrimSocket from '@/features/scrims/hooks/useScrimSocket';
 import { useAppStyles } from '@/styles/App.styles';
 
 // components
+import { useLocation } from 'react-router-dom';
 import AppRouter from './navigation/AppRouter';
 import CssBaseline from '@mui/material/CssBaseline';
 import Loading from '@/components/shared/Loading';
@@ -45,6 +46,8 @@ function App() {
   useNotifications(); // reload user notifications on socket events
 
   const { brandName, tagline } = useBranding();
+  const location = useLocation();
+  const isDraftPage = location.pathname.startsWith('/draft');
 
   if (isVerifyingUser) {
     return (
@@ -66,7 +69,7 @@ function App() {
         <CssBaseline />
         <CurrentAlertSnackbar />
         <AppRouter />
-        <Footer />
+        {!isDraftPage && <Footer />}
         <AppModals />
       </div>
     </>

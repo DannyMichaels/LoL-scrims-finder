@@ -4,6 +4,7 @@ const { MONGODB_URI } = require('./utils/constants');
 const createSocket = require('./socket');
 const scrimScheduler = require('./services/scrimScheduler.services');
 const { initializeCronJobs } = require('./services/cronJobs.services');
+const championsService = require('./services/champions.services');
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,6 +32,9 @@ connection.once(`open`, async () => {
   
   // Initialize cron jobs for automatic ban management
   initializeCronJobs();
+
+  // Initialize champions cache from Data Dragon
+  await championsService.initialize();
 });
 
 // Cleanup on server shutdown

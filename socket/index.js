@@ -3,6 +3,7 @@ const { sendNotification } = require('./events/sendNotification');
 const { addUser, removeUser, getUser } = require('./_helpers');
 const { sendConversation } = require('./events/sendConversation');
 const { sendScrimMessage } = require('./events/sendScrimMessage');
+const { registerDraftEvents } = require('./events/draftEvents');
 
 require('dotenv').config();
 const allowedOrigins = require('../config/allowed-origins.json');
@@ -61,6 +62,9 @@ const createSocket = (server) => {
     });
 
     // sendScrimTransaction is now handled directly by backend controllers
+
+    // Register draft events
+    registerDraftEvents(io, socket);
 
     // when disconnect
     // add unsubscribe event listener

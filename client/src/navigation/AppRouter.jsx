@@ -20,6 +20,8 @@ import TermsOfService from '@/screens/TermsOfService';
 import BanHistory from '@/features/admin/screens/BanHistory';
 import AdminDashboard from '@/features/admin/screens/AdminDashboard';
 import BrandingConfig from '@/features/admin/components/BrandingConfig';
+import DraftPage from '@/features/draft/components/DraftPage';
+import DraftCreateForm from '@/features/draft/components/DraftCreateForm';
 
 const AppRouter = () => {
   const { currentUser } = useSelector(({ auth }) => auth);
@@ -42,6 +44,8 @@ const AppRouter = () => {
         path={['/admin/bans', '/ban-history']}
         component={BanHistory}
       />
+      <PrivateRoute exact path="/draft/new" component={DraftCreateForm} />
+      <PrivateRoute exact path="/draft/:id" component={DraftPage} />
       <PrivateRoute exact path="/scrims/:id" component={ScrimDetail} />
       <PrivateRoute exact path="/scrims" component={Scrims} />
       <PrivateRoute exact path="/settings" component={Settings} />
