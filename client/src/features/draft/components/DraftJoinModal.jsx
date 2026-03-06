@@ -131,7 +131,7 @@ const DraftJoinModal = ({ draftId }) => {
         </Box>
 
         <Button
-          onClick={() => handleJoin(null)}
+          onClick={() => handleJoin('spectate')}
           sx={{
             color: '#5b5a56',
             fontFamily: '"Spiegel", sans-serif',

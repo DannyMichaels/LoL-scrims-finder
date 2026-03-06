@@ -56,7 +56,6 @@ export default function NavbarDrawerItems({ showCheckboxes, setIsDrawerOpen }) {
     currentUser?.region
   );
 
-  console.log('profileData', profileData);
   const [openSections, setOpenSections] = useState({
     gaming: false,
     social: false,

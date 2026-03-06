@@ -66,7 +66,7 @@ const DraftPage = () => {
 
   // Show join modal if team not selected and draft is waiting/ready
   const showJoinModal =
-    !myTeam &&
+    myTeam === null &&
     (draft.status === 'waiting' || draft.status === 'ready');
 
   return (

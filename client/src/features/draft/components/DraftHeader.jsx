@@ -22,10 +22,11 @@ const DraftHeader = () => {
 
   const handleNextGame = async () => {
     try {
+      // Sides swap each game
       const newDraft = await createDraft({
         mode: draft.mode,
-        blueTeamName: draft.blueTeam.name,
-        redTeamName: draft.redTeam.name,
+        blueTeamName: draft.redTeam.name,
+        redTeamName: draft.blueTeam.name,
         timerDuration: draft.timerDuration,
         bestOf: draft.bestOf,
         fearlessMode: draft.fearlessMode,
