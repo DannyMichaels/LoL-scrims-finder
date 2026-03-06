@@ -18,7 +18,7 @@ const DraftHeader = () => {
     cancelled: 'Cancelled',
   };
 
-  const isSeries = draft.seriesId && draft.fearlessMode !== 'off';
+  const isSeries = draft.bestOf > 1 && draft.seriesId;
 
   const handleNextGame = async () => {
     try {
@@ -27,6 +27,7 @@ const DraftHeader = () => {
         blueTeamName: draft.blueTeam.name,
         redTeamName: draft.redTeam.name,
         timerDuration: draft.timerDuration,
+        bestOf: draft.bestOf,
         fearlessMode: draft.fearlessMode,
         seriesId: draft.seriesId,
         gameNumber: draft.gameNumber + 1,
@@ -99,7 +100,7 @@ const DraftHeader = () => {
             mt: 0.2,
           }}
         >
-          {draft.mode === 'captain' ? 'Captain Mode' : 'Individual Mode'}
+          {isSeries ? `Best of ${draft.bestOf}` : 'Single Game'}
           {draft.fearlessMode !== 'off' &&
             ` · Fearless (${draft.fearlessMode})`}
         </Typography>
@@ -107,7 +108,7 @@ const DraftHeader = () => {
         {/* Game indicators for series */}
         {isSeries && (
           <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center', mt: 0.8 }}>
-            {[1, 2, 3, 4, 5].slice(0, Math.max(draft.gameNumber, 3)).map((num) => (
+            {Array.from({ length: draft.bestOf }, (_, i) => i + 1).map((num) => (
               <Box
                 key={num}
                 sx={{
@@ -139,7 +140,7 @@ const DraftHeader = () => {
         )}
 
         {/* Next Game button for completed series drafts */}
-        {isSeries && draft.status === 'completed' && (
+        {isSeries && draft.status === 'completed' && draft.gameNumber < draft.bestOf && (
           <Button
             onClick={handleNextGame}
             size="small"

@@ -96,6 +96,7 @@ const Draft = new Schema(
       enum: ['off', 'soft', 'hard'],
       default: 'off',
     },
+    bestOf: { type: Number, enum: [1, 3, 5], default: 1 },
     seriesId: { type: String, default: null },
     gameNumber: { type: Number, default: 1 },
     previouslyPickedChampions: {

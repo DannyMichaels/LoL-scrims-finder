@@ -15,6 +15,7 @@ const createDraft = async (options) => {
     scrimId,
     timerDuration = 30,
     fearlessMode = 'off',
+    bestOf = 1,
     seriesId = null,
     gameNumber = 1,
     createdBy,
@@ -23,6 +24,12 @@ const createDraft = async (options) => {
     blueCaptain = null,
     redCaptain = null,
   } = options;
+
+  // Auto-generate seriesId for best-of series
+  const resolvedSeriesId =
+    bestOf > 1 && !seriesId
+      ? `series_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+      : seriesId;
 
   // Generate action sequence based on mode
   const sequence =
@@ -91,7 +98,8 @@ const createDraft = async (options) => {
     _scrim: scrimId || null,
     createdBy,
     fearlessMode,
-    seriesId,
+    bestOf,
+    seriesId: resolvedSeriesId,
     gameNumber,
     previouslyPickedChampions,
   });

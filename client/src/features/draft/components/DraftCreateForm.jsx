@@ -12,6 +12,8 @@ import {
   Slider,
   Paper,
   IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { createDraft } from '../services/draft.services';
@@ -38,9 +40,8 @@ const DraftCreateForm = () => {
   const [blueTeamName, setBlueTeamName] = useState('');
   const [redTeamName, setRedTeamName] = useState('');
   const [timerDuration, setTimerDuration] = useState(30);
+  const [bestOf, setBestOf] = useState(1);
   const [fearlessMode, setFearlessMode] = useState('off');
-  const [seriesId, setSeriesId] = useState('');
-  const [gameNumber, setGameNumber] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -60,9 +61,8 @@ const DraftCreateForm = () => {
         blueTeamName: blueTeamName.trim(),
         redTeamName: redTeamName.trim(),
         timerDuration,
+        bestOf,
         fearlessMode,
-        seriesId: seriesId.trim() || undefined,
-        gameNumber: fearlessMode !== 'off' ? gameNumber : undefined,
       });
 
       history.push(`/draft/${draft._id}`);
@@ -235,43 +235,64 @@ const DraftCreateForm = () => {
             />
           </Box>
 
-          {/* Fearless Mode */}
+          {/* Best of */}
           <Box sx={{ mb: 3 }}>
-            <FormControl fullWidth size="small" sx={inputSx}>
-              <InputLabel>Fearless Mode</InputLabel>
-              <Select
-                value={fearlessMode}
-                label="Fearless Mode"
-                onChange={(e) => setFearlessMode(e.target.value)}
-                sx={{ color: '#a09b8c' }}
-              >
-                <MenuItem value="off">Off</MenuItem>
-                <MenuItem value="soft">Soft (team-locked)</MenuItem>
-                <MenuItem value="hard">Hard (global lock)</MenuItem>
-              </Select>
-            </FormControl>
+            <Typography
+              sx={{
+                color: '#a09b8c',
+                fontFamily: '"Spiegel", sans-serif',
+                fontSize: '0.75rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.15em',
+                mb: 1,
+              }}
+            >
+              Series
+            </Typography>
+            <ToggleButtonGroup
+              value={bestOf}
+              exclusive
+              onChange={(_, val) => val && setBestOf(val)}
+              fullWidth
+              sx={{
+                '& .MuiToggleButton-root': {
+                  color: '#5b5a56',
+                  borderColor: '#1e2328',
+                  fontFamily: '"Spiegel", sans-serif',
+                  textTransform: 'none',
+                  fontSize: '0.85rem',
+                  py: 1,
+                  '&.Mui-selected': {
+                    color: '#c8aa6e',
+                    background: 'rgba(200,155,60,0.1)',
+                    borderColor: '#463714',
+                    '&:hover': { background: 'rgba(200,155,60,0.15)' },
+                  },
+                },
+              }}
+            >
+              <ToggleButton value={1}>Bo1</ToggleButton>
+              <ToggleButton value={3}>Bo3</ToggleButton>
+              <ToggleButton value={5}>Bo5</ToggleButton>
+            </ToggleButtonGroup>
           </Box>
 
-          {/* Series fields when fearless is on */}
-          {fearlessMode !== 'off' && (
-            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-              <TextField
-                label="Series ID"
-                value={seriesId}
-                onChange={(e) => setSeriesId(e.target.value)}
-                fullWidth
-                size="small"
-                sx={inputSx}
-              />
-              <TextField
-                label="Game #"
-                type="number"
-                value={gameNumber}
-                onChange={(e) => setGameNumber(parseInt(e.target.value) || 1)}
-                inputProps={{ min: 1, max: 5 }}
-                sx={{ ...inputSx, width: 120 }}
-                size="small"
-              />
+          {/* Fearless Mode — only relevant for series */}
+          {bestOf > 1 && (
+            <Box sx={{ mb: 3 }}>
+              <FormControl fullWidth size="small" sx={inputSx}>
+                <InputLabel>Fearless Mode</InputLabel>
+                <Select
+                  value={fearlessMode}
+                  label="Fearless Mode"
+                  onChange={(e) => setFearlessMode(e.target.value)}
+                  sx={{ color: '#a09b8c' }}
+                >
+                  <MenuItem value="off">Off</MenuItem>
+                  <MenuItem value="soft">Soft (team-locked)</MenuItem>
+                  <MenuItem value="hard">Hard (global lock)</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
           )}
 

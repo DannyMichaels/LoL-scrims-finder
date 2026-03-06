@@ -174,10 +174,9 @@ const DraftDrawer = ({ emitCancel }) => {
                 mt: 0.3,
               }}
             >
-              {draft.mode === 'captain' ? 'Captain' : 'Individual'} Mode
+              {draft.bestOf > 1 ? `Best of ${draft.bestOf} · Game ${draft.gameNumber}` : 'Single Game'}
               {draft.fearlessMode !== 'off' &&
                 ` · Fearless (${draft.fearlessMode})`}
-              {draft.gameNumber > 1 && ` · Game ${draft.gameNumber}`}
             </Typography>
           </Box>
         )}
