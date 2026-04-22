@@ -58,7 +58,9 @@ const TeamPicksColumn = ({ side, emitSwapRequest }) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: '2px',
+        gap: '3px',
+        height: '100%',
+        minHeight: 0,
       }}
     >
       {slots.map((slotIndex) => {

@@ -10,7 +10,8 @@ const DraftBoard = ({ emitReady, emitAction, emitSwapRequest, emitSwapRespond })
   return (
     <Box
       sx={{
-        maxWidth: 1100,
+        width: '100%',
+        maxWidth: 1920,
         mx: 'auto',
         height: '100vh',
         display: 'flex',
@@ -27,7 +28,11 @@ const DraftBoard = ({ emitReady, emitAction, emitSwapRequest, emitSwapRespond })
         sx={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '200px 1fr 200px',
+          gridTemplateColumns: {
+            xs: '220px 1fr 220px',
+            md: 'minmax(260px, 20%) 1fr minmax(260px, 20%)',
+            lg: 'minmax(300px, 22%) 1fr minmax(300px, 22%)',
+          },
           gap: 0,
           overflow: 'hidden',
           minHeight: 0,
@@ -39,8 +44,8 @@ const DraftBoard = ({ emitReady, emitAction, emitSwapRequest, emitSwapRespond })
             borderRight: '1px solid #1e2328',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
-            py: 1,
+            py: 0.5,
+            minHeight: 0,
           }}
         >
           <TeamPicksColumn side="blue" emitSwapRequest={emitSwapRequest} />
@@ -64,8 +69,8 @@ const DraftBoard = ({ emitReady, emitAction, emitSwapRequest, emitSwapRespond })
             borderLeft: '1px solid #1e2328',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
-            py: 1,
+            py: 0.5,
+            minHeight: 0,
           }}
         >
           <TeamPicksColumn side="red" emitSwapRequest={emitSwapRequest} />
@@ -77,7 +82,11 @@ const DraftBoard = ({ emitReady, emitAction, emitSwapRequest, emitSwapRespond })
         sx={{
           borderTop: '1px solid #1e2328',
           display: 'grid',
-          gridTemplateColumns: '200px 1fr 200px',
+          gridTemplateColumns: {
+            xs: '220px 1fr 220px',
+            md: 'minmax(260px, 20%) 1fr minmax(260px, 20%)',
+            lg: 'minmax(300px, 22%) 1fr minmax(300px, 22%)',
+          },
           alignItems: 'center',
           px: 2,
           py: 1.5,
@@ -95,7 +104,9 @@ const DraftBoard = ({ emitReady, emitAction, emitSwapRequest, emitSwapRespond })
         }}
       >
         {/* Blue bans */}
-        <BanBar side="blue" />
+        <Box sx={{ pl: 1 }}>
+          <BanBar side="blue" />
+        </Box>
 
         {/* Center: Timer + Actions */}
         <Box
@@ -113,7 +124,9 @@ const DraftBoard = ({ emitReady, emitAction, emitSwapRequest, emitSwapRespond })
         </Box>
 
         {/* Red bans */}
-        <BanBar side="red" />
+        <Box sx={{ pr: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <BanBar side="red" />
+        </Box>
       </Box>
     </Box>
   );
